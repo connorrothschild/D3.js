@@ -114,11 +114,11 @@ nav {
 }
 
 #intro {
-  margin-bottom: 320px;
+  margin-bottom: 120px;
 }
 
 #outro {
-  height: 640px;
+  height: 120px;
 }
 
 @media (min-width: 840px) {
