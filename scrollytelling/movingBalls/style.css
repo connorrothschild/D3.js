@@ -1,0 +1,27 @@
+#sections {
+  position: relative;
+  display: inline-block;
+  width: 350px;
+}
+
+#vis {
+  display: inline-block;
+  position: fixed;
+  top: 60px;
+  
+  height: 600px;
+  width: 300px;
+  margin-left:20px;
+  border:1px solid gray;
+}
+
+
+/* increase the font size for the title class */
+.title {
+  font-size:30px;
+}
+
+/* Give the step class a margin bottom of 300px */
+.step {
+  margin-bottom:300px;
+}
