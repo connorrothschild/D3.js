@@ -1,85 +1,83 @@
 <!DOCTYPE html>
 <html>
   <head>
+
     <meta charset="utf-8">
     <title>Automation and Its Impact on Jobs</title>
-    <subtitle>Automation and Its Impact on Jobs</subtitle>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+
+
+</head>
     <style type="text/css">
+
     /* custom css styles will go here */
-		h2{
+
+    @import url('https://fonts.googleapis.com/css?family=Lato');
+
+		h1{
 			text-align: center;
-			font-family: 'Krub', sans-serif;
+			font-family: 'Lato', sans-serif;
 		}
-		svg{
-		max-width; 500px;
-		margin-left: auto;
-		margin-right: auto;
-		display: block;
+
+		svg {
+			max-width; 500px;
+			margin-left: auto;
+			margin-right: auto;
+			display: block;
 		}
-		p{
+
+		p {
 			max-width: 700px;
 			margin-left: auto;
 			margin-right: auto;
-			font-family: 'Krub', sans-serif;
+			font-family: 'Lato', sans-serif;
 		}
-		
-		p1{
-			max-width: 700px;
-			margin-left: 500;
-			margin-right: 500;
-			font-family: 'Krub', sans-serif;
-			font-size: 12px;
-			
-			
-		}
+
 		#data-source{
 			margin-right: auto;
 			margin-left: 0;
 			font-size: 10px;
 			margin-top: 3px;
 			margin-bottom: 10px;
-			font-family: 'Krub', sans-serif;
+			font-family: 'Lato', sans-serif;
 		}
 	
-		
-    </style>
+		body {
+		  font-size: 14px; 
+		  font-family: 'Lato', sans-serif;
+		}
 
-	
-</head>
+		.axis path,
+		.axis line {
+		  fill: none;
+		  stroke: #000;
+		  shape-rendering: crispEdges;
+		}
 
-<style>
-body {
-  font: 14px sans-serif;
-}
+		.dot {
+		  stroke: #000000;
+		  opacity: .75;
+		}
 
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-.dot {
-  stroke: #000000;
-}
-
-.tooltip {
-  position: absolute;
-  width: 300px;
-  height: 70px;
-  white-space: normal;
-  padding: 2px;
-  pointer-events: none;
-  background: lightsteelblue;
-  border: 1px;
-  border-radius: 8px
-}
+		.tooltip {	
+		    position: absolute;			
+		    text-align: left;								
+		    padding: 4px;				
+		    font-size: 12px; 
+		  	font-family: 'Lato', sans-serif;	
+		    background: lightsteelblue;	
+		    border: 0px;		
+		    border-radius: 8px;			
+		    pointer-events: none;			
+		}
   
 </style>
+
 <body>
-<script src="https://d3js.org/d3.v3.min.js"></script>
+
+	<h1>Automation and Its Impact on Jobs</h1>
 
 <script>
 var margin = {top: 20, right: 20, bottom: 40, left: 40},
@@ -100,7 +98,7 @@ var yValue = function(d) { return d.probability*100;}, // data -> value
 
 // setup fill color
 var cValue = function(d) { return d.typicaled;},
-    color = d3.scale.category10();
+color = d3.scale.category10();
   
 //setup circle size
 var circSize = function(d) { return d.TOT_EMP;} // data -> value
@@ -183,32 +181,59 @@ var size = d3.scale.linear()
 
   // draw dots
   svg.selectAll(".dot")
-      .data(data)
-    	.enter()
-    	.append("circle")
-  		.attr("r", function(d) { return size(d.TOT_EMP); })
+     	.data(data)
+		.enter()
+		.append("circle")
+		.attr("r", function(d) { return size(d.TOT_EMP); })
   		// to remove size mapping to radius:
       //.attr("r", 5)
-      .attr("class", "dot")
-      .attr("cx", xMap)
-      .attr("cy", yMap)
-      .style("fill", function(d) { return color(cValue(d));})
-      .on("mouseover", function(d) {
+      	.attr("class", "dot")
+      	.attr("cx", function(d) { return xScale(xValue(d));})
+	    .attr("cy", function(d) { return xScale(yValue(d));})
+     	.style("fill", function(d) { return color(cValue(d));})
+      	.on("mouseover", function(d) {
           tooltip.transition()
                .duration(200)
                .style("opacity", 1);
-          tooltip.html("Occupation: " + d.occupation + 
-                       "<br/> \n Income: $" + xValue(d) + 
-                       "<br/> \n Probability of Automation: " + 
+          tooltip.html("<b>Occupation</b>: " + d.occupation + 
+                       "<br/> <b>Income</b>: $" + xValue(d) + 
+                       "<br/> <b>Probability of Automation</b>: " + 
                        Math.round(yValue(d)) + "%")
                .style("left", (d3.event.pageX + 5) + "px")
                .style("top", (d3.event.pageY - 28) + "px");
       })
-      .on("mouseout", function(d) {
+      	.on("mouseout", function(d) {
           tooltip.transition()
                .duration(500)
                .style("opacity", 0);
       });
+
+      // add animation (new!)
+
+      svg.selectAll("circle")
+	    .transition()
+	    .delay(function(d,i){return(i*3)})
+	    .duration(2000)
+	    .attr("cx", function(d) { return xScale(xValue(d));})
+      	.attr("cy", function(d) { return yScale(yValue(d));})
+
+      // add axis labels
+      //text for x
+       svg.append("text")             
+	      .attr("transform",
+	            "translate(" + (width/2) + " ," + 
+	                           (height + margin.top + 20) + ")")
+	      .style("text-anchor", "middle")
+	      .text("Median Income");
+
+	  // text for  y
+	  svg.append("text")
+	      .attr("transform", "rotate(-90)")
+	      .attr("y", 0 - margin.left*2)
+	      .attr("x", 0 - (height / 2))
+	      .attr("dy", "1em")
+	      .style("text-anchor", "middle")
+	      .text("Probability of Automation");  
 
   // draw legend
   var legend = svg.selectAll(".legend")
@@ -217,12 +242,29 @@ var size = d3.scale.linear()
       .attr("class", "legend")
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
-  // draw legend colored rectangles
+  var clicked = ""
+
   legend.append("rect")
-      .attr("x", width - 18)
-      .attr("width", 18)
-      .attr("height", 18)
-      .style("fill", color);
+    	.style("fill", function(d) { return color(d); })
+    	.attr("x", width - 18)
+    	.attr("width", 18)
+     	.attr("height", 18)
+  		.on("click",function(d){
+   
+			   d3.selectAll("circle").style("opacity",.75)
+			   
+			   if (clicked !== d){
+			     d3.selectAll("circle")
+			       .filter(function(e){
+			       return e.typicaled !== d;
+			     })
+			       .style("opacity",0.1)
+			     clicked = d
+			   }
+			    else {
+			      clicked = ""
+			    }
+			  });
 
   // draw legend text
   legend.append("text")
@@ -231,7 +273,7 @@ var size = d3.scale.linear()
       .attr("dy", ".35em")
       .style("text-anchor", "end")
       .text(function(d) { return d;})
-});
+  });
 
 </script>
 </body>
