@@ -235,6 +235,48 @@ var size = d3.scale.linear()
 	      .style("text-anchor", "middle")
 	      .text("Probability of Automation");  
 
+// add circle legend
+  var valuesToShow = [10000, 2500000, 5000000]
+  var xCircle = width/1.1
+  var xLabel = width/1.05
+  var yCircle = 250
+
+svg
+  .selectAll("circleLegend")
+  .data(valuesToShow)
+  .enter()
+  .append("circle")
+    .attr("cx", xCircle)
+    .attr("cy", function(d){ return yCircle - size(d) } )
+    .attr("r", function(d){ return size(d) })
+    .style("fill", "none")
+    .attr("stroke", "black")
+
+// Add legend: segments
+svg
+  .selectAll("circleLegend")
+  .data(valuesToShow)
+  .enter()
+  .append("line")
+    .attr('x1', function(d){ return xCircle + size(d) } )
+    .attr('x2', xLabel)
+    .attr('y1', function(d){ return yCircle - size(d) } )
+    .attr('y2', function(d){ return yCircle - size(d) } )
+    .attr('stroke', 'black')
+    .style('stroke-dasharray', ('2,2'))
+
+// Add legend: labels
+svg
+  .selectAll("circleLegend")
+  .data(valuesToShow)
+  .enter()
+  .append("text")
+    .attr('x', xLabel)
+    .attr('y', function(d){ return yCircle - size(d) } )
+    .text( function(d){ return d } )
+    .style("font-size", 10)
+    .attr('alignment-baseline', 'middle')
+
   // draw legend
   var legend = svg.selectAll(".legend")
       .data(color.domain())
