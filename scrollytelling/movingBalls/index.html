@@ -8,89 +8,13 @@
   <meta name="description" content="Testing Scrollama">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel='stylesheet' href='./style.css'>
-  <style>
-    #scrolly {
-      position: relative;
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      background-color: #f3f3f3;
-      padding: 1rem;
-    }
 
-    #scrolly > * {
-      -webkit-box-flex: 1;
-      -ms-flex: 1;
-      flex: 1;
-    }
-
-
-    article {
-      position: relative;
-      padding: 0 1rem;
-      max-width: 20rem;
-    }
-
-    figure {
-      position: -webkit-sticky;
-      position: sticky;
-      width: 100%;
-      margin: 0;
-      -webkit-transform: translate3d(0, 0, 0);
-      -moz-transform: translate3d(0, 0, 0);
-      transform: translate3d(0, 0, 0);
-      background-color: #8a8a8a;
-    }
-
-    figure p {
-      text-align: center;
-      padding: 1rem;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      -moz-transform: translate(-50%, -50%);
-      -webkit-transform: translate(-50%, -50%);
-      transform: translate(-50%, -50%);
-      font-size: 8rem;
-      font-weight: 900;
-      color: #fff;
-    }
-
-
-    .step {
-      margin: 0 auto 2rem auto;
-      background-color: #3b3b3b;
-      color: #fff;
-    }
-
-    .step:last-child {
-      margin-bottom: 0;
-    }
-
-    .step.is-active {
-      background-color: goldenrod;
-      color: #3b3b3b;
-    }
-
-    .step p {
-      text-align: center;
-      padding: 1rem;
-      font-size: 1.5rem;
-    }
-  </style>
-
-</head>
-
-<!DOCTYPE html>
-<html>
-<head>
-<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
-<script src="http://d3js.org/d3.v3.min.js"></script>
-  <meta charset="utf-8">
-  <title>JS Bin</title>
+  <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
   <script type="text/javascript" src="https://mkfreeman.github.io/scrolling/js/scroller.js"></script>
-    <script type="text/javascript" src="https://mkfreeman.github.io/scrolling/js/queue.js"></script>
+  <script type="text/javascript" src="https://mkfreeman.github.io/scrolling/js/queue.js"></script>
 </head>
+
 <body>
 
 <div id='graphic'>
@@ -124,13 +48,14 @@
 // Settings object
 var settings = {
   showX: true, 
-  showY:false,
-}
+  showY: false,
+};
+
 // SVG to work with
-var svg = d3.select('#vis')
-  .append('svg')
-  .attr('height', 200)
-  .attr('width', 200)
+var svg = d3.select('#vis');
+// .append('svg');
+//  .attr('height', 200)
+//  .attr('width', 200)
 
 // Circle positioning function
 
@@ -140,7 +65,7 @@ var circleFunc = function(circle) {
           .attr('fill', 'blue')
           .attr('cx', function(d) { return settings.showX == true ? xScale(d.x) : 100})
           .attr('cy', function(d) { return settings.showY == true ? yScale(d.y) : 100})
-}
+};
 
 // Reusable drawing function
 var draw = function(data) {
@@ -155,52 +80,52 @@ var draw = function(data) {
   
     // Transition all circles to new dself.settings.data
     svg.selectAll('circle').transition().duration(1500).call(circleFunc)  
-}
+};
 
 // Define data, xScale, yScale
 
-var xScale = d3.scale.linear().range([100,200]).domain([0,5])
-var yScale = d3.scale.linear().range([100,200]).domain([0,5])
+var data = [{x:1, y:2}, {x:4, y:4}, {x:3, y:1}];
+var xScale = d3.scale.linear().range([100,200]).domain([0,5]);
+var yScale = d3.scale.linear().range([100,200]).domain([0,5]);
 
 // ******* Change the showX and showY function for some cases ********
 var update = function(value) {
   switch(value) {
     case 1:
-      var data = [{x:1, y:2}, {x:4, y:4}, {x:3, y:1}]
+      data = [{x:1, y:2}, {x:4, y:4}, {x:3, y:1}];
+      settings.showX = true
+      settings.showY = true
       break;
     case 2: 
-      var data = [{x:3, y:2}, {x:4, y:4}]
+      data = [{x:3, y:2}, {x:4, y:4}];
       settings.showX = true
       settings.showY = true
       break;
     case 3: 
-      var data = [{x:3, y:2}, {x:4, y:4}]
+      data = [{x:3, y:2}, {x:4, y:4}];
        settings.showX = false
        break;
     case 4: 
-      var data = [{x:3, y:2}, {x:4, y:4}]
+      data = [{x:3, y:2}, {x:4, y:4}];
        settings.showY = false
        break;
     default:
       settings.showX = true
       settings.showY = true
-      var data = [{x:1, y:1},{x:2, y:2},{x:3, y:3}]
+      data = [{x:1, y:1},{x:2, y:2},{x:3, y:3}];
       break;
   }
   draw(data)
-}
-// setup scroll functionality
-var scroll = scroller()
-    .container(d3.select('#graphic'));
+};
 
+// setup scroll functionality
+var scroll = scroller();
+    .container(d3.select('#graphic'));
 // pass in .step selection as the steps
 scroll(d3.selectAll('.step'));
-
 // Pass in desired update function
-
-
 // Pass the update function to the scroll object
-scroll.update(update)
+scroll.update(update);
 
     </script>
   </body>

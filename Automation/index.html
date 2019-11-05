@@ -213,7 +213,7 @@ var size = d3.scale.linear()
       svg.selectAll("circle")
 	    .transition()
 	    .delay(function(d,i){return(i*3)})
-	    .duration(2000)
+	    .duration(800)
 	    .attr("cx", function(d) { return xScale(xValue(d));})
       	.attr("cy", function(d) { return yScale(yValue(d));})
 
