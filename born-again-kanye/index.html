@@ -37,7 +37,8 @@
 
 		<div class="radarChart"></div>
 
-		<script src="radarChart.js"></script>	
+		<script src="./radarChart.js"> </script>
+
 		<script>
       
       /* Radar chart design created by Nadieh Bremer - VisualCinnamon.com */
@@ -54,54 +55,179 @@
 			////////////////////////// Data ////////////////////////////// 
 			////////////////////////////////////////////////////////////// 
 
+	//		d3.csv("https://raw.githubusercontent.com/connorrothschild/D3.js///master/born-again-kanye/kanye_data.csv", 
+	//		       function(error, data) {
+	//		  // change string (from CSV) into number format
+	//		  data.forEach(function(d) {
+	//		    d.album_name = +d.album_name;
+	//		    d.danceability = +d.danceability;
+	//		    d.energy = +d.energy;
+	//		    d.key = +d.key;
+	//		    d.loudness = +d.loudness;
+	//		    d.mode = +d.mode;
+	//		    d.speechiness = +d.speechiness;
+	//		    d.acousticness = +d.acousticness;
+	//		    d.instrumentalness = +d.instrumentalness;
+	//		    d.liveness = +d.liveness;
+	//		    d.valence = +d.valence;
+	//		    d.tempo = +d.tempo;
+	//		    return d;
+	//		   // console.log(d);
+	//		  });
+	//		});
 
+var kanye = d3.csv("kanye_data.csv", function(d) {
+  return {
+    album_name: d.album_name, // convert "Year" column to Date
+    danceability : +d.danceability,
+	energy : +d.energy,
+	key : +d.key,
+	loudness : +d.loudness,
+	mode : +d.mode,
+	speechiness : +d.speechiness,
+	acousticness : +d.acousticness,
+	instrumentalness : +d.instrumentalness,
+	liveness : +d.liveness,
+	valence : +d.valence,
+	tempo : +d.tempo
+  };
+}, function(error, rows) {
+  console.log(rows);
+});
 
-			var data = [
-					  [//Jesus is King
-						{axis:"Danceability",value:jesusisking.danceability},
-						{axis:"Energy",value:0.28},
-						{axis:"Contract Cost",value:0.29},
-						{axis:"Key",value:0.17},
-						{axis:"Loudness",value:0.22},
-						{axis:"Mode",value:0.02},
-						{axis:"Speechiness",value:0.21},
-						{axis:"Acousticness",value:0.50}	
-						{axis:"Intrumentalness",value:0.02},
-						{axis:"Liveness",value:0.21},
-						{axis:"Valuence",value:0.50}		
-					  ],[//ye
-						{axis:"Battery Life",value:0.27},
-						{axis:"Brand",value:0.16},
-						{axis:"Contract Cost",value:0.35},
-						{axis:"Design And Quality",value:0.13},
-						{axis:"Have Internet Connectivity",value:0.20},
-						{axis:"Large Screen",value:0.13},
-						{axis:"Price Of Device",value:0.35},
-						{axis:"To Be A Smartphone",value:0.38}
-					  ],[//Kids See Ghosts
-						{axis:"Battery Life",value:0.26},
-						{axis:"Brand",value:0.10},
-						{axis:"Contract Cost",value:0.30},
-						{axis:"Design And Quality",value:0.14},
-						{axis:"Have Internet Connectivity",value:0.22},
-						{axis:"Large Screen",value:0.04},
-						{axis:"Price Of Device",value:0.41},
-						{axis:"To Be A Smartphone",value:0.30}
-					  ]
-					];
+// have to fix this
+var eightoeights = function(kanye) {
+	kanye[0];
+}
+console.log(eightoeights)
+
+var graduation = function(kanye) {
+	console.log(kanye[1]);
+}
+
+var jesusisking = function(kanye) {
+	console.log(kanye[2]);
+}
+
+const gmcs = function(kanye) {
+	console.log(kanye[3]);
+}
+
+const kidsseeghosts = function(kanye) {
+	console.log(kanye[4]);
+}
+
+const lateregistration = function(kanye) {
+	console.log(kanye[5]);
+}
+
+const mbdtf = function(kanye) {
+	console.log(kanye[6]);
+}
+
+const collegedropout = function(kanye) {
+	console.log(kanye[7]);
+}
+
+const tlop = function(kanye) {
+	console.log(kanye[8]);
+}
+
+const ye = function(kanye) {
+	console.log(kanye[9]);
+}
+
+const yeezus = function(kanye) {
+	console.log(kanye[10]);
+}
+			
+//	 	var data = [
+//			  [//Test
+//				{axis:"Danceability",value:eightoeights.danceability},
+//				{axis:"Energy",value:eightoeights.energy},
+//				//{axis:"Key",value:eightoeights.key},
+//				//{axis:"Loudness",value:eightoeights.loudness},
+//				//{axis:"Liveness",value:eightoeights.liveness},
+//				{axis:"Mode",value:eightoeights.mode},
+//				{axis:"Speechiness",value:eightoeights.speechiness},
+//				//{axis:"Tempo",value:eightoeights.tempo},
+//				{axis:"Valence",value:eightoeights.valence},
+//				{axis:"Acousticness",value:eightoeights.acousticness}
+//			  ],[//Test
+//				{axis:"Danceability",value:graduation.danceability},
+//				{axis:"Energy",value:graduation.energy},
+//				//{axis:"Key",value:graduation.key},
+//				//{axis:"Loudness",value:graduation.loudness},
+//				//{axis:"Liveness",value:graduation.liveness},
+//				{axis:"Mode",value:graduation.mode},
+//				{axis:"Speechiness",value:graduation.speechiness},
+//				//{axis:"Tempo",value:graduation.tempo},
+//				{axis:"Valence",value:graduation.valence},
+//				{axis:"Acousticness",value:graduation.acousticness}
+//			  ],[//Test
+//				{axis:"Danceability",value:jesusisking.danceability},
+//				{axis:"Energy",value:jesusisking.energy},
+//				//{axis:"Key",value:jesusisking.key},
+//				//{axis:"Loudness",value:jesusisking.loudness},
+//				//{axis:"Liveness",value:jesusisking.liveness},
+//				{axis:"Mode",value:jesusisking.mode},
+//				{axis:"Speechiness",value:jesusisking.speechiness},
+//				//{axis:"Tempo",value:jesusisking.tempo},
+//				{axis:"Valence",value:jesusisking.valence},
+//				{axis:"Acousticness",value:jesusisking.acousticness}
+//			  ]
+//			];
+
+var data = [
+				  [//Test
+					{axis:"Danceability",value:.1},
+					{axis:"Energy",value:2},
+					//{axis:"Key",value:eightoeights.key},
+					//{axis:"Loudness",value:eightoeights.loudness},
+					//{axis:"Liveness",value:eightoeights.liveness},
+					{axis:"Mode",value:1},
+					{axis:"Speechiness",value:2},
+					//{axis:"Tempo",value:eightoeights.tempo},
+					{axis:"Valence",value:2},
+					{axis:"Acousticness",value:1.2}
+				  ],[//Test
+					{axis:"Danceability",value:1},
+					{axis:"Energy",value:.5},
+					//{axis:"Key",value:graduation.key},
+					//{axis:"Loudness",value:graduation.loudness},
+					//{axis:"Liveness",value:graduation.liveness},
+					{axis:"Mode",value:1.5},
+					{axis:"Speechiness",value:1},
+					//{axis:"Tempo",value:graduation.tempo},
+					{axis:"Valence",value:.3},
+					{axis:"Acousticness",value:.25}
+				  ],[//Test
+					{axis:"Danceability",value:.9},
+					{axis:"Energy",value:.1},
+					//{axis:"Key",value:jesusisking.key},
+					//{axis:"Loudness",value:jesusisking.loudness},
+					//{axis:"Liveness",value:jesusisking.liveness},
+					{axis:"Mode",value:.5},
+					{axis:"Speechiness",value:1},
+					//{axis:"Tempo",value:jesusisking.tempo},
+					{axis:"Valence",value:1.7},
+					{axis:"Acousticness",value:eightoeights.tempo}
+				  ]
+				];
+
 			////////////////////////////////////////////////////////////// 
 			//////////////////// Draw the Chart ////////////////////////// 
 			////////////////////////////////////////////////////////////// 
 
 			var color = d3.scale.ordinal()
-				.range(["#EDC951","#CC333F","#00A0B0"]);
+				.range(["#EDC951","#CC333F","#00A0B0", "#000000", "#101010", "#111111"]);
 				
 			var radarChartOptions = {
 			  w: width,
 			  h: height,
 			  margin: margin,
-			  maxValue: 0.5,
-			  levels: 5,
+			  maxValue: 1,
+			  levels: 4,
 			  roundStrokes: true,
 			  color: color
 			};

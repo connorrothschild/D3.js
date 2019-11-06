@@ -17,4 +17,4 @@ grouped <- grouped %>%
   filter(album_name != "Graduation (Alternative Business Partners)" & album_name != "Late Orchestration") %>% 
   mutate(album_name = ifelse(album_name == "Kanye West Presents Good Music Cruel Summer", "Good Music Cruel Summer", album_name))
 
-write.csv(grouped, "kanye_data")
+write.csv(grouped, "./kanye_data.csv")
