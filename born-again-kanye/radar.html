@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/ >
+		<title>Born Again Kanye</title>
+
+		<!-- Google fonts -->
+		<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300" rel='stylesheet' type='text/css'>
+		<link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+
+		<!-- D3.js -->
+		<script src="https://d3js.org/d3.v3.min.js"></script>		
+		<style>
+			body {
+				font-family: 'Open Sans', sans-serif;
+				font-size: 11px;
+				font-weight: 300;
+				fill: #242424;
+				text-align: center;
+				text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
+				cursor: default;
+			}
+			
+			.legend {
+				font-family: 'Lato', sans-serif;
+				fill: #333333;
+			}
+			
+			.tooltip {
+				fill: #333333;
+			}
+		</style>
+	
+	</head>
+	<body>
+
+		<div class="radarChart"></div>
+
+		<script src="./radarChart.js"> </script>
+
+		<script>
+      
+      /* Radar chart design created by Nadieh Bremer - VisualCinnamon.com */
+      
+			////////////////////////////////////////////////////////////// 
+			//////////////////////// Set-Up ////////////////////////////// 
+			////////////////////////////////////////////////////////////// 
+
+			var margin = {top: 100, right: 100, bottom: 100, left: 100},
+				width = Math.min(700, window.innerWidth - 10) - margin.left - margin.right,
+				height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
+					
+			////////////////////////////////////////////////////////////// 
+			////////////////////////// Data ////////////////////////////// 
+			////////////////////////////////////////////////////////////// 
+
+var data = d3.csv("kanye_data.csv", function(error, data) {
+  
+  data.forEach(function(d) {
+    d.album_name = d.album_name; // convert "Year" column to Date
+    d.danceability = +d.danceability;
+	d.energy = +d.energy;
+	d.key = +d.key;
+	d.loudness = +d.loudness;
+	d.mode = +d.mode;
+	d.speechiness = +d.speechiness;
+	d.acousticness = +d.acousticness;
+	d.instrumentalness = +d.instrumentalness;
+	d.liveness = +d.liveness;
+	d.valence = +d.valence;
+	d.tempo = +d.tempo;
+	return d;
+  });
+  });
+
+//// have to fix ths
+//var eightoeights = function(data) {
+//	console.log(kanye[0]);
+//}
+//
+//var graduation = function(kanye) {
+//	console.log(kanye[1]);
+//}
+//
+//var jesusisking = function(kanye) {
+//	console.log(kanye[2]);
+//}
+//
+//const gmcs = function(kanye) {
+//	console.log(kanye[3]);
+//}
+//
+//const kidsseeghosts = function(kanye) {
+//	console.log(kanye[4]);
+//}
+//
+//const lateregistration = function(kanye) {
+//	console.log(kanye[5]);
+//}
+//
+//const mbdtf = function(kanye) {
+//	console.log(kanye[6]);
+//}
+//
+//const collegedropout = function(kanye) {
+//	console.log(kanye[7]);
+//}
+//
+//const tlop = function(kanye) {
+//	console.log(kanye[8]);
+//}
+//
+//const ye = function(kanye) {
+//	console.log(kanye[9]);
+//}
+//
+//const yeezus = function(kanye) {
+//	console.log(kanye[10]);
+//}
+			
+//	 	var data = [
+//			  [//Test
+//				{axis:"Danceability",value:eightoeights.danceability},
+//				{axis:"Energy",value:eightoeights.energy},
+//				//{axis:"Key",value:eightoeights.key},
+//				//{axis:"Loudness",value:eightoeights.loudness},
+//				//{axis:"Liveness",value:eightoeights.liveness},
+//				{axis:"Mode",value:eightoeights.mode},
+//				{axis:"Speechiness",value:eightoeights.speechiness},
+//				//{axis:"Tempo",value:eightoeights.tempo},
+//				{axis:"Valence",value:eightoeights.valence},
+//				{axis:"Acousticness",value:eightoeights.acousticness}
+//			  ],[//Test
+//				{axis:"Danceability",value:graduation.danceability},
+//				{axis:"Energy",value:graduation.energy},
+//				//{axis:"Key",value:graduation.key},
+//				//{axis:"Loudness",value:graduation.loudness},
+//				//{axis:"Liveness",value:graduation.liveness},
+//				{axis:"Mode",value:graduation.mode},
+//				{axis:"Speechiness",value:graduation.speechiness},
+//				//{axis:"Tempo",value:graduation.tempo},
+//				{axis:"Valence",value:graduation.valence},
+//				{axis:"Acousticness",value:graduation.acousticness}
+//			  ],[//Test
+//				{axis:"Danceability",value:jesusisking.danceability},
+//				{axis:"Energy",value:jesusisking.energy},
+//				//{axis:"Key",value:jesusisking.key},
+//				//{axis:"Loudness",value:jesusisking.loudness},
+//				//{axis:"Liveness",value:jesusisking.liveness},
+//				{axis:"Mode",value:jesusisking.mode},
+//				{axis:"Speechiness",value:jesusisking.speechiness},
+//				//{axis:"Tempo",value:jesusisking.tempo},
+//				{axis:"Valence",value:jesusisking.valence},
+//				{axis:"Acousticness",value:jesusisking.acousticness}
+//			  ]
+//			];
+
+//var data = [
+//				  [//Test
+//					{axis:"Danceability",value:.1},
+//					{axis:"Energy",value:2},
+//					//{axis:"Key",value:eightoeights.key},
+//					//{axis:"Loudness",value:eightoeights.loudness},
+//					//{axis:"Liveness",value:eightoeights.liveness},
+//					{axis:"Mode",value:1},
+//					{axis:"Speechiness",value:2},
+//					//{axis:"Tempo",value:eightoeights.tempo},
+//					{axis:"Valence",value:2},
+//					{axis:"Acousticness",value:1.2}
+//				  ],[//Test
+//					{axis:"Danceability",value:1},
+//					{axis:"Energy",value:.5},
+//					//{axis:"Key",value:graduation.key},
+//					//{axis:"Loudness",value:graduation.loudness},
+//					//{axis:"Liveness",value:graduation.liveness},
+//					{axis:"Mode",value:1.5},
+//					{axis:"Speechiness",value:1},
+//					//{axis:"Tempo",value:graduation.tempo},
+//					{axis:"Valence",value:.3},
+//					{axis:"Acousticness",value:.25}
+//				  ],[//Test
+//					{axis:"Danceability",value:.9},
+//					{axis:"Energy",value:.1},
+//					//{axis:"Key",value:jesusisking.key},
+//					//{axis:"Loudness",value:jesusisking.loudness},
+//					//{axis:"Liveness",value:jesusisking.liveness},
+//					{axis:"Mode",value:.5},
+//					{axis:"Speechiness",value:1},
+//					//{axis:"Tempo",value:jesusisking.tempo},
+//					{axis:"Valence",value:1.7},
+//					{axis:"Acousticness",value:.9}
+//				  ]
+//				];
+//
+//			////////////////////////////////////////////////////////////// 
+//			//////////////////// Draw the Chart ////////////////////////// 
+//			////////////////////////////////////////////////////////////// 
+
+var x = d3.scale.ordinal().rangeRoundBands([0, width], .05);
+
+var y = d3.scale.linear().range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .ticks(11);
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .ticks(10);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", 
+          "translate(" + margin.left + "," + margin.top + ")");
+
+  x.domain(d3.map(function(d){ return d.album_name; }));
+  y.domain([0, d3.max(data, function(d) { return d.danceability; })]);
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .append("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", "-.55em")
+      //.attr("transform", "rotate(-90)" )
+      .text("Album");
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Danceability");
+
+  svg.selectAll("bar")
+      .data(data)
+    .enter().append("rect")
+      .style("fill", "steelblue")
+      .attr("x", function(d){ return x(d.album_name)})
+      .attr("width", x.rangeBand())
+      .attr("y", function(d){ return y(d.danceability); })
+      .attr("height", function(d) {
+      	return d.danceability;
+      });
+
+//
+//			var color = d3.scale.ordinal()
+//				.range(["#EDC951","#CC333F","#00A0B0", "#000000", "#101010", // "#111111"]);
+//				
+//			var radarChartOptions = {
+//			  w: width,
+//			  h: height,
+//			  margin: margin,
+//			  maxValue: 2,
+//			  levels: 4,
+//			  roundStrokes: true,
+//			  color: color
+//			};
+//			//Call function to draw the Radar chart
+//			RadarChart(".radarChart", data, radarChartOptions);
+		</script>
+	</body>
+</html>

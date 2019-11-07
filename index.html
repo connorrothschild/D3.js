@@ -1,0 +1,32 @@
+---
+layout: default
+title: D3 Visualizations
+projects:
+
+  - title: Automation and Its Impact on Jobs
+    image: /breastfeeding/breastfeedingscreenshot2.png
+    description: This chart shows the percent increase in breastfeeding rates at an infant's six months of life in the United States.
+    link: /Automation/
+
+  - title: Kanye West's Rebirth
+    image: /berkeley-pd/berkeley-pd-screenshot.png
+    description: Reasons for recent arrests by the Berkeley Police Department. 
+    link: /born-again-kanye/
+
+---
+<div class="row">
+
+  {% for project in page.projects %}
+  <div class="col-6 col-md-4">
+    <div class="card">
+      <img src="{{ project.image }}" class="card-img-top img-fluid d-block" alt="placeholder">
+      <div class="card-body">
+        <h5 class="card-title">{{ project.title }}</h5>
+        <p class="card-text">{{ project.description }}</p>
+        <a href="{{ project.link }}" class="btn btn-dark" target="_blank">Click Here</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  
+</div>
