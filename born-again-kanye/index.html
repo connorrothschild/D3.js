@@ -9,28 +9,22 @@
     /* custom css styles will go here */
 		h2{
 			text-align: center;
-			font-family: 'Krub', sans-serif;
+			font-family: 'Lato', sans-serif;
 		}
-		svg{
-    		max-width; 500px;
+
+		svg {
+    		max-width: 1000px;
     		margin-left: auto;
     		margin-right: auto;
     		display: block;
 		}
-		p{
+
+		p {
 			max-width: 700px;
 			margin-left: auto;
 			margin-right: auto;
-			font-family: 'Krub', sans-serif;
+			font-family: 'Lato', sans-serif;
 		}
-		
-		p1{
-			max-width: 700px;
-			margin-left: 500;
-			margin-right: 500;
-			font-family: 'Krub', sans-serif;
-			font-size: 12px;
-			
 			
 		}
 		#data-source{
@@ -39,7 +33,7 @@
 			font-size: 10px;
 			margin-top: 3px;
 			margin-bottom: 10px;
-			font-family: 'Krub', sans-serif;
+			font-family: 'Lato', sans-serif;
 		}
 
     .bar:hover {
@@ -57,7 +51,7 @@
     <script src="https://d3js.org/d3.v5.min.js"></script>
 
     <script>
-      var margin = {top:60, right:10, bottom:20, left:100},
+      var margin = {top:60, right:10, bottom:100, left:150},
           width  = 1300 - margin.left - margin.right,
           height = 600 - margin.top - margin.bottom;
       var svg = d3.select("body")
@@ -73,6 +67,46 @@
       var yScale = d3.scaleBand()
           .range([0, height])
           .padding(0.1);
+
+function responsivefy(svg) {
+  // container will be the DOM element
+  // that the svg is appended to
+  // we then measure the container
+  // and find its aspect ratio
+  const container = d3.select(svg.node().parentNode),
+      width = parseInt(svg.style('width'), 10),
+      height = parseInt(svg.style('height'), 10),
+      aspect = width / height;
+ 
+  // set viewBox attribute to the initial size
+  // control scaling with preserveAspectRatio
+  // resize svg on inital page load
+  svg.attr('viewBox', `0 0 ${width} ${height}`)
+      .attr('preserveAspectRatio', 'xMinYMid')
+      .call(resize);
+ 
+  // add a listener so the chart will be resized
+  // when the window resizes
+  // multiple listeners for the same event type
+  // requires a namespace, i.e., 'click.foo'
+  // api docs: https://goo.gl/F3ZCFr
+  d3.select(window).on(
+      'resize.' + container.attr('id'), 
+      resize
+  );
+ 
+  // this is the code that resizes the chart
+  // it will be called on load
+  // and in response to window resizes
+  // gets the width of the container
+  // and resizes the svg to fill it
+  // while maintaining a consistent aspect ratio
+  function resize() {
+      const w = parseInt(container.style('width'));
+      svg.attr('width', w);
+      svg.attr('height', Math.round(w / aspect));
+  }
+}
 
 d3.csv("kanye_data.csv")
 .then(function(data){
@@ -96,12 +130,12 @@ d3.csv("kanye_data.csv")
 
         data.sort(function(a, b) {
         
-        return b.danceability - a.danceability;
+        return b.acousticness - a.acousticness;
 
         });
 		  
 		
-        xScale.domain([0, 1]);
+        xScale.domain([0, d3.max(data, function (d) { return d.acousticness * 1.1; })]);
         yScale.domain(data.map(function(d){ return d.album_name; }))
 		  
         chart.selectAll(".bar")
@@ -129,15 +163,17 @@ d3.csv("kanye_data.csv")
             .data(data)
             .enter()
             .append("text")
+            .transition()
+            .duration(800)
             .attr("class", "textlabel-1")
-            .attr("x", function(d){ return xScale(d.danceability) +28;})
-            .attr("y", function(d){ return yScale(d.album_name) +16; })
+            .attr("x", function(d){ return xScale(d.acousticness) +32;})
+            .attr("y", function(d){ return yScale(d.album_name) +12; })
 		  	.attr("alignment-baseline", "hanging")
             .attr("text-anchor", "end")
-            .attr("font-family", "sans-serif")
-            .attr("font-size", "12px")
+            .attr("font-family", "Lato")
+            .attr("font-size", "14px")
 		  	.attr("fill", "black")
-            .text(function(d){ return d3.format(",")(d.danceability.toFixed(2)); })
+            .text(function(d){ return d3.format(",")(d.acousticness.toFixed(2)); })
 		  
         //adding y axis to the left of the chart
         svg.append("g")
@@ -150,30 +186,134 @@ d3.csv("kanye_data.csv")
             .call(d3.axisBottom(xScale));
         
         svg.append("g")
-            .attr("transform", "translate(" + (width/1.8) + ", 15)")
+            .attr("transform", "translate(" + (width/1.8) + ", 20)")
             .append("text")
             .text("Kanye West's Rebirth")
             .style("text-anchor", "middle")
-            .style("font-family", "Arial")
-            .style("font-weight", "600");
+            .style("font-family", "Lato")
+            .style("font-weight", "600")
+            .style("font-size", "24");
 		  
         svg.append("g")
-            .attr("transform", "translate(" + (width/1.8) + ", 35)")
+            .attr("transform", "translate(" + (width/1.8) + ", 45)")
             .append("text")
-            .text("Differences in danceability by album.")
+            .text("Differences in acousticness by album.")
             .style("text-anchor", "middle")
-            .style("font-family", "Arial")
-            .style("font-weight", "100")
-		  	.style("font-size","12");
+            .style("font-family", "Lato")
+            .style("font-weight", "50")
+		  	.style("font-size","14");
 
           svg.selectAll("rect")
               .transition()
               .duration(800)
               .attr("y", function(d) { return yScale(d.album_name); })
-              .attr("width", function(d) { return xScale(d.danceability); })
+              .attr("width", function(d) { return xScale(d.acousticness); })
               .delay(function(d,i){console.log(i) ; return(i*100)})
-		 
+
+          svg.append("text")             
+              .attr("transform",
+                    "translate(" + (width/1.8) + " ," + 
+                                   (height + margin.top + 50) + ")")
+              .style("text-anchor", "middle")
+              .text("Danceability");
       });   
+
+//function update(variable) {
+//
+//    d3.csv("kanye_data.csv")
+//        .then(function(data){
+//
+//        data = data.map(function(d){ 
+//            d.album_name = d.album_name; // convert "Year" column to Date
+//            d.variable = +d.variable;
+//            return d;
+//
+//      });
+//
+//        data.sort(function(a, b) {
+//        
+//        return b.variable - a.variable;
+//
+//        });
+//
+//       xScale.domain([0, d3.max(data, function (d) { return d.variable * 1.1; })//]);
+//        yScale.domain(data.map(function(d){ return d.album_name; }))
+//          
+//        chart.selectAll(".bar")
+//            .data(data)
+//            .enter()
+//            .append("rect")
+//            .attr("class", "bar")
+//            .attr("x", 0)/*function(d){ return xScale(d["Breastfeeding at 6 //months (2008)"]); })*/
+//            .attr("y", function(d){ return yScale(d.album_name); })
+//            .attr("height", function(d){ return yScale.bandwidth(); })
+//            .attr("width", 0)
+//            .attr("fill", function (d) {
+//                if (d.album_name == "JESUS IS KING") {
+//                    return "brown";
+//                } else {
+//                    return "steelblue";
+//                };
+//
+//            });           
+//          
+//          
+//            svg.append("g")
+//            .attr("transform", "translate(" + margin.left + "," + margin.top + "//)")
+//            .selectAll(".textlabel-1")
+//            .data(data)
+//            .enter()
+//            .append("text")
+//            .transition()
+//            .duration(800)
+//            .attr("class", "textlabel-1")
+//            .attr("x", function(d){ return xScale(d.variable) +28;})
+//            .attr("y", function(d){ return yScale(d.album_name) +16; })
+//            .attr("alignment-baseline", "hanging")
+//            .attr("text-anchor", "end")
+//            .attr("font-family", "sans-serif")
+//            .attr("font-size", "12px")
+//            .attr("fill", "black")
+//            .text(function(d){ return d3.format(",")(d.variable.toFixed(2)); })
+//          
+//        //adding y axis to the left of the chart
+//        svg.append("g")
+//            .attr("transform", "translate(" + margin.left + "," + margin.top + "//)")
+//            .call(d3.axisLeft(yScale));
+//
+//        //adding x axis to the bottom of chart
+//        svg.append("g")
+//            .attr("transform", "translate(" + margin.left + "," + (height + //margin.top) + ")")
+//            .call(d3.axisBottom(xScale));
+//        
+//        svg.append("g")
+//            .attr("transform", "translate(" + (width/1.8) + ", 15)")
+//            .append("text")
+//            .text("Kanye West's Rebirth")
+//            .style("text-anchor", "middle")
+//            .style("font-family", "Arial")
+//            .style("font-weight", "600");
+//          
+//        svg.append("g")
+//            .attr("transform", "translate(" + (width/1.8) + ", 35)")
+//            .append("text")
+//            .text("Differences in acousticness by album.")
+//            .style("text-anchor", "middle")
+//            .style("font-family", "Arial")
+//            .style("font-weight", "100")
+//            .style("font-size","12");
+//
+//          svg.selectAll("rect")
+//              .transition()
+//              .duration(800)
+//              .attr("y", function(d) { return yScale(d.album_name); })
+//              .attr("width", function(d) { return xScale(d.variable); })
+//              .delay(function(d,i){console.log(i) ; return(i*100)})
+//
+//    });
+//}
+//
+//update('danceability');
 		
 		
     </script>
