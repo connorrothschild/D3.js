@@ -11,40 +11,36 @@
                 text-align: center;
                 font-family: 'Lato', sans-serif;
             }
-
-		h2{
-			text-align: center;
-			font-family: 'Lato', sans-serif;
-		}
-
-		svg1 {
-    		max-width: 800px;
-    		margin-left: auto;
-    		margin-right: auto;
-		}
-
-		p {
-			max-width: 700px;
-			margin-left: auto;
-			margin-right: auto;
-			font-family: 'Lato', sans-serif;
-		}
-			
-		}
-		#data-source{
-			margin-right: auto;
-			margin-left: 0;
-			font-size: 10px;
-			margin-top: 3px;
-			margin-bottom: 10px;
-			font-family: 'Lato', sans-serif;
-		}
-
+    h2{
+      text-align: center;
+      font-family: 'Lato', sans-serif;
+    }
+    svg1 {
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    p {
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      font-family: 'Lato', sans-serif;
+    }
+      
+    }
+    #data-source{
+      margin-right: auto;
+      margin-left: 0;
+      font-size: 10px;
+      margin-top: 3px;
+      margin-bottom: 10px;
+      font-family: 'Lato', sans-serif;
+    }
     .bar:hover {
       fill: brown;
     }
-	
-		
+  
+    
     </style>
 
     <h1> <img src="https://d063e17xn2-flywheel.netdna-ssl.com/wp-content/uploads/2019/10/https-hypebeast.com-image-2019-10-kanye-west-jesus-is-king-album-release-stream-spotify-apple-music-download-11-1-1.jpg" width = "78", height = "52", align = "center">Kanye West's Rebirth <img src="https://d063e17xn2-flywheel.netdna-ssl.com/wp-content/uploads/2019/10/https-hypebeast.com-image-2019-10-kanye-west-jesus-is-king-album-release-stream-spotify-apple-music-download-11-1-1.jpg" width = "78", height = "52", align = "center"></h1>
@@ -52,9 +48,9 @@
     <p>How does Kanye West's most recent album compare to his previous ones? Has he went through some form of transformation?</p>
 
     <p>How does <span style = "color:brown">Jesus is King</span> compare to his other albums?</p> 
-	
+  
 </head>
-	
+  
 <body>
 
     <script src="https://d3js.org/d3.v5.min.js"></script>
@@ -76,10 +72,8 @@
       var yScale = d3.scaleBand()
           .range([0, height])
           .padding(0.1); 
-
 d3.csv("kanye_data.csv")
 .then(function(data){
-
         data = data.map(function(d){ 
             d.album_name = d.album_name; // convert "Year" column to Date
             d.danceability = +d.danceability;
@@ -95,21 +89,17 @@ d3.csv("kanye_data.csv")
             d.tempo = +d.tempo;
             d.image = d.image;
             return d;
-
       });
-
         console.table(data);
-
         data.sort(function(a, b) {
         
         return b.acousticness - a.acousticness;
-
         });
-		  
-		
+      
+    
         xScale.domain([0, d3.max(data, function (d) { return d.acousticness * 1.1; })]);
         yScale.domain(data.map(function(d){ return d.album_name; }));
-		  
+      
         chart.selectAll(".bar")
             .data(data)
             .enter()
@@ -125,7 +115,6 @@ d3.csv("kanye_data.csv")
                 } else {
                     return "steelblue";
                 };
-
             });           
           
         svg1.append("g")
@@ -139,18 +128,17 @@ d3.csv("kanye_data.csv")
             .attr("class", "textlabel-1")
             .attr("x", function(d){ return xScale(d.acousticness) +32;})
             .attr("y", function(d){ return yScale(d.album_name) +12; })
-		  	.attr("alignment-baseline", "hanging")
+        .attr("alignment-baseline", "hanging")
             .attr("text-anchor", "end")
             .attr("font-family", "Lato")
             .attr("font-size", "14px")
-		  	.attr("fill", "black")
+        .attr("fill", "black")
             .text(function(d){ return d3.format(",")(d.acousticness.toFixed(2)); })
-		  
+      
         //adding y axis to the left of the chart
         svg1.append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
             .call(d3.axisLeft(yScale));
-
         //adding x axis to the bottom of chart
         svg1.append("g")
             .attr("transform", "translate(" + margin.left + "," + (height + margin.top) + ")")
@@ -162,35 +150,25 @@ d3.csv("kanye_data.csv")
               .attr("y", function(d) { return yScale(d.album_name); })
               .attr("width", function(d) { return xScale(d.acousticness); })
               .delay(function(d,i){ return(i*100)})
-
           svg1.append("text")             
               .attr("transform",
                     "translate(" + (width/1.8) + " ," + 
                                    (height + margin.top + 50) + ")")
               .style("text-anchor", "middle")
               .text("Acousticness");
-
       });   
-
-
 // function update(variable) {
-
 //    d3.csv("kanye_data.csv")
 //        .then(function(data){
-
 //        data = data.map(function(d){ 
 //            d.album_name = d.album_name; // convert "Year" column to Date
 //            d.variable = +d.variable;
 //            return d;
-
 //      });
-
 //        data.sort(function(a, b) {
 //        
 //        return b.variable - a.variable;
-
 //        });
-
 //       xScale.domain([0, d3.max(data, function (d) { return d.variable * 1.1; //]);
 //        yScale.domain(data.map(function(d){ return d.album_name; }))
 //          
@@ -209,7 +187,6 @@ d3.csv("kanye_data.csv")
 //                } else {
 //                    return "steelblue";
 //                };
-
 //            });           
 //          
 //          
@@ -235,7 +212,6 @@ d3.csv("kanye_data.csv")
 //        svg.append("g")
 //            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 //            .call(d3.axisLeft(yScale));
-
 //        //adding x axis to the bottom of chart
 //        svg.append("g")
 //            .attr("transform", "translate(" + margin.left + "," + (height + margin.top) + ")")
@@ -257,16 +233,13 @@ d3.csv("kanye_data.csv")
 //            .style("font-family", "Arial")
 //            .style("font-weight", "100")
 //            .style("font-size","12");
-
 //          svg.selectAll("rect")
 //              .transition()
 //              .duration(800)
 //              .attr("y", function(d) { return yScale(d.album_name); })
 //              .attr("width", function(d) { return xScale(d.variable); })
 //              .delay(function(d,i){console.log(i) ; return(i*100)})
-
 //    });
-
 //function update(variable) {
 //
 //var variable = +variable;
@@ -486,7 +459,6 @@ d3.csv("kanye_data.csv")
 //
 //// Initialize the plot with the first dataset
 //update(1);
-
     </script>
     </body>
 </html>
