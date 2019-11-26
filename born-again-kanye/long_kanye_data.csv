@@ -65,17 +65,17 @@ Late Registration,instrumentalness,0.001879337
 Late Registration,liveness,0.2060875
 Late Registration,valence,0.519375
 Late Registration,tempo,102.6952031
-My Beautiful Dark Twisted Fantasy,danceability,0.532346154
-My Beautiful Dark Twisted Fantasy,energy,0.680046154
-My Beautiful Dark Twisted Fantasy,key,4.961538462
-My Beautiful Dark Twisted Fantasy,loudness,-5.938730769
-My Beautiful Dark Twisted Fantasy,mode,0.307692308
-My Beautiful Dark Twisted Fantasy,speechiness,0.135930769
-My Beautiful Dark Twisted Fantasy,acousticness,0.190156923
-My Beautiful Dark Twisted Fantasy,instrumentalness,0.060181515
-My Beautiful Dark Twisted Fantasy,liveness,0.377423077
-My Beautiful Dark Twisted Fantasy,valence,0.361273077
-My Beautiful Dark Twisted Fantasy,tempo,111.2858077
+MBDTF,danceability,0.532346154
+MBDTF,energy,0.680046154
+MBDTF,key,4.961538462
+MBDTF,loudness,-5.938730769
+MBDTF,mode,0.307692308
+MBDTF,speechiness,0.135930769
+MBDTF,acousticness,0.190156923
+MBDTF,instrumentalness,0.060181515
+MBDTF,liveness,0.377423077
+MBDTF,valence,0.361273077
+MBDTF,tempo,111.2858077
 The College Dropout,danceability,0.592666667
 The College Dropout,energy,0.590547619
 The College Dropout,key,6.071428571

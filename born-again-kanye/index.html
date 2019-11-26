@@ -1,6 +1,6 @@
 <!DOCTYPE html>
     <meta charset="utf-8">
-    <title>Born Again Kanye</title>
+    <title>Kanye West's Rebirth</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type="text/css">
@@ -15,21 +15,47 @@
       font-family: 'Lato', sans-serif;
     	}
 
+    .pTitle {
+       font-size: 24px;
+       font-weight: 5px;
+       text-shadow: 0 1px 0 #fff;
+       fill: #474747;
+       font-weight: bold;
+    }
+
+    .middletext {
+      text-align: center;
+      font-size: 25px;
+      color: black;
+    }
+
     .axis--x path {
 	  display: none;
 				}
 
-	.axis--y path {
+	  .axis--y path {
 	  display: none;
 				}
 
     svg {
-       position: absolute;
-       max-width: 800px;
-       margin-left: auto;
-       margin-right: auto;
+       display: block;
+       max-width: 1000px;
+       margin: auto;
     	}
-    
+
+      #chart {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        display:inline-block;
+         padding:0.35em 1.2em;
+         margin:0 0.3em 0.3em 0;
+         border-radius:0.12em;
+         box-sizing: border-box;
+         text-decoration:none;
+         transition: all 0.2s;
+        }
+
     p {
       max-width: 700px;
       margin-left: auto;
@@ -51,8 +77,38 @@
     			}
 
     select {
-  	margin-left: 10px;
+  	 text-align: center;
+     position: center;
+      margin-left: auto;
+      margin-right: auto;
 		}
+
+    #SideText{
+        font-family: 'Lato', sans-serif;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+        font-family: 'Lato', sans-serif;
+      }
+
+    div.tooltip {
+      position: absolute;
+      top: 100px;
+      left: 100px;
+      -moz-border-radius:5px;
+      border-radius: 5px;
+      border: 2px solid #000;
+      background: #fff;
+      opacity: .9;
+      color: black;
+      padding: 10px;
+      width: 300px;
+      font-size: 12px;
+      z-index: 10;
+      font-family: 'Lato', sans-serif;
+    }
+
+   
   
     </style>
 
@@ -60,20 +116,42 @@
 
     <h1> <img src="https://d063e17xn2-flywheel.netdna-ssl.com/wp-content/uploads/2019/10/https-hypebeast.com-image-2019-10-kanye-west-jesus-is-king-album-release-stream-spotify-apple-music-download-11-1-1.jpg" width = "78", height = "52", align = "center">Kanye West's Rebirth <img src="https://d063e17xn2-flywheel.netdna-ssl.com/wp-content/uploads/2019/10/https-hypebeast.com-image-2019-10-kanye-west-jesus-is-king-album-release-stream-spotify-apple-music-download-11-1-1.jpg" width = "78", height = "52", align = "center"></h1>
 
-    <p>How does Kanye West's most recent album compare to his previous ones? Has he went through some form of transformation?</p>
+    <p><span style = "font-weight:bold">Kanye West has been born again.</span> His philosophy on life, his politics, and his faith have all undergone significant changes in less than a year. <br><br> But how does Kanye West's most recent album compare to his previous ones? Aside from his spiritual transformation, has he been musically born again?</p>
 
-    <p>How does <span style = "color:#0534D7">Jesus is King</span> compare to his other albums?</p> 
+    <p class = "middletext">How does <span style = "color:#0534D7">Jesus is King</span> compare to Kanye West's other albums?</p> 
 
-	<select id="filter">
+<div class = "middletext">
+
+	<select id="filter" class = "middletext">
       <option value=acousticness>Acousticness</option>
       <option value=danceability>Danceability</option>
-      <option value=liveness>liveness</option>
+      <option value=liveness>Liveness</option>
       <option value=energy>Energy</option>
       <option value=mode>Mode</option>
       <option value=valence>Valence</option>
-
     </select>
-    <svg width="1000" height="500"></svg>
+
+</div>
+
+<div id="SideText">
+  <!-- <p id="p0" class="pTitle Side">Acousticness</p> -->
+  <p id="p1" class="Side">Acousticness is defined by Spotify as a confidence measure of whether the track is acoustic. In other words, the music seems to be composed through acoustic means rather than electronic ones.</p>
+  <p class="Side">
+    <span>
+      <span style = "color:#0534D7">Jesus is King</span> is the
+    </span>
+
+    <span style = "font-weight:bold" id="ranking">most acoustic</span>
+    <span>album of Kanye West's discography.</span>
+   <!-- <br><br>
+    <span id = "wittyremark"></span> -->
+  </p>
+
+</div>
+
+<div id = "chart">
+    <svg></svg>
+</div>
 
 </body>
 
@@ -81,28 +159,34 @@
 
 <script>
 
-var svg = d3.select("svg"),
-    margin = {top: 20, right: 20, bottom: 20, left: 175},
-    width = +svg.attr("width") - margin.left - margin.right,
-    height = +svg.attr("height") - margin.top - margin.bottom;
+var margin = {top:20, right:20, bottom:20, left:50},
+          width  = 1000 - margin.left - margin.right,
+          height = 500 - margin.top - margin.bottom;
+
+      var svg = d3.select("body")
+              .append("svg")
+              .attr("width", "100%")
+              .attr("height", "100%")
+              .attr("viewBox", "0 0 " + (width + margin.left + margin.right) + " " + (height + margin.top + margin.bottom));
 
 var x =  d3.scaleLinear()
           .range([0, width]);
-var y = d3.scaleBand()
+var y =  d3.scaleBand()
           .range([height, 0])
           .padding(0.1); 
-//var xAxis = svg.append("g")
-//    .attr("transform", "translate(0," + height + ")")
-//    .call(d3.axisBottom(x));
-//var yAxis = svg.append("g")
-//    .attr("transform", "translate(0," + height + ")")
-//    .call(d3.axisLeft(y));
 
 var g = svg.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+// define a tooltip
+var div = d3.select("body").append("div")
+  .attr("class", "tooltip")
+  .style("opacity", 0);
+
+
 // create a variable that will hold the loaded data
 var csv;
+var selected_variable = "acousticness"
 
 // load the data
 d3.csv("long_kanye_data.csv", function(d) {
@@ -128,36 +212,39 @@ d3.csv("long_kanye_data.csv", function(d) {
 
  // set the domains of the axes
  y.domain(data.map(function(d) { return d.album_name; }));
- x.domain([0, d3.max(data, function(d) { return d.score * 1.4; })]);
+ x.domain([0, d3.max(data, function(d) { return d.score * 1.1; })]);
 
  // add the axes
  g.append("g")
      .attr("class", "axis axis--x")
      .attr("transform", "translate(0," + height + ")")
+     .attr("font-family", "Lato")
+     .attr("font-size", "120px")
      .call(d3.axisBottom(x));
 
- //g.append("g")
- //    .attr("class", "axis axis--y")
- //    .call(d3.axisLeft(y))
- //    .selectAll("text")
- //    //.remove()
- //    .attr("dx", -35);
-
-  g.append("g")
-  	 .attr("class", "axis axis--y")
-     .call(d3.axisLeft(y))	
+g.append("g")
+     .attr("class", "axis axis--y")
+     .call(d3.axisLeft(y))
      .selectAll(".tick").each( function(d,i) {
          d3.select(this)
          .append("svg:image")
-         .attr("x", -35)
-         .attr("y", -15)
+         .attr("x", -36.5)
+         .attr("y", -18.5)
          .attr("dy", ".35em")
-         .attr("width", 25)
-         .attr("height", 25)
+         .attr("width", 37)
+         .attr("height", 37)
          .attr("xlink:href", "assets/" +i+".jpg")
          //.style('fill', '#000000');
 	
  });
+
+// move the existing text labels to the left of the newly created images
+ g.select(".axis--y")
+     .selectAll("text")
+//      .attr("x", -40)
+//      .attr("font-family", "Lato")
+    // or remove them all
+      .remove()
 
  // add text labels to the end of bars
  svg.append("g")
@@ -176,7 +263,16 @@ d3.csv("long_kanye_data.csv", function(d) {
            .attr("font-family", "Lato")
            .attr("font-size", "14px")
        .attr("fill", "black")
-           .text(function(d){ return d3.format(",")(d.score.toFixed(2)); })
+    .text(function(d){ return d3.format(",")(d.score.toFixed(2)); });
+
+var tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+//define a function to make selected_variable title case
+String.prototype.toProperCase = function () {
+    return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+};
 
   // create the bars
   g.selectAll(".bar")
@@ -187,41 +283,94 @@ d3.csv("long_kanye_data.csv", function(d) {
       .attr("x", 0)
       .attr("height", function(d){ return y.bandwidth(); })
       .attr("width", function(d) { return x(d.score); })
+      // change fill for jesus is king
       .attr("fill", function (d) {
                 if (d.album_name == "JESUS IS KING") {
                     return "#0534D7";
                 } else {
                     return "grey";
-                };
+                };})
+      // add the tooltip
+        .on("mouseover", function(d) {
+          tooltip.transition()
+               .duration(200)
+               .style("opacity", 1);
+          tooltip.html("<b>Album</b>: " + d.album_name + 
+                       "<br/> <b>" + selected_variable.toProperCase() + "</b>: " + 
+  //round to two digits https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-only-if-necessary
+                       Math.round(d.score * 100)/100)
+               .style("left", (d3.event.pageX + 5) + "px")
+               .style("top", (d3.event.pageY - 28) + "px");
+      })
+        .on("mouseout", function(d) {
+          tooltip.transition()
+               .duration(500)
+               .style("opacity", 0);
       });
+
 
   // add a change event handler 
   d3.select("#filter").on("change", function() {
       
       applyFilter(this.value);
 
-    });
+      var selected_variable = this.value;
+      console.log(selected_variable)
 
-  console.log(data);
+if(selected_variable == "acousticness") {
+      tooltip = "test!"
+      d3.select("#p0").transition().duration(800).style("opacity", 1).text("Acousticness");
+      d3.select("#p1").transition().duration(800).style("opacity", 1).text("Acousticness is defined by Spotify as a confidence measure of whether the track is acoustic. In other words, the music seems to be composed through acoustic means rather than electronic ones.");
+      d3.select("#ranking").transition().duration(800).style("opacity", 1).text("most acoustic");
+    } else if (selected_variable == "danceability") {
+      d3.select("#p0").transition().duration(800).style("opacity", 1).text("Danceability");
+      d3.select("#p1").transition().duration(800).style("opacity", 1).text("Danceability is defined by Spotify as 'how suitable a track is for dancing', based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity.");
+      d3.select("#ranking").transition().duration(800).style("opacity", 1).text("third least danceable");
+    } else if (selected_variable == "liveness") {
+      d3.select("#p0").transition().duration(800).style("opacity", 1).text("Liveness");
+      d3.select("#p1").transition().duration(800).style("opacity", 1).text("Liveness is defined by Spotify as the likelihood that an audience is present at the time of recording. Higher liveness values represent an increased probability that the track was performed live.");
+      d3.select("#ranking").transition().duration(800).style("opacity", 1).text("fourth most 'live'");
+    } else if (selected_variable == "energy") {
+      d3.select("#p0").transition().duration(800).style("opacity", 1).text("Energy");
+      d3.select("#p1").transition().duration(800).style("opacity", 1).text("Energy is defined by Spotify as a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. The features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy.");
+      d3.select("#ranking").transition().duration(800).style("opacity", 1).text("third least energetic");
+    } else if (selected_variable == "mode") {
+      d3.select("#p0").transition().duration(800).style("opacity", 1).text("Employment rate");
+      d3.select("#p1").transition().duration(800).style("opacity", 1).text("Mode is a measure used to indicate the modality of a track. In other words, it indicates whether a track is major (1) or minor (0).");
+      d3.select("#ranking").transition().duration(800).style("opacity", 1).text("third least modal");
+    } else if (selected_variable == "valence") {
+      d3.select("#p0").transition().duration(800).style("opacity", 1).text("Valence");
+      d3.select("#p1").transition().duration(800).style("opacity", 1).text("Valence is a measure used by Spotify to determine the 'musical positiveness conveyed by a track.' Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).");
+      d3.select("#ranking").transition().duration(800).style("opacity", 1).text("fifth most positive");
+      //d3.select("#wittyremark").transition().duration(800).style("opacity", 1).text("");
+      
+    } 
+
+    });
 
   // call this whenever the filter changes
   function applyFilter(value) {
+
     // filter the data
     var data = csv.filter(function(d) {return d.group === value;});
 
-	data.sort(function(a, b) {
-	  return d3.ascending(a.score, b.score)
-	});
+  	data.sort(function(a, b) {
+  	  return d3.ascending(a.score, b.score)
+  	});
 
   	// update domain
-  	x.domain([0, d3.max(data, function(d) { return d.score * 1.4; })]);
- 	y.domain(data.map(function(d) { return d.album_name; }));
+    x.domain([0, d3.max(data, function(d) { return d.score * 1.1; })]);
+   	y.domain(data.map(function(d) { return d.album_name; }));
 
   	// update axis
   	svg.select(".axis--x")
   	 .transition().duration(1000)
      .attr("transform", "translate(0," + height + ")")
      .call(d3.axisBottom(x));
+
+   g.select(".axis--y")
+     .selectAll("tick.text")
+     .remove()
 
     svg.select(".axis--y")
   	 .transition().duration(1000)
@@ -258,6 +407,6 @@ d3.csv("long_kanye_data.csv", function(d) {
 
   }
 
-});
+  });
 
 	</script>
