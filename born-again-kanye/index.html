@@ -57,7 +57,7 @@
         }
 
     p {
-      max-width: 700px;
+      max-width: 1000px;
       margin-left: auto;
       margin-right: auto;
       font-family: 'Lato', sans-serif;
@@ -85,7 +85,7 @@
 
     #SideText{
         font-family: 'Lato', sans-serif;
-        max-width: 700px;
+        max-width: 1000px;
         margin-left: auto;
         margin-right: auto;
         font-family: 'Lato', sans-serif;
@@ -118,9 +118,7 @@
 
     <p><span style = "font-weight:bold">Kanye West has been born again.</span> His philosophy on life, his politics, and his faith have all undergone significant changes in less than a year. <br><br> But how does Kanye West's most recent album compare to his previous ones? Aside from his spiritual transformation, has he been musically born again?</p>
 
-    <p class = "middletext">How does <span style = "color:#0534D7">Jesus is King</span> compare to Kanye West's other albums?</p> 
-
-<div class = "middletext">
+    <p class = "middletext">How does <span style = "color:#0534D7">Jesus is King</span> compare to Kanye West's other albums in 
 
 	<select id="filter" class = "middletext">
       <option value=acousticness>Acousticness</option>
@@ -130,8 +128,8 @@
       <option value=mode>Mode</option>
       <option value=valence>Valence</option>
     </select>
-
-</div>
+    ?
+    </p>
 
 <div id="SideText">
   <!-- <p id="p0" class="pTitle Side">Acousticness</p> -->
@@ -161,7 +159,7 @@
 
 var margin = {top:20, right:20, bottom:20, left:50},
           width  = 1000 - margin.left - margin.right,
-          height = 500 - margin.top - margin.bottom;
+          height = 400 - margin.top - margin.bottom;
 
       var svg = d3.select("body")
               .append("svg")
@@ -228,11 +226,11 @@ g.append("g")
      .selectAll(".tick").each( function(d,i) {
          d3.select(this)
          .append("svg:image")
-         .attr("x", -36.5)
-         .attr("y", -18.5)
+         .attr("x", -28)
+         .attr("y", -14.25)
          .attr("dy", ".35em")
-         .attr("width", 37)
-         .attr("height", 37)
+         .attr("width", 28.5)
+         .attr("height", 28.5)
          .attr("xlink:href", "assets/" +i+".jpg")
          //.style('fill', '#000000');
 	
@@ -257,7 +255,7 @@ g.append("g")
     .duration(800)
     .attr("class", "textlabel-1")
     .attr("x", function(d){ return x(d.score) +32;})
-    .attr("y", function(d){ return y(d.album_name) +12; })
+    .attr("y", function(d){ return y(d.album_name) +8.5; })
     .attr("alignment-baseline", "hanging")
            .attr("text-anchor", "end")
            .attr("font-family", "Lato")
@@ -397,7 +395,7 @@ if(selected_variable == "acousticness") {
      	.transition().duration(1000)
      	.attr("class", "textlabel-1")
      	.attr("x", function(d){ return x(d.score) +32;})
-     	.attr("y", function(d){ return y(d.album_name) +12; })
+     	.attr("y", function(d){ return y(d.album_name) +8.5; })
      	.attr("alignment-baseline", "hanging")
      	       .attr("text-anchor", "end")
      	       .attr("font-family", "Lato")
