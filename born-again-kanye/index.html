@@ -108,8 +108,15 @@
       font-family: 'Lato', sans-serif;
     }
 
-   
-  
+    .footer {
+        padding: 0px 10px 0px 0px;
+        text-align: left;
+        position:absolute;
+        bottom:-0;
+        font-size: 8px;
+    }
+
+
     </style>
 
  <body>
@@ -151,13 +158,17 @@
     <svg></svg>
 </div>
 
+<!-- <div class = "footer">
+  <p>Data cleaning, analysis, and visualization by <a href="http://connorrothschild.github.io/">Connor Rothschild</a><br>Data is pulled from the <a href="https://developer.spotify.com/documentation/web-api/">Spotify API</a><br>Find the code <a href="https://github.com/connorrothschild/D3.js/tree/master/born-again-kanye">here</a></p>
+</div> -->
+
 </body>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
 
 <script>
 
-var margin = {top:20, right:20, bottom:20, left:50},
+var margin = {top:20, right:20, bottom:50, left:50},
           width  = 1000 - margin.left - margin.right,
           height = 400 - margin.top - margin.bottom;
 
@@ -181,10 +192,12 @@ var div = d3.select("body").append("div")
   .attr("class", "tooltip")
   .style("opacity", 0);
 
-
 // create a variable that will hold the loaded data
 var csv;
-var selected_variable = "acousticness"
+
+// couldn't get selected variable to update with other selected_variable
+// for the tooltip:
+var selected_variable = "Value"
 
 // load the data
 d3.csv("long_kanye_data.csv", function(d) {
