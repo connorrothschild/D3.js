@@ -1,464 +1,263 @@
 <!DOCTYPE html>
-<html>
-<head>
     <meta charset="utf-8">
     <title>Born Again Kanye</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type="text/css">
     
-        h1{
-                text-align: center;
-                font-family: 'Lato', sans-serif;
-            }
-    h2{
+    h1 {
+       text-align: center;
+       font-family: 'Lato', sans-serif;
+        }
+
+    h2 {
       text-align: center;
       font-family: 'Lato', sans-serif;
-    }
-    svg1 {
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
-    }
+    	}
+
+    .axis--x path {
+	  display: none;
+				}
+
+	.axis--y path {
+	  display: none;
+				}
+
+    svg {
+       position: absolute;
+       max-width: 800px;
+       margin-left: auto;
+       margin-right: auto;
+    	}
+    
     p {
       max-width: 700px;
       margin-left: auto;
       margin-right: auto;
       font-family: 'Lato', sans-serif;
-    }
-      
-    }
-    #data-source{
+   	  }
+
+    #data-source {
       margin-right: auto;
       margin-left: 0;
       font-size: 10px;
       margin-top: 3px;
       margin-bottom: 10px;
       font-family: 'Lato', sans-serif;
-    }
-    .bar:hover {
-      fill: brown;
-    }
-  
+    			}
     
+    .bar:hover {
+      fill: #0534D7;
+    			}
+
+    select {
+  	margin-left: 10px;
+		}
+  
     </style>
+
+ <body>
 
     <h1> <img src="https://d063e17xn2-flywheel.netdna-ssl.com/wp-content/uploads/2019/10/https-hypebeast.com-image-2019-10-kanye-west-jesus-is-king-album-release-stream-spotify-apple-music-download-11-1-1.jpg" width = "78", height = "52", align = "center">Kanye West's Rebirth <img src="https://d063e17xn2-flywheel.netdna-ssl.com/wp-content/uploads/2019/10/https-hypebeast.com-image-2019-10-kanye-west-jesus-is-king-album-release-stream-spotify-apple-music-download-11-1-1.jpg" width = "78", height = "52", align = "center"></h1>
 
     <p>How does Kanye West's most recent album compare to his previous ones? Has he went through some form of transformation?</p>
 
-    <p>How does <span style = "color:brown">Jesus is King</span> compare to his other albums?</p> 
-  
-</head>
-  
-<body>
+    <p>How does <span style = "color:#0534D7">Jesus is King</span> compare to his other albums?</p> 
 
-    <script src="https://d3js.org/d3.v5.min.js"></script>
+	<select id="filter">
+      <option value=acousticness>Acousticness</option>
+      <option value=danceability>Danceability</option>
+      <option value=liveness>liveness</option>
+      <option value=energy>Energy</option>
+      <option value=mode>Mode</option>
+      <option value=valence>Valence</option>
 
-    <script>
-      var margin = {top:30, right:10, bottom:100, left:150},
-          width  = 1300 - margin.left - margin.right,
-          height = 600 - margin.top - margin.bottom;
-      var svg1 = d3.select("body")
-          .append("svg")
-          .attr("width", "100%")
-          .attr("height", "100%")
-          .attr("viewBox", "0 0 " + (width + margin.left + margin.right) + " " + (height + margin.top + margin.bottom));
-      var chart = svg1.append("g")
-          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-      
-      var xScale = d3.scaleLinear()
+    </select>
+    <svg width="1000" height="500"></svg>
+
+</body>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+<script>
+
+var svg = d3.select("svg"),
+    margin = {top: 20, right: 20, bottom: 20, left: 175},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom;
+
+var x =  d3.scaleLinear()
           .range([0, width]);
-      var yScale = d3.scaleBand()
-          .range([0, height])
+var y = d3.scaleBand()
+          .range([height, 0])
           .padding(0.1); 
-d3.csv("kanye_data.csv")
-.then(function(data){
-        data = data.map(function(d){ 
-            d.album_name = d.album_name; // convert "Year" column to Date
-            d.danceability = +d.danceability;
-            d.energy = +d.energy;
-            d.key = +d.key;
-            d.loudness = +d.loudness;
-            d.mode = +d.mode;
-            d.speechiness = +d.speechiness;
-            d.acousticness = +d.acousticness;
-            d.instrumentalness = +d.instrumentalness;
-            d.liveness = +d.liveness;
-            d.valence = +d.valence;
-            d.tempo = +d.tempo;
-            d.image = d.image;
-            return d;
-      });
-        console.table(data);
-        data.sort(function(a, b) {
-        
-        return b.acousticness - a.acousticness;
-        });
-      
-    
-        xScale.domain([0, d3.max(data, function (d) { return d.acousticness * 1.1; })]);
-        yScale.domain(data.map(function(d){ return d.album_name; }));
-      
-        chart.selectAll(".bar")
-            .data(data)
-            .enter()
-            .append("rect")
-            .attr("class", "bar")
-            .attr("x", 0)
-            .attr("y", function(d){ return yScale(d.album_name); })
-            .attr("height", function(d){ return yScale.bandwidth(); })
-            .attr("width", 0)
-            .attr("fill", function (d) {
+//var xAxis = svg.append("g")
+//    .attr("transform", "translate(0," + height + ")")
+//    .call(d3.axisBottom(x));
+//var yAxis = svg.append("g")
+//    .attr("transform", "translate(0," + height + ")")
+//    .call(d3.axisLeft(y));
+
+var g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+// create a variable that will hold the loaded data
+var csv;
+
+// load the data
+d3.csv("long_kanye_data.csv", function(d) {
+  d.score = +d.score;
+//  d.album_name = d.album_name;
+  return d;
+}, function(error, datafile) {
+  if (error) throw error;
+
+  // put the original data in csv
+  csv = datafile;
+  console.log(csv);
+
+  // filter the data based on the inital value
+  var data = csv.filter(function(d) { 
+    var sq = d3.select("#filter").property("value");
+    return d.group === sq;
+  });
+
+  data.sort(function(a, b) {
+  return d3.ascending(a.score, b.score)
+});
+
+ // set the domains of the axes
+ y.domain(data.map(function(d) { return d.album_name; }));
+ x.domain([0, d3.max(data, function(d) { return d.score * 1.4; })]);
+
+ // add the axes
+ g.append("g")
+     .attr("class", "axis axis--x")
+     .attr("transform", "translate(0," + height + ")")
+     .call(d3.axisBottom(x));
+
+ //g.append("g")
+ //    .attr("class", "axis axis--y")
+ //    .call(d3.axisLeft(y))
+ //    .selectAll("text")
+ //    //.remove()
+ //    .attr("dx", -35);
+
+  g.append("g")
+  	 .attr("class", "axis axis--y")
+     .call(d3.axisLeft(y))	
+     .selectAll(".tick").each( function(d,i) {
+         d3.select(this)
+         .append("svg:image")
+         .attr("x", -35)
+         .attr("y", -15)
+         .attr("dy", ".35em")
+         .attr("width", 25)
+         .attr("height", 25)
+         .attr("xlink:href", "assets/" +i+".jpg")
+         //.style('fill', '#000000');
+	
+ });
+
+ // add text labels to the end of bars
+ svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+    .selectAll(".textlabel-1")
+    .data(data)
+    .enter()
+    .append("text")
+    .transition()
+    .duration(800)
+    .attr("class", "textlabel-1")
+    .attr("x", function(d){ return x(d.score) +32;})
+    .attr("y", function(d){ return y(d.album_name) +12; })
+    .attr("alignment-baseline", "hanging")
+           .attr("text-anchor", "end")
+           .attr("font-family", "Lato")
+           .attr("font-size", "14px")
+       .attr("fill", "black")
+           .text(function(d){ return d3.format(",")(d.score.toFixed(2)); })
+
+  // create the bars
+  g.selectAll(".bar")
+    .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("y", function(d) { return y(d.album_name); })
+      .attr("x", 0)
+      .attr("height", function(d){ return y.bandwidth(); })
+      .attr("width", function(d) { return x(d.score); })
+      .attr("fill", function (d) {
                 if (d.album_name == "JESUS IS KING") {
-                    return "brown";
+                    return "#0534D7";
                 } else {
-                    return "steelblue";
+                    return "grey";
                 };
-            });           
-          
-        svg1.append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-            .selectAll(".textlabel-1")
-            .data(data)
-            .enter()
-            .append("text")
-            .transition()
-            .duration(800)
-            .attr("class", "textlabel-1")
-            .attr("x", function(d){ return xScale(d.acousticness) +32;})
-            .attr("y", function(d){ return yScale(d.album_name) +12; })
-        .attr("alignment-baseline", "hanging")
-            .attr("text-anchor", "end")
-            .attr("font-family", "Lato")
-            .attr("font-size", "14px")
-        .attr("fill", "black")
-            .text(function(d){ return d3.format(",")(d.acousticness.toFixed(2)); })
+      });
+
+  // add a change event handler 
+  d3.select("#filter").on("change", function() {
       
-        //adding y axis to the left of the chart
-        svg1.append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-            .call(d3.axisLeft(yScale));
-        //adding x axis to the bottom of chart
-        svg1.append("g")
-            .attr("transform", "translate(" + margin.left + "," + (height + margin.top) + ")")
-            .call(d3.axisBottom(xScale));
-        
-          svg1.selectAll("rect")
-              .transition()
-              .duration(800)
-              .attr("y", function(d) { return yScale(d.album_name); })
-              .attr("width", function(d) { return xScale(d.acousticness); })
-              .delay(function(d,i){ return(i*100)})
-          svg1.append("text")             
-              .attr("transform",
-                    "translate(" + (width/1.8) + " ," + 
-                                   (height + margin.top + 50) + ")")
-              .style("text-anchor", "middle")
-              .text("Acousticness");
-      });   
-// function update(variable) {
-//    d3.csv("kanye_data.csv")
-//        .then(function(data){
-//        data = data.map(function(d){ 
-//            d.album_name = d.album_name; // convert "Year" column to Date
-//            d.variable = +d.variable;
-//            return d;
-//      });
-//        data.sort(function(a, b) {
-//        
-//        return b.variable - a.variable;
-//        });
-//       xScale.domain([0, d3.max(data, function (d) { return d.variable * 1.1; //]);
-//        yScale.domain(data.map(function(d){ return d.album_name; }))
-//          
-//        chart.selectAll(".bar")
-//            .data(data)
-//            .enter()
-//            .append("rect")
-//            .attr("class", "bar")
-//            .attr("x", 0)
-//            .attr("y", function(d){ return yScale(d.album_name); })
-//            .attr("height", function(d){ return yScale.bandwidth(); })
-//            .attr("width", 0)
-//            .attr("fill", function (d) {
-//                if (d.album_name == "JESUS IS KING") {
-//                    return "brown";
-//                } else {
-//                    return "steelblue";
-//                };
-//            });           
-//          
-//          
-//            svg.append("g")
-//            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-//            .selectAll(".textlabel-1")
-//            .data(data)
-//            .enter()
-//            .append("text")
-//            .transition()
-//            .duration(800)
-//            .attr("class", "textlabel-1")
-//            .attr("x", function(d){ return xScale(d.variable) +28;})
-//            .attr("y", function(d){ return yScale(d.album_name) +16; })
-//            .attr("alignment-baseline", "hanging")
-//            .attr("text-anchor", "end")
-//            .attr("font-family", "sans-serif")
-//            .attr("font-size", "12px")
-//            .attr("fill", "black")
-//            .text(function(d){ return d3.format(",")(d.variable.toFixed(2)); 
-//          
-//        //adding y axis to the left of the chart
-//        svg.append("g")
-//            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-//            .call(d3.axisLeft(yScale));
-//        //adding x axis to the bottom of chart
-//        svg.append("g")
-//            .attr("transform", "translate(" + margin.left + "," + (height + margin.top) + ")")
-//            .call(d3.axisBottom(xScale));
-//        
-//        svg.append("g")
-//            .attr("transform", "translate(" + (width/1.8) + ", 15)")
-//            .append("text")
-//            .text("Kanye West's Rebirth")
-//            .style("text-anchor", "middle")
-//            .style("font-family", "Arial")
-//            .style("font-weight", "600");
-//          
-//        svg.append("g")
-//            .attr("transform", "translate(" + (width/1.8) + ", 35)")
-//            .append("text")
-//            .text("Differences in acousticness by album.")
-//            .style("text-anchor", "middle")
-//            .style("font-family", "Arial")
-//            .style("font-weight", "100")
-//            .style("font-size","12");
-//          svg.selectAll("rect")
-//              .transition()
-//              .duration(800)
-//              .attr("y", function(d) { return yScale(d.album_name); })
-//              .attr("width", function(d) { return xScale(d.variable); })
-//              .delay(function(d,i){console.log(i) ; return(i*100)})
-//    });
-//function update(variable) {
-//
-//var variable = +variable;
-//
-//switch(variable) {
-//  case 0:
-//
-//       var margin = {top:30, right:10, bottom:100, left:150},
-//          width  = 1300 - margin.left - margin.right,
-//          height = 600 - margin.top - margin.bottom;
-//      var svg = d3.select("body")
-//          .append("svg")
-//          .attr("width", "100%")
-//          .attr("height", "100%")
-//          .attr("viewBox", "0 0 " + (width + margin.left + margin.right) + " " + (height + //margin.top + margin.bottom));
-//      var chart = svg.append("g")
-//          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-//      
-//      var xScale = d3.scaleLinear()
-//          .range([0, width]);
-//      var yScale = d3.scaleBand()
-//          .range([0, height])
-//          .padding(0.1); 
-//
-//d3.csv("kanye_data.csv")
-//.then(function(data){
-//
-//        data = data.map(function(d){ 
-//            d.album_name = d.album_name; // convert "Year" column to Date
-//            d.variable = +d.instrumentalness;
-//            return d;
-//
-//      });
-//
-//        data.sort(function(a, b) {
-//        
-//        return b.variable - a.variable;
-//
-//        });
-//
-//        console.table(data);
-//          
-//        xScale.domain([0, d3.max(data, function (d) { return d.variable * 1.1; })]);
-//        yScale.domain(data.map(function(d){ return d.album_name; }));
-//          
-//        chart.selectAll(".bar")
-//            .data(data)
-//            .enter()
-//            .append("rect")
-//            .attr("class", "bar")
-//            .attr("x", 0)
-//            .attr("y", function(d){ return yScale(d.album_name); })
-//            .attr("height", function(d){ return yScale.bandwidth(); })
-//            .attr("width", 0)
-//            .attr("fill", function (d) {
-//                if (d.album_name == "JESUS IS KING") {
-//                    return "brown";
-//                } else {
-//                    return "steelblue";
-//                };
-//
-//            });           
-//          
-//        svg.append("g")
-//            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-//            .selectAll(".textlabel-1")
-//            .data(data)
-//            .enter()
-//            .append("text")
-//            .transition()
-//            .duration(800)
-//            .attr("class", "textlabel-1")
-//            .attr("x", function(d){ return xScale(d.variable) +32;})
-//            .attr("y", function(d){ return yScale(d.album_name) +12; })
-//            .attr("alignment-baseline", "hanging")
-//            .attr("text-anchor", "end")
-//            .attr("font-family", "Lato")
-//            .attr("font-size", "14px")
-//            .attr("fill", "black")
-//            .text(function(d){ return d3.format(",")(d.variable.toFixed(2)); })
-//          
-//        //adding y axis to the left of the chart
-//        svg.append("g")
-//            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-//            .call(d3.axisLeft(yScale));
-//
-//        //adding x axis to the bottom of chart
-//        svg.append("g")
-//            .attr("transform", "translate(" + margin.left + "," + (height + margin.top) + ")//")
-//            .call(d3.axisBottom(xScale));
-//        
-//          svg.selectAll("rect")
-//              .transition()
-//              .duration(800)
-//              .attr("y", function(d) { return yScale(d.album_name); })
-//              .attr("width", function(d) { return xScale(d.variable); })
-//              .delay(function(d,i){ return(i*100)})
-//
-//          svg.append("text")             
-//              .attr("transform",
-//                    "translate(" + (width/1.8) + " ," + 
-//                                   (height + margin.top + 50) + ")")
-//              .style("text-anchor", "middle")
-//              .text("Acousticness");
-//
-//          });
-//
-//    break;
-//
-//  case 1:
-//
-//       var margin = {top:30, right:10, bottom:100, left:150},
-//          width  = 1300 - margin.left - margin.right,
-//          height = 600 - margin.top - margin.bottom;
-//      var svg = d3.select("body")
-//          .append("svg")
-//          .attr("width", "100%")
-//          .attr("height", "100%")
-//          .attr("viewBox", "0 0 " + (width + margin.left + margin.right) + " " + (height + //margin.top + margin.bottom));
-//      var chart = svg.append("g")
-//          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-//      
-//      var xScale = d3.scaleLinear()
-//          .range([0, width]);
-//      var yScale = d3.scaleBand()
-//          .range([0, height])
-//          .padding(0.1); 
-//
-//d3.csv("kanye_data.csv")
-//.then(function(data){
-//
-//        data = data.map(function(d){ 
-//            d.album_name = d.album_name; // convert "Year" column to Date
-//            d.variable = +d.acousticness;
-//            return d;
-//
-//      });
-//
-//        console.table(data);
-//
-//        data.sort(function(a, b) {
-//        
-//        return b.variable - a.variable;
-//
-//        });
-//          
-//        
-//        xScale.domain([0, d3.max(data, function (d) { return d.variable * 1.1; })]);
-//        yScale.domain(data.map(function(d){ return d.album_name; }));
-//          
-//        chart.selectAll(".bar")
-//            .data(data)
-//            .enter()
-//            .append("rect")
-//            .attr("class", "bar")
-//            .attr("x", 0)
-//            .attr("y", function(d){ return yScale(d.album_name); })
-//            .attr("height", function(d){ return yScale.bandwidth(); })
-//            .attr("width", 0)
-//            .attr("fill", function (d) {
-//                if (d.album_name == "JESUS IS KING") {
-//                    return "brown";
-//                } else {
-//                    return "steelblue";
-//                };
-//
-//            });           
-//          
-//        svg.append("g")
-//            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-//            .selectAll(".textlabel-1")
-//            .data(data)
-//            .enter()
-//            .append("text")
-//            .transition()
-//            .duration(800)
-//            .attr("class", "textlabel-1")
-//            .attr("x", function(d){ return xScale(d.variable) +32;})
-//            .attr("y", function(d){ return yScale(d.album_name) +12; })
-//            .attr("alignment-baseline", "hanging")
-//            .attr("text-anchor", "end")
-//            .attr("font-family", "Lato")
-//            .attr("font-size", "14px")
-//            .attr("fill", "black")
-//            .text(function(d){ return d3.format(",")(d.variable.toFixed(2)); })
-//          
-//        //adding y axis to the left of the chart
-//        svg.append("g")
-//            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-//            .call(d3.axisLeft(yScale));
-//
-//        //adding x axis to the bottom of chart
-//        svg.append("g")
-//            .attr("transform", "translate(" + margin.left + "," + (height + margin.top) + ")//")
-//            .call(d3.axisBottom(xScale));
-//        
-//          svg.selectAll("rect")
-//              .transition()
-//              .duration(800)
-//              .attr("y", function(d) { return yScale(d.album_name); })
-//              .attr("width", function(d) { return xScale(d.variable); })
-//              .delay(function(d,i){ return(i*100)})
-//
-//          svg.append("text")             
-//              .attr("transform",
-//                    "translate(" + (width/1.8) + " ," + 
-//                                   (height + margin.top + 50) + ")")
-//              .style("text-anchor", "middle")
-//              .text("Acousticness");
-//
-//          });
-//  default:
-//  // code block
-//}
-//      
-// };
-//
-//// Initialize the plot with the first dataset
-//update(1);
-    </script>
-    </body>
-</html>
+      applyFilter(this.value);
+
+    });
+
+  console.log(data);
+
+  // call this whenever the filter changes
+  function applyFilter(value) {
+    // filter the data
+    var data = csv.filter(function(d) {return d.group === value;});
+
+	data.sort(function(a, b) {
+	  return d3.ascending(a.score, b.score)
+	});
+
+  	// update domain
+  	x.domain([0, d3.max(data, function(d) { return d.score * 1.4; })]);
+ 	y.domain(data.map(function(d) { return d.album_name; }));
+
+  	// update axis
+  	svg.select(".axis--x")
+  	 .transition().duration(1000)
+     .attr("transform", "translate(0," + height + ")")
+     .call(d3.axisBottom(x));
+
+    svg.select(".axis--y")
+  	 .transition().duration(1000)
+     .call(d3.axisLeft(y));
+
+    // update the bars
+    d3.selectAll(".bar")
+       .data(data)
+       .transition().duration(1000)
+       .attr("x", 0)
+       .attr("y", function(d) { return y(d.album_name); })
+       //.attr("x", function(d) { return x(d.score); })
+       .attr("width", function(d) { return x(d.score); })
+       .attr("height", function(d){ return y.bandwidth(); })
+       .attr("fill", function (d) {
+                if (d.album_name == "JESUS IS KING") {
+                    return "#0534D7";
+                } else {
+                    return "grey";
+                };});
+
+      d3.selectAll(".textlabel-1")
+     	.data(data)
+     	.transition().duration(1000)
+     	.attr("class", "textlabel-1")
+     	.attr("x", function(d){ return x(d.score) +32;})
+     	.attr("y", function(d){ return y(d.album_name) +12; })
+     	.attr("alignment-baseline", "hanging")
+     	       .attr("text-anchor", "end")
+     	       .attr("font-family", "Lato")
+     	       .attr("font-size", "14px")
+     	   .attr("fill", "black")
+     	       .text(function(d){ return d3.format(",")(d.score.toFixed(2)); });
+
+  }
+
+});
+
+	</script>

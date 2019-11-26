@@ -282,9 +282,31 @@ d3.selectAll('.d_sel').on('click', function(){
 		selected_variable = this.value;
 		selected_variable_scaled = this.value + '_scaled';
 
-        xScale.domain([0, d3.max(data, function (d) { return d[selected_variable] * 1.1; })]);
+    console.log(selected_variable)
 
-        yScale.domain(data.map(function(d){ return d.album_name; }))
+        function changeSize(size) {
+          chart
+          .selectAll(".bar")
+          .attr('width', size)
+        }
+
+        // Listen to the slider?
+        d3.select(".d_sel").on('click', function(d){
+          selected_variable = this.value
+          selected_variable_scaled = this.value + '_scaled';
+        console.log(selected_variable);
+        changeSize(function(d) {return d[selected_variable_scaled];})
+        })
+
+
+    //    xScale.domain([0, d3.max(data, function (d) { return d[selected_variable//] * 1.1; })]);
+//
+    //    yScale.domain(data.map(function(d){ return d.album_name; }))
+//
+    //      chart
+    //      .selectAll(".bar")
+    //      .attr('width', function (d) { return d[selected_variable]; })
+
 
   //     var yAxis = d3.axisLeft(yScale)
   //             .tickFormat(function(d){ return d[image;});;
@@ -338,8 +360,6 @@ d3.selectAll('.d_sel').on('click', function(){
 		};
 
 	});
-
-}); 
 
     </script>
     </body>

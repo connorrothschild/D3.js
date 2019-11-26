@@ -1,0 +1,122 @@
+album_name,group,score
+808s & Heartbreak,danceability,0.653291667
+808s & Heartbreak,energy,0.4825
+808s & Heartbreak,key,5.666666667
+808s & Heartbreak,loudness,-9.317583333
+808s & Heartbreak,mode,0.5
+808s & Heartbreak,speechiness,0.058375
+808s & Heartbreak,acousticness,0.2073125
+808s & Heartbreak,instrumentalness,0.139196217
+808s & Heartbreak,liveness,0.227879167
+808s & Heartbreak,valence,0.345679167
+808s & Heartbreak,tempo,116.932875
+Graduation,danceability,0.5722
+Graduation,energy,0.624675
+Graduation,key,5.5
+Graduation,loudness,-7.1974
+Graduation,mode,0.6
+Graduation,speechiness,0.18576
+Graduation,acousticness,0.11222675
+Graduation,instrumentalness,4.01E-05
+Graduation,liveness,0.3044775
+Graduation,valence,0.50983
+Graduation,tempo,104.9856
+JESUS IS KING,danceability,0.566454545
+JESUS IS KING,energy,0.539454545
+JESUS IS KING,key,4.909090909
+JESUS IS KING,loudness,-6.253454545
+JESUS IS KING,mode,0.363636364
+JESUS IS KING,speechiness,0.151118182
+JESUS IS KING,acousticness,0.479577091
+JESUS IS KING,instrumentalness,0.000223036
+JESUS IS KING,liveness,0.301054545
+JESUS IS KING,valence,0.380727273
+JESUS IS KING,tempo,102.2899091
+Good Music Cruel Summer,danceability,0.571416667
+Good Music Cruel Summer,energy,0.676833333
+Good Music Cruel Summer,key,5.083333333
+Good Music Cruel Summer,loudness,-6.623666667
+Good Music Cruel Summer,mode,0.416666667
+Good Music Cruel Summer,speechiness,0.213366667
+Good Music Cruel Summer,acousticness,0.079515
+Good Music Cruel Summer,instrumentalness,0.000186083
+Good Music Cruel Summer,liveness,0.253358333
+Good Music Cruel Summer,valence,0.366058333
+Good Music Cruel Summer,tempo,127.97975
+KIDS SEE GHOSTS,danceability,0.649
+KIDS SEE GHOSTS,energy,0.622142857
+KIDS SEE GHOSTS,key,3.714285714
+KIDS SEE GHOSTS,loudness,-6.092428571
+KIDS SEE GHOSTS,mode,0.571428571
+KIDS SEE GHOSTS,speechiness,0.118871429
+KIDS SEE GHOSTS,acousticness,0.247652857
+KIDS SEE GHOSTS,instrumentalness,0.005799221
+KIDS SEE GHOSTS,liveness,0.213571429
+KIDS SEE GHOSTS,valence,0.378428571
+KIDS SEE GHOSTS,tempo,120.601
+Late Registration,danceability,0.603046875
+Late Registration,energy,0.635625
+Late Registration,key,6.453125
+Late Registration,loudness,-7.860140625
+Late Registration,mode,0.53125
+Late Registration,speechiness,0.374454688
+Late Registration,acousticness,0.182325156
+Late Registration,instrumentalness,0.001879337
+Late Registration,liveness,0.2060875
+Late Registration,valence,0.519375
+Late Registration,tempo,102.6952031
+My Beautiful Dark Twisted Fantasy,danceability,0.532346154
+My Beautiful Dark Twisted Fantasy,energy,0.680046154
+My Beautiful Dark Twisted Fantasy,key,4.961538462
+My Beautiful Dark Twisted Fantasy,loudness,-5.938730769
+My Beautiful Dark Twisted Fantasy,mode,0.307692308
+My Beautiful Dark Twisted Fantasy,speechiness,0.135930769
+My Beautiful Dark Twisted Fantasy,acousticness,0.190156923
+My Beautiful Dark Twisted Fantasy,instrumentalness,0.060181515
+My Beautiful Dark Twisted Fantasy,liveness,0.377423077
+My Beautiful Dark Twisted Fantasy,valence,0.361273077
+My Beautiful Dark Twisted Fantasy,tempo,111.2858077
+The College Dropout,danceability,0.592666667
+The College Dropout,energy,0.590547619
+The College Dropout,key,6.071428571
+The College Dropout,loudness,-7.839166667
+The College Dropout,mode,0.476190476
+The College Dropout,speechiness,0.407716667
+The College Dropout,acousticness,0.359087857
+The College Dropout,instrumentalness,1.16E-06
+The College Dropout,liveness,0.316740476
+The College Dropout,valence,0.663047619
+The College Dropout,tempo,106.1515952
+The Life Of Pablo,danceability,0.611025641
+The Life Of Pablo,energy,0.575717949
+The Life Of Pablo,key,6.564102564
+The Life Of Pablo,loudness,-6.176717949
+The Life Of Pablo,mode,0.692307692
+The Life Of Pablo,speechiness,0.258520513
+The Life Of Pablo,acousticness,0.34349
+The Life Of Pablo,instrumentalness,0.000203399
+The Life Of Pablo,liveness,0.243769231
+The Life Of Pablo,valence,0.394884615
+The Life Of Pablo,tempo,110.9262821
+ye,danceability,0.685857143
+ye,energy,0.503428571
+ye,key,5
+ye,loudness,-5.668285714
+ye,mode,0.285714286
+ye,speechiness,0.314528571
+ye,acousticness,0.306742857
+ye,instrumentalness,0
+ye,liveness,0.185957143
+ye,valence,0.281385714
+ye,tempo,121.3627143
+Yeezus,danceability,0.5562
+Yeezus,energy,0.592
+Yeezus,key,4.7
+Yeezus,loudness,-5.4099
+Yeezus,mode,0.6
+Yeezus,speechiness,0.1791
+Yeezus,acousticness,0.1742754
+Yeezus,instrumentalness,8.91E-05
+Yeezus,liveness,0.15278
+Yeezus,valence,0.35279
+Yeezus,tempo,119.8598
