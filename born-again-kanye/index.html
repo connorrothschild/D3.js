@@ -10,11 +10,6 @@
        font-family: 'Lato', sans-serif;
         }
 
-    h2 {
-      text-align: center;
-      font-family: 'Lato', sans-serif;
-    	}
-
     .pTitle {
        font-size: 24px;
        font-weight: 5px;
@@ -27,6 +22,14 @@
       text-align: center;
       font-size: 25px;
       color: black;
+    }
+
+    .dropdown {
+      text-align-last:center;
+      font-size: 25px;
+      color: black;
+      border: none;
+      fill: none;
     }
 
     .axis--x path {
@@ -83,14 +86,6 @@
       margin-right: auto;
 		}
 
-    #SideText{
-        font-family: 'Lato', sans-serif;
-        max-width: 1000px;
-        margin-left: auto;
-        margin-right: auto;
-        font-family: 'Lato', sans-serif;
-      }
-
     div.tooltip {
       position: absolute;
       top: 100px;
@@ -123,11 +118,14 @@
 
     <h1> <img src="https://d063e17xn2-flywheel.netdna-ssl.com/wp-content/uploads/2019/10/https-hypebeast.com-image-2019-10-kanye-west-jesus-is-king-album-release-stream-spotify-apple-music-download-11-1-1.jpg" width = "78", height = "52", align = "center">Kanye West's Rebirth <img src="https://d063e17xn2-flywheel.netdna-ssl.com/wp-content/uploads/2019/10/https-hypebeast.com-image-2019-10-kanye-west-jesus-is-king-album-release-stream-spotify-apple-music-download-11-1-1.jpg" width = "78", height = "52", align = "center"></h1>
 
-    <p><span style = "font-weight:bold">Kanye West has been born again.</span> His philosophy on life, his politics, and his faith have all undergone significant changes in less than a year. <br><br> But how does Kanye West's most recent album compare to his previous ones? Aside from his spiritual transformation, has he been musically born again?</p>
+    <p><span style = "font-weight:bold">Kanye West has been born again.
+    </span> His philosophy on life, his politics, and his faith have all undergone significant changes in less than a year. 
+    <br><br> 
+    But how does Kanye West's most recent album compare to his previous ones? Aside from his spiritual transformation, has he been musically born again? Using data from the <a href="https://developer.spotify.com/documentation/web-api/">Spotify API</a>, we can answer the question:</p>
 
     <p class = "middletext">How does <span style = "color:#0534D7">Jesus is King</span> compare to Kanye West's other albums in 
 
-	<select id="filter" class = "middletext">
+	<select id="filter" class = "dropdown">
       <option value=acousticness>Acousticness</option>
       <option value=danceability>Danceability</option>
       <option value=liveness>Liveness</option>
@@ -138,17 +136,22 @@
     ?
     </p>
 
-<div id="SideText">
-  <!-- <p id="p0" class="pTitle Side">Acousticness</p> -->
-  <p id="p1" class="Side">Acousticness is defined by Spotify as a confidence measure of whether the track is acoustic. In other words, the music seems to be composed through acoustic means rather than electronic ones.</p>
-  <p class="Side">
+<div>
+  <!-- If you'd like to add a title to each section:
+  <p id="p0" class="pTitle Side">Acousticness</p> -->
+  <p id="p1">Acousticness is defined by Spotify as a confidence measure of whether the track is acoustic. In other words, the music seems to be composed through acoustic means rather than electronic ones.</p>
+
+  <!-- We're splitting this up in to multiple pieces (rather than just one sentence that changes on each attribute) so that we can add styling such as 'Jesus is King' in Blue and the ranking being in bold. -->
+  <p style = "font-size:20px">
     <span>
       <span style = "color:#0534D7">Jesus is King</span> is the
     </span>
 
+  <!-- By giving this statement the id "ranking", it gets replaced with the specified ranking further down in the code --> 
     <span style = "font-weight:bold" id="ranking">most acoustic</span>
     <span>album of Kanye West's discography.</span>
-   <!-- <br><br>
+   <!-- If desired, add a witty remark here
+    <br><br>
     <span id = "wittyremark"></span> -->
   </p>
 
@@ -158,7 +161,8 @@
     <svg></svg>
 </div>
 
-<!-- <div class = "footer">
+<!-- Add a footer, if desired:
+<div class = "footer">
   <p>Data cleaning, analysis, and visualization by <a href="http://connorrothschild.github.io/">Connor Rothschild</a><br>Data is pulled from the <a href="https://developer.spotify.com/documentation/web-api/">Spotify API</a><br>Find the code <a href="https://github.com/connorrothschild/D3.js/tree/master/born-again-kanye">here</a></p>
 </div> -->
 
@@ -166,7 +170,10 @@
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
 
+<!-- Begin script -->
 <script>
+
+// This code was very helpful for creating the button functionality https://github.com/rlbarter/world_happiness_viz/blob/master/index.html
 
 var margin = {top:20, right:20, bottom:50, left:50},
           width  = 1000 - margin.left - margin.right,
@@ -201,9 +208,10 @@ var selected_variable = "Value"
 
 // load the data
 d3.csv("long_kanye_data.csv", function(d) {
+  
   d.score = +d.score;
-//  d.album_name = d.album_name;
   return d;
+
 }, function(error, datafile) {
   if (error) throw error;
 
@@ -217,6 +225,7 @@ d3.csv("long_kanye_data.csv", function(d) {
     return d.group === sq;
   });
 
+  // sort so that bars are ascending
   data.sort(function(a, b) {
   return d3.ascending(a.score, b.score)
 });
@@ -233,6 +242,7 @@ d3.csv("long_kanye_data.csv", function(d) {
      .attr("font-size", "120px")
      .call(d3.axisBottom(x));
 
+// append the images to the y axis
 g.append("g")
      .attr("class", "axis axis--y")
      .call(d3.axisLeft(y))
@@ -245,17 +255,16 @@ g.append("g")
          .attr("width", 28.5)
          .attr("height", 28.5)
          .attr("xlink:href", "assets/" +i+".jpg")
-         //.style('fill', '#000000');
 	
  });
 
-// move the existing text labels to the left of the newly created images
+// and remove the text from the axis
  g.select(".axis--y")
      .selectAll("text")
+     .remove()
+// if desired, move the labels to the left of the images rather than delete the labels
 //      .attr("x", -40)
 //      .attr("font-family", "Lato")
-    // or remove them all
-      .remove()
 
  // add text labels to the end of bars
  svg.append("g")
@@ -276,11 +285,13 @@ g.append("g")
        .attr("fill", "black")
     .text(function(d){ return d3.format(",")(d.score.toFixed(2)); });
 
+// define the tooltip
 var tooltip = d3.select("body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
-//define a function to make selected_variable title case
+// define a function to make selected_variable title case
+// this ended up not being necessary
 String.prototype.toProperCase = function () {
     return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 };
@@ -326,16 +337,16 @@ String.prototype.toProperCase = function () {
       applyFilter(this.value);
 
       var selected_variable = this.value;
-      console.log(selected_variable)
 
-if(selected_variable == "acousticness") {
-      tooltip = "test!"
+// this function rewrites the paragraph text that accompanies each view. Using `selected_variable` (defined above), it then changes #p0, #p1, and #ranking to the correct text.
+
+    if(selected_variable == "acousticness") {
       d3.select("#p0").transition().duration(800).style("opacity", 1).text("Acousticness");
       d3.select("#p1").transition().duration(800).style("opacity", 1).text("Acousticness is defined by Spotify as a confidence measure of whether the track is acoustic. In other words, the music seems to be composed through acoustic means rather than electronic ones.");
       d3.select("#ranking").transition().duration(800).style("opacity", 1).text("most acoustic");
     } else if (selected_variable == "danceability") {
       d3.select("#p0").transition().duration(800).style("opacity", 1).text("Danceability");
-      d3.select("#p1").transition().duration(800).style("opacity", 1).text("Danceability is defined by Spotify as 'how suitable a track is for dancing', based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity.");
+      d3.select("#p1").transition().duration(800).style("opacity", 1).text("Danceability is a measure of 'how suitable a track is for dancing', based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity.");
       d3.select("#ranking").transition().duration(800).style("opacity", 1).text("third least danceable");
     } else if (selected_variable == "liveness") {
       d3.select("#p0").transition().duration(800).style("opacity", 1).text("Liveness");
@@ -343,17 +354,17 @@ if(selected_variable == "acousticness") {
       d3.select("#ranking").transition().duration(800).style("opacity", 1).text("fourth most 'live'");
     } else if (selected_variable == "energy") {
       d3.select("#p0").transition().duration(800).style("opacity", 1).text("Energy");
-      d3.select("#p1").transition().duration(800).style("opacity", 1).text("Energy is defined by Spotify as a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. The features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy.");
+      d3.select("#p1").transition().duration(800).style("opacity", 1).text("Energy is Spotify's perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. The features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy.");
       d3.select("#ranking").transition().duration(800).style("opacity", 1).text("third least energetic");
     } else if (selected_variable == "mode") {
       d3.select("#p0").transition().duration(800).style("opacity", 1).text("Employment rate");
-      d3.select("#p1").transition().duration(800).style("opacity", 1).text("Mode is a measure used to indicate the modality of a track. In other words, it indicates whether a track is major (1) or minor (0).");
+      d3.select("#p1").transition().duration(800).style("opacity", 1).text("Mode is a measure Spotify uses to indicate the modality of a track. In other words, it indicates whether a given track is major (1) or minor (0).");
       d3.select("#ranking").transition().duration(800).style("opacity", 1).text("third least modal");
     } else if (selected_variable == "valence") {
       d3.select("#p0").transition().duration(800).style("opacity", 1).text("Valence");
       d3.select("#p1").transition().duration(800).style("opacity", 1).text("Valence is a measure used by Spotify to determine the 'musical positiveness conveyed by a track.' Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).");
       d3.select("#ranking").transition().duration(800).style("opacity", 1).text("fifth most positive");
-      //d3.select("#wittyremark").transition().duration(800).style("opacity", 1).text("");
+      // if desired, add a witty remark after the statement d3.select("#wittyremark").transition().duration(800).style("opacity", 1).text("Looks like Kanye's not that happy!");
       
     } 
 
@@ -365,6 +376,7 @@ if(selected_variable == "acousticness") {
     // filter the data
     var data = csv.filter(function(d) {return d.group === value;});
 
+    // resort the data, so that the bars are in ascending order
   	data.sort(function(a, b) {
   	  return d3.ascending(a.score, b.score)
   	});
@@ -373,16 +385,13 @@ if(selected_variable == "acousticness") {
     x.domain([0, d3.max(data, function(d) { return d.score * 1.1; })]);
    	y.domain(data.map(function(d) { return d.album_name; }));
 
-  	// update axis
+  	// update x axis
   	svg.select(".axis--x")
   	 .transition().duration(1000)
      .attr("transform", "translate(0," + height + ")")
      .call(d3.axisBottom(x));
 
-   g.select(".axis--y")
-     .selectAll("tick.text")
-     .remove()
-
+     // update the y axis, so that the album covers move
     svg.select(".axis--y")
   	 .transition().duration(1000)
      .call(d3.axisLeft(y));
@@ -393,7 +402,6 @@ if(selected_variable == "acousticness") {
        .transition().duration(1000)
        .attr("x", 0)
        .attr("y", function(d) { return y(d.album_name); })
-       //.attr("x", function(d) { return x(d.score); })
        .attr("width", function(d) { return x(d.score); })
        .attr("height", function(d){ return y.bandwidth(); })
        .attr("fill", function (d) {
@@ -403,6 +411,7 @@ if(selected_variable == "acousticness") {
                     return "grey";
                 };});
 
+      // update the text labels
       d3.selectAll(".textlabel-1")
      	.data(data)
      	.transition().duration(1000)
