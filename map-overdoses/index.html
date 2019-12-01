@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<title>U.S. Overdose Deaths</title>
 <meta charset="utf-8">
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <style type="text/css">
 
 body {
-  	font-family: 'Lato', sans-serif;
+  font-family: 'Lato', sans-serif;
 	background-color: #ffffff;
 }
         
 .legend {
-	position:absolute;
+  position: absolute;
 	left:20px;
-	top:30px;
+	top:150px;
 	font-family: 'Lato', sans-serif;
 }
 
@@ -29,9 +30,30 @@ body {
     pointer-events: none;			
 }
 
+h1 {
+  text-align: center;
+  max-width: 960px;
+  font-weight: normal;
+}
+
+.year {
+  font-size: 35px;
+  font-family: 'Lato', sans-serif;  
+  font-weight: 60;
+}
+
+/* svg {
+   display: block;
+   margin: auto;
+  }
+*/
+
 </style>
 </head>
 <body>
+
+<h1>U.S. Overdose Deaths</h1>
+
 <script type="text/javascript">
 		
 // set width and height of map
@@ -66,14 +88,16 @@ var tooltip = d3.select("body").append("div")
 // source: https://www.cdc.gov/nchs/pressroom/sosmap/drug_poisoning_mortality/drug_poisoning.htm
 d3.csv("overdoses.csv", function(data) {
 
-// filter only 2017 data
+//filter only 2017 data
 var data = data.filter(function (d) {
 		return d.year === "2017"; })
-
-	var dataArray = [];
+	
+  var dataArray = [];
 	for (var d = 0; d < data.length; d++) {
 	dataArray.push(parseFloat(data[d].value));
 	}
+
+  console.log(dataArray);
 	
 	// set minimum/maximum values for color scale
 	var minVal = d3.min(dataArray)
@@ -125,12 +149,20 @@ var data = data.filter(function (d) {
       }
     }
 
+    //var data1 = json.features;
+    //console.log(data1);
+    console.log(json);
+
+   // var ninenine = data1.filter(function (d) {return d.properties.year === ""; });
+    //console.log(ninenine);
+
     // bind the data to the SVG and create one path per GeoJSON feature
     svg.selectAll("path")
       .data(json.features)
       .enter()
       .append("path")
       .attr("d", path)
+      //.style("stroke", "#000000")
       .style("stroke", "#fff")
       .style("stroke-width", "1")
       .style("fill", function(d) { return ramp(d.properties.value); })
@@ -141,8 +173,8 @@ var data = data.filter(function (d) {
            .style("opacity", .95);      
            tooltip.html(
            			"<b>State</b>: " + d.properties.name + 
-                    "<br/> <b>Death Rate (Per 100k)</b>: " + d.properties.value + 
-                    "<br/> <b>Deaths (Raw)</b>: " + d.properties.deaths + 
+                    "<br/> <b>Deaths per 100k</b>: " + d.properties.value + 
+                    "<br/> <b>Total Deaths</b>: " + d.properties.deaths + 
                     "<br/> <b>Year</b>: " + d.properties.year)
                .style("left", (d3.event.pageX + 5) + "px")
                .style("top", (d3.event.pageY - 28) + "px");  
@@ -155,7 +187,7 @@ var data = data.filter(function (d) {
 
 // add a legend
 // helpful: https://bl.ocks.org/wboykinm/dbbe50d1023f90d4e241712395c27fb3
-var w = 140, h = 450;
+var w = 140, h = 400;
 
 var key = d3.select("body")
 	.append("svg")
@@ -192,12 +224,76 @@ var y = d3.scaleLinear()
 	.range([h, 0])
 	.domain([minVal, maxVal]);
 
-var yAxis = d3.axisRight(y);
+var yAxis = d3.axisRight(y)
+    .ticks(7)
+    .tickSize(0);
 
 key.append("g")
 	.attr("class", "y axis")
-	.attr("transform", "translate(41,10)")
+	.attr("transform", "translate(40,10)")
 	.call(yAxis)
+
+// add title to legend
+// helpful: http://dimplejs.org/advanced_examples_viewer.html?id=advanced_interactive_legends
+// key.selectAll("title_text")
+//   .data(["Overdose Deaths per 100,000"])
+//   .enter()
+//   .append("text")
+//     .attr("x", 0)
+//     .attr("y", 9)
+//     .style("font-family", "Lato")
+//     .style("font-size", "12px")
+//     .style("color", "Black")
+//     .text(function (d) { return d; });
+
+// nvm, add text this way lol its way easier
+svg.append("text") 
+  .html(function (d) {
+  return "<tspan x='.6em' dy='1.2em'>" + "Overdose deaths" + "</tspan>" 
+       + "<tspan x='.6em' dy='1.2em'>" + "per 100,000" + "</tspan>";
+})
+  .attr("x", 0)
+  .attr("y", 25)
+
+// add year banner
+svg.append("text")
+  .data(json.features)
+  .attr("class", "year")
+  .text(function (d) {
+    return d.properties.year;
+  })
+  .attr("x", 650)
+  .attr("y", 105)
+
+//// ANIMATION
+
+var update = function(){
+
+svg.selectAll("path")
+      .transition()
+      .duration(1000)
+      .style("fill", "black")
+      .transition()
+      .duration(1000)
+      .style("fill", function(d) { return ramp(d.properties.value); });
+
+      repeat();
+
+      function repeat() {
+
+ svg.selectAll("path")
+      .transition()
+      .duration(1000)
+      .style("fill", "black")
+      .transition()
+      .duration(1000)
+      .style("fill", function(d) { return ramp(d.properties.value); })
+        .on("end", repeat);  // when the transition finishes start again
+    };
+
+};
+
+  update()
 
   });
 });
