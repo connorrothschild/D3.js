@@ -88,15 +88,29 @@ var tooltip = d3.select("body").append("div")
 // source: https://www.cdc.gov/nchs/pressroom/sosmap/drug_poisoning_mortality/drug_poisoning.htm
 d3.csv("overdoses.csv", function(data) {
 
+data.forEach(function (d) {
+    // coerce to number
+    d.value = +d.value;
+});
+
+//var data2017 = data.filter(function(d) {return d.year === "2017"});
+//var data2016 = data.filter(function(d) {return d.year === "2016"});
+//var data2015 = data.filter(function(d) {return d.year === "2015"});
+//var data2014 = data.filter(function(d) {return d.year === "2014"});
+//var data1999 = data.filter(function(d) {return d.year === "1999"});
+
+console.log(data);
+
 //filter only 2017 data
 var data = data.filter(function (d) {
 		return d.year === "2017"; })
 	
   var dataArray = [];
 	for (var d = 0; d < data.length; d++) {
-	dataArray.push(parseFloat(data[d].value));
+	 dataArray.push(parseFloat(data[d].value));
 	}
 
+  console.log(data);
   console.log(dataArray);
 	
 	// set minimum/maximum values for color scale
@@ -115,6 +129,8 @@ var data = data.filter(function (d) {
   // load GeoJSON data and merge with states data
   // source: https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/us-states.json
   d3.json("us_states.json", function(json) {
+
+    var json = json;
 
     // loop through each state data value in the .csv file
     for (var i = 0; i < data.length; i++) {
@@ -153,7 +169,7 @@ var data = data.filter(function (d) {
     //console.log(data1);
     console.log(json);
 
-   // var ninenine = data1.filter(function (d) {return d.properties.year === ""; });
+   //var ninenine = json.features.filter(function (d) {return d.properties.year === "2017"; });
     //console.log(ninenine);
 
     // bind the data to the SVG and create one path per GeoJSON feature
@@ -269,31 +285,101 @@ svg.append("text")
 
 var update = function(){
 
-svg.selectAll("path")
-      .transition()
-      .duration(1000)
-      .style("fill", "black")
-      .transition()
-      .duration(1000)
-      .style("fill", function(d) { return ramp(d.properties.value); });
+  // loop through each state data value in the .csv file
+    for (var i = 0; i < data2017.length; i++) {
 
-      repeat();
+      // add state name
+      var dataState = data2017[i].state;
 
-      function repeat() {
+      // add data value (death rates)
+      var dataValue = data2017[i].value;
 
- svg.selectAll("path")
-      .transition()
-      .duration(1000)
-      .style("fill", "black")
-      .transition()
-      .duration(1000)
+      // add year value
+      var dataYear = data2017[i].year;
+
+      // add deaths
+      var dataDeaths = data2017[i].total_deaths;
+
+      // find the corresponding state inside the GeoJSON
+      for (var j = 0; j < json.features.length; j++) {
+
+        var json2017 = json;
+
+        var jsonState = json2017.features[j].properties.name;
+
+        if (dataState == jsonState) {
+
+          // copy the data value into the JSON
+          json2017.features[j].properties.value = dataValue;
+          json2017.features[j].properties.year = dataYear;
+          json2017.features[j].properties.deaths = dataDeaths;
+
+          // stop looking through JSON
+          break;
+        }
+      }
+    }
+
+console.table(json2017);
+
+var u = svg.selectAll("path")
+    .data(json2017.features);
+
+u.exit().remove();
+
+u
+      .enter()
+      .append("path")
+     // .transition()
+     // .duration(1000)      
+      .attr("d", path)
+      //.style("stroke", "#000000")
+      .style("stroke", "#fff")
+      .style("stroke-width", "1")
       .style("fill", function(d) { return ramp(d.properties.value); })
-        .on("end", repeat);  // when the transition finishes start again
-    };
+      // add tooltip
+  .on("mouseover", function(d) {      
+      tooltip.transition()        
+           .duration(200)      
+           .style("opacity", .95);      
+           tooltip.html(
+                "<b>State</b>: " + d.properties.name + 
+                    "<br/> <b>Deaths per 100k</b>: " + d.properties.value + 
+                    "<br/> <b>Total Deaths</b>: " + d.properties.deaths + 
+                    "<br/> <b>Year</b>: " + d.properties.year)
+               .style("left", (d3.event.pageX + 5) + "px")
+               .style("top", (d3.event.pageY - 28) + "px");  
+  })                
+    .on("mouseout", function(d) {       
+        tooltip.transition()        
+           .duration(500)      
+           .style("opacity", 0);   
+    });
+
+//svg.selectAll("path")
+//      .transition()
+//      .duration(1000)
+//      .style("fill", "black")
+//      .transition()
+//      .duration(1000)
+//      .style("fill", function(d) { return ramp(properties.value//); });
+//      repeat();
+//
+//      function repeat() {
+//
+// svg.selectAll("path")
+//      .transition()
+//      .duration(1000)
+//      .style("fill", "black")
+//      .transition()
+//      .duration(1000)
+//      .style("fill", function(d) { return ramp(properties.////value); })
+//        .on("end", repeat);  // when the transition finishes //start again
+//    };
 
 };
 
-  update()
+//  update();
 
   });
 });
