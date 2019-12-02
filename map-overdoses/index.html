@@ -86,214 +86,232 @@ div.tooltip {
 <script src="https://d3js.org/queue.v1.min.js"></script>
 
 <script>
-  var svg = d3.select("svg");
-  var path = d3.geoPath();
-  var format = d3.format("");
-  var height = 600;
-  var width = 960;
 
-  var colorScheme = d3.schemeBlues[9];
-  colorScheme.unshift("#eee");
+/* This viz was made a lot easier thanks to the following code:
 
-  var color = d3.scaleQuantize()
-    .domain([0, 50])
-    .range(colorScheme);
-  var x = d3.scaleLinear()
-    .domain(d3.extent(color.domain()))
-    .rangeRound([600,860]);
-  var g = svg.append("g")
-    .attr("transform", "translate(0,40)");
+* animation using TweenYear
+http://bl.ocks.org/jgujgu/bfbb41f5e8b90ff09d7805f71ef2538e
+* choropleth map of us states (using json fips state ids)
+https://bl.ocks.org/chucklam/f628765b873d707a3d0e44ffc78deab8
+* another choropleth; although I didn't end up following its structure it was a helpful introduction
+https://bl.ocks.org/wboykinm/dbbe50d1023f90d4e241712395c27fb3
 
-  // legend boxes
-  g.selectAll("rect")
-    .data(color.range().map(function(d){ return color.invertExtent(d); }))
-    .enter()
-    .append("rect")
-      .attr("height", 8)
-      .attr("x", function(d){ return x(d[0]); })
-      .attr("width", function(d){ return x(d[1]) - x(d[0]); })
-      .attr("fill", function(d){ return color(d[0]); });
+A special thanks to Robert Hosbach for his viz here (and his willingness to respond to my email!): https://rahosbach.github.io/2018-10-27-d3UnemploymentChoropleth/
+*/  
 
-  // legend title
-  g.append("text")
-    .attr("class", "caption")
-    .attr("x", x.range()[0])
-    .attr("y", -6)
-    .attr("fill", "#000")
-    .attr("text-anchor", "start")
-    .attr("font-weight", 30)
-    .text("Overdose Death Rate (Per 100,000)");
+var svg = d3.select("svg");
+var path = d3.geoPath();
+var format = d3.format("");
+var height = 600;
+var width = 960;
 
-  // legend ticks
-  g.call(d3.axisBottom(x)
-    .tickSize(13)
-    .tickFormat(format)
-    .tickValues(color.range().slice(1).map(function(d){ return color.invertExtent(d)[0]; })))
-    .select(".domain")
-    .remove();
+// options for color scheme: https://github.com/d3/d3-scale-chromatic
+var colorScheme = d3.schemeReds[9];
+colorScheme.unshift("#eee");
 
-  // create tooltip
-  var div = d3.select("body")
-    .append("div")
-    .attr("class", "tooltip")
-    .style("opacity", 0);
+// building the legend at the top
+var color = d3.scaleQuantize()
+  .domain([0, 50])
+  .range(colorScheme);
+var x = d3.scaleLinear()
+  .domain(d3.extent(color.domain()))
+  // the range specifies the x position of the legend
+  .rangeRound([600,860]);
+var g = svg.append("g")
+  .attr("transform", "translate(0,40)");
+
+// legend boxes
+g.selectAll("rect")
+  .data(color.range().map(function(d){ return color.invertExtent(d); }))
+  .enter()
+  .append("rect")
+    .attr("height", 8)
+    .attr("x", function(d){ return x(d[0]); })
+    .attr("width", function(d){ return x(d[1]) - x(d[0]); })
+    .attr("fill", function(d){ return color(d[0]); });
+
+// legend title
+g.append("text")
+  .attr("class", "caption")
+  .attr("x", x.range()[0])
+  .attr("y", -6)
+  .attr("fill", "#000")
+  .attr("text-anchor", "start")
+  .attr("font-weight", 30)
+  .text("Overdose Death Rate (Per 100,000)");
+
+// legend ticks
+g.call(d3.axisBottom(x)
+  .tickSize(13)
+  .tickFormat(format)
+  .tickValues(color.range().slice(1).map(function(d){ return color.invertExtent(d)[0]; })))
+  .select(".domain")
+  .remove();
+
+// create tooltip
+var div = d3.select("body")
+  .append("div")
+  .attr("class", "tooltip")
+  .style("opacity", 0);
 
 // label positions
 labely = height - 50
 labelx = width - 280
 
-  // Add the year label; the value is set on transition.
-  var label = svg.append("text")
-    .attr("class", "year label")
-    .attr("text-anchor", "middle")
-    // position the label
-    .attr("y", labely)
-    .attr("x", labelx)
-    .text(1999);
+// Add the year label; the value is set on transition.
+var label = svg.append("text")
+  .attr("class", "year label")
+  .attr("text-anchor", "middle")
+  // position the label
+  .attr("y", labely)
+  .attr("x", labelx)
+  .text(1999);
 
-  var helperlabel = svg.append("text")
-    .attr("class", "helper label")
-    .attr("text-anchor", "middle")
-    // position the label
-    .attr("y", labely + 20)
-    .attr("x", labelx)
-    .text("Hover to change year");
+var helperlabel = svg.append("text")
+  .attr("class", "helper label")
+  .attr("text-anchor", "middle")
+  // position the label
+  .attr("y", labely + 20)
+  .attr("x", labelx)
+  .text("Hover to change year");
 
-  queue()
-    // read in JSON which includes all of the complicated shape data for states/counties/etc.
-    .defer(d3.json, "https://d3js.org/us-10m.v1.json")
-    // read in opioid data
-    .defer(d3.csv, "overdoses.csv")
-    /*
-    NOTE ON OVERDOSE DATA: 
-    
-    This CSV file was created via pulling data from CDC's WONDER database.
-    
-    I pulled all deaths from the National Vital Statistics System's multiple cause-of-death mortality files which had one of the following causes of death: opioids (T40.0, T40.1, T40.2, T40.3, T40.4, or T40.6)**; natural/semisynthetic opioids (T40.2); methadone (T40.3); heroin (T40.1); synthetic opioids other than methadone (T40.4); cocaine (T40.5). I followed the methodology of this paper: https://www.cdc.gov/mmwr/volumes/67/wr/mm675152e1.htm?s_cid=mm675152e1_w. Deaths may include multiple opioids as a cause and thus are not mutually exclusive.
-
-    You can replicate the data pull on CDC WONDER with this link: https://wonder.cdc.gov/mcd-icd10.html
-
-    Source: Multiple Cause of Death 1999–2017 on CDC Wide-ranging Online Data for Epidemiologic Research (CDC WONDER). Atlanta, GA: CDC, National Center for Health Statistics. 2018. Available at http://wonder.cdc.gov. 
-    */
-    .await(ready);
+queue()
+  // read in JSON which includes all of the complicated shape data for states/counties/etc.
+  .defer(d3.json, "https://d3js.org/us-10m.v1.json")
+  // read in opioid data
+  .defer(d3.csv, "overdoses.csv")
+  /*
+  NOTE ON OVERDOSE DATA: 
   
-  function ready(error, us, overdoses) {
-    if (error) throw error;
-
-      // Initialize data to 1990
-      var currentYear = 1999;
-
-      // Add an overlay for the year label.
-      var box = label.node().getBBox();
+  This CSV file was created via pulling data from CDC's WONDER database.
   
-      var overlay = svg.append("rect")
-        .attr("class", "overlay")
-        .attr("x", box.x)
-        .attr("y", box.y)
-        .attr("width", box.width)
-        .attr("height", box.height)
-        .on("mouseover", enableInteraction);
-  
-      // Start a transition that interpolates the data based on year.
-      svg.transition()
-        .duration(10000)
-        .ease(d3.easeLinear)
-        .tween("year", tweenYear);
+  I pulled all deaths from the National Vital Statistics System's multiple cause-of-death mortality files which had one of the following causes of death: opioids (T40.0, T40.1, T40.2, T40.3, T40.4, or T40.6)**; natural/semisynthetic opioids (T40.2); methadone (T40.3); heroin (T40.1); synthetic opioids other than methadone (T40.4); cocaine (T40.5). I followed the methodology of this paper: https://www.cdc.gov/mmwr/volumes/67/wr/mm675152e1.htm?s_cid=mm675152e1_w. Deaths may include multiple opioids as a cause and thus are not mutually exclusive.
 
-      states = svg.append("g")
-        .attr("class", "states")
-        .selectAll("path")
-        .data(topojson.feature(us, us.objects.states).features)
-        .enter()
-        .append("path")
-        .attr("d", path)
-        .call(style,currentYear)
+  You can replicate the data pull on CDC WONDER with this link: https://wonder.cdc.gov/mcd-icd10.html
 
-      function style(states, year){
-        newoverdoses = interpolateData(year);
+  Source: Multiple Cause of Death 1999–2017 on CDC Wide-ranging Online Data for Epidemiologic Research (CDC WONDER). Atlanta, GA: CDC, National Center for Health Statistics. 2018. Available at http://wonder.cdc.gov. 
+  */
+  .await(ready);
 
-      var rateById = {};
-      var nameById = {};
+function ready(error, us, overdoses) {
+  if (error) throw error;
 
-      newoverdoses.forEach(function(d) {
+    // Initialize data to 1990
+    var currentYear = 1999;
 
-        // each state is encoded according to its ANSI/FIPS state code
-        // you can find states and their codes here https://en.wikipedia.org/wiki/List_of_U.S._state_abbreviations#ANSI_standard_INCITS_38:2009
-        rateById[d.id] = +d.rate;
-        nameById[d.id] = d.state;
-        
-      });
+    // Add an overlay for the year label.
+    var box = label.node().getBBox();
+
+    var overlay = svg.append("rect")
+      .attr("class", "overlay")
+      .attr("x", box.x)
+      .attr("y", box.y)
+      .attr("width", box.width)
+      .attr("height", box.height)
+      .on("mouseover", enableInteraction);
+
+    // Start a transition that interpolates the data based on year.
+    svg.transition()
+      .duration(10000)
+      .ease(d3.easeLinear)
+      .tween("year", tweenYear);
+
+    states = svg.append("g")
+      .attr("class", "states")
+      .selectAll("path")
+      .data(topojson.feature(us, us.objects.states).features)
+      .enter()
+      .append("path")
+      .attr("d", path)
+      .call(style,currentYear)
+
+    function style(states, year){
+      newoverdoses = interpolateData(year);
+
+    var rateById = {};
+    var nameById = {};
+
+    newoverdoses.forEach(function(d) {
+
+      // each state is encoded according to its ANSI/FIPS state code
+      // you can find states and their codes here https://en.wikipedia.org/wiki/List_of_U.S._state_abbreviations#ANSI_standard_INCITS_38:2009
+      rateById[d.id] = +d.rate;
+      nameById[d.id] = d.state;
       
-      states.style("fill", function(d) { return color(rateById[d.id]); })
-        .on("mouseover", function(d) {      
-            div.transition()        
-              .duration(200)      
-              .style("opacity", .9);  
+    });
+    
+    // add fill according to death rates, for each id (state)
+    states.style("fill", function(d) { return color(rateById[d.id]); })
+      .on("mouseover", function(d) {      
+          div.transition()        
+            .duration(200)      
+            .style("opacity", .9);  
 
-        // add tooltip here    
-            div.html('<strong> State: </strong>' + nameById[d.id] + 
-              '<br>' + 
-              '<strong> Year: </strong>' + Math.round(currentYear) +
-              '<br>' + 
-              '<strong> Rate: </strong>' + rateById[d.id] + " per 100,000")
-              .style("left", (d3.event.pageX) + "px")     
-              .style("top", (d3.event.pageY - 28) + "px");})   
-         // fade out tooltip on mouse out               
-         .on("mouseout", function(d) {       
-            div.transition()        
-             .duration(500)      
-             .style("opacity", 0);});
+      // add tooltip here    
+          div.html('<strong> State: </strong>' + nameById[d.id] + 
+            '<br>' + 
+            '<strong> Year: </strong>' + Math.round(currentYear) +
+            '<br>' + 
+            '<strong> Rate: </strong>' + rateById[d.id] + " per 100,000")
+            .style("left", (d3.event.pageX) + "px")     
+            .style("top", (d3.event.pageY - 28) + "px");})   
+       // remove tooltip on mouse out               
+       .on("mouseout", function(d) {       
+          div.transition()        
+           .duration(500)      
+           .style("opacity", 0);});
+  }
+
+  // create the actual state objects
+  svg.append("path")
+    .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
+    .attr("fill", "none")
+    .attr("stroke", "white")
+    .attr("stroke-linejoin", "round")
+    .attr("d", path);
+
+  // after the transition finishes, mouseover to change  year.
+  function enableInteraction() {
+    var yearScale = d3.scaleLinear()
+      .domain([1999, 2017])
+      .range([box.x + 10, box.x + box.width - 10])
+      .clamp(true);
+
+    // Cancel the current transition, if any.
+    svg.transition().duration(0);
+
+    overlay
+      .on("mouseover", mouseover)
+      .on("mouseout", mouseout)
+      .on("mousemove", mousemove)
+      .on("touchmove", mousemove);
+
+    function mouseover() { label.classed("active", true); }
+    function mouseout() { label.classed("active", false); }
+    function mousemove() { displayYear(yearScale.invert(d3.mouse(this)[0])); }
+  }
+
+  // Tweens the entire chart by first tweening the year, and then the data.
+  // For the interpolated data, the dots and label are redrawn.
+  function tweenYear() {
+    var year = d3.interpolateNumber(1999, 2017);
+    return function(t) { displayYear(year(t)); };
+  }
+
+  // Updates the display to show the specified year.
+  function displayYear(year) {
+    currentYear = year;
+    states.call(style,year)
+    label.text(Math.round(year));
+  }
+
+  // Interpolates the dataset for the given (fractional) year.
+  function interpolateData(year) {
+    return overdoses.filter(function(row) {
+    return row['year'] == Math.round(year);
+     });
     }
-
-    svg.append("path")
-      .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
-      .attr("fill", "none")
-      .attr("stroke", "white")
-      .attr("stroke-linejoin", "round")
-      .attr("d", path);
-
-    // After the transition finishes, you can mouseover to change the year.
-    function enableInteraction() {
-      var yearScale = d3.scaleLinear()
-        .domain([1999, 2017])
-        .range([box.x + 10, box.x + box.width - 10])
-        .clamp(true);
-
-      // Cancel the current transition, if any.
-      svg.transition().duration(0);
-
-      overlay
-        .on("mouseover", mouseover)
-        .on("mouseout", mouseout)
-        .on("mousemove", mousemove)
-        .on("touchmove", mousemove);
-
-      function mouseover() { label.classed("active", true); }
-      function mouseout() { label.classed("active", false); }
-      function mousemove() { displayYear(yearScale.invert(d3.mouse(this)[0])); }
-    }
-
-    // Tweens the entire chart by first tweening the year, and then the data.
-    // For the interpolated data, the dots and label are redrawn.
-    function tweenYear() {
-      var year = d3.interpolateNumber(1999, 2017);
-      return function(t) { displayYear(year(t)); };
-    }
-
-    // Updates the display to show the specified year.
-    function displayYear(year) {
-      currentYear = year;
-      states.call(style,year)
-      label.text(Math.round(year));
-    }
-
-    // Interpolates the dataset for the given (fractional) year.
-    function interpolateData(year) {
-      return overdoses.filter(function(row) {
-      return row['year'] == Math.round(year);
-       });
-      }
 };
-  </script> 
+    </script> 
   </body>
 </html>
