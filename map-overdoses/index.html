@@ -1,388 +1,259 @@
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<title>U.S. Overdose Deaths</title>
-<meta charset="utf-8">
-<script src="https://d3js.org/d3.v4.min.js"></script>
-<style type="text/css">
+  <!-- Beautiful Jekyll | MIT license | Copyright Dean Attali 2016 -->
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 
-body {
-  font-family: 'Lato', sans-serif;
-	background-color: #ffffff;
-}
-        
-.legend {
-  position: absolute;
-	left:20px;
-	top:150px;
-	font-family: 'Lato', sans-serif;
-}
+  <title>Overdose Deaths</title>
 
-.tooltip {	
-    position: absolute;			
-    text-align: left;								
-    padding: 4px;				
-    font-size: 12px; 
-  	font-family: 'Lato', sans-serif;	
-    background: lightgrey;	
-    border: 0px;		
-    border-radius: 8px;			
-    pointer-events: none;			
-}
+  <meta name="author" content="Robert Hosbach" />
 
-h1 {
-  text-align: center;
-  max-width: 960px;
-  font-weight: normal;
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+      <article role="main" class="blog-post">
+        <svg width="960" height="600"></svg>
+
+<style>
+div.tooltip {   
+  position: absolute;           
+  text-align: center; 
+  vertical-align: middle;          
+  width: auto;                 
+  height: auto;                 
+  padding: 2px;             
+  font: 12px sans-serif;    
+  color: white;    
+  background: gray;   
+  border: 0px;      
+  border-radius: 8px;           
+  pointer-events: none;         
 }
 
-.year {
-  font-size: 35px;
-  font-family: 'Lato', sans-serif;  
-  font-weight: 60;
+.counties :hover {
+  stroke: black;
+  stroke-width: 2px;
 }
 
-/* svg {
-   display: block;
-   margin: auto;
-  }
-*/
+.county-borders {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 0.5px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  pointer-events: none;
+}
 
+.year.label {
+  font: 300 40px "Helvetica Neue";
+  fill: gray;
+}
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+  cursor: ew-resize;
+}
 </style>
-</head>
-<body>
 
-<h1>U.S. Overdose Deaths</h1>
+<script src="https://d3js.org/d3.v4.min.js"></script>
 
-<script type="text/javascript">
-		
-// set width and height of map
-var width = 960;
-var height = 500;
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 
-// set colors for ramp
-var lowColor = '#EAEAEA'
-var highColor = '#F80000'
+<script src="https://d3js.org/topojson.v1.min.js"></script>
 
-// D3 Projection
-var projection = d3.geoAlbersUsa()
-  .translate([width / 2, height / 2]) // translate to center of screen
-  .scale([1000]); // scale things down so see entire US
+<script src="https://d3js.org/queue.v1.min.js"></script>
 
-// define path generator
-var path = d3.geoPath() // path generator that will convert GeoJSON to SVG paths
-  .projection(projection); // tell path generator to use albersUsa projection, defined above
+<script>
+  var svg = d3.select("svg");
+  var path = d3.geoPath();
+  var format = d3.format("");
+  var height = 600;
+  var width = 960;
 
-// create SVG element and append map to the SVG
-var svg = d3.select("body")
-  .append("svg")
-  .attr("width", width)
-  .attr("height", height);
+  var colorScheme = d3.schemeReds[9];
+  colorScheme.unshift("#eee");
 
-  // append tooltip to div
-var tooltip = d3.select("body").append("div")
+  var color = d3.scaleQuantize()
+    .domain([0, 50])
+    .range(colorScheme);
+  var x = d3.scaleLinear()
+    .domain(d3.extent(color.domain()))
+    .rangeRound([600,860]);
+  var g = svg.append("g")
+    .attr("transform", "translate(0,40)");
+
+  g.selectAll("rect")
+    .data(color.range().map(function(d){ return color.invertExtent(d); }))
+    .enter()
+    .append("rect")
+      .attr("height", 8)
+      .attr("x", function(d){ return x(d[0]); })
+      .attr("width", function(d){ return x(d[1]) - x(d[0]); })
+      .attr("fill", function(d){ return color(d[0]); });
+
+  g.append("text")
+    .attr("class", "caption")
+    .attr("x", x.range()[0])
+    .attr("y", -6)
+    .attr("fill", "#000")
+    .attr("text-anchor", "start")
+    .attr("font-weight", "bold")
+    .text("Overdose Death Rate (%)");
+
+  g.call(d3.axisBottom(x)
+    .tickSize(13)
+    .tickFormat(format)
+    .tickValues(color.range().slice(1).map(function(d){ return color.invertExtent(d)[0]; })))
+  .select(".domain")
+    .remove();
+
+  var div = d3.select("body")
+    .append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
-// load in overdose data 
-// source: https://www.cdc.gov/nchs/pressroom/sosmap/drug_poisoning_mortality/drug_poisoning.htm
-d3.csv("overdoses.csv", function(data) {
+  // Add the year label; the value is set on transition.
+  var label = svg.append("text")
+    .attr("class", "year label")
+    .attr("text-anchor", "end")
+    .attr("y", height - 450)
+    .attr("x", width - 170)
+    .text(1999);
 
-data.forEach(function (d) {
-    // coerce to number
-    d.value = +d.value;
-});
+  queue()
+    .defer(d3.json, "https://d3js.org/us-10m.v1.json")
+    /* NOTE ON DATA: 
+    
+    This CSV file was created via pulling data from CDC's WONDER database.
+    
+    I pulled all deaths from the National Vital Statistics System's multiple cause-of-death mortality files which had one of the following causes of death: opioids (T40.0, T40.1, T40.2, T40.3, T40.4, or T40.6)**; natural/semisynthetic opioids (T40.2); methadone (T40.3); heroin (T40.1); synthetic opioids other than methadone (T40.4); cocaine (T40.5). I followed the methodology of this paper: https://www.cdc.gov/mmwr/volumes/67/wr/mm675152e1.htm?s_cid=mm675152e1_w. Deaths may include multiple opioids as a cause and thus are not mutually exclusive.
 
-//var data2017 = data.filter(function(d) {return d.year === "2017"});
-//var data2016 = data.filter(function(d) {return d.year === "2016"});
-//var data2015 = data.filter(function(d) {return d.year === "2015"});
-//var data2014 = data.filter(function(d) {return d.year === "2014"});
-//var data1999 = data.filter(function(d) {return d.year === "1999"});
+    You can replicate the data pull on CDC WONDER with this link: https://wonder.cdc.gov/mcd-icd10.html
 
-console.log(data);
+    Source: Multiple Cause of Death 1999–2017 on CDC Wide-ranging Online Data for Epidemiologic Research (CDC WONDER). Atlanta, GA: CDC, National Center for Health Statistics. 2018. Available at http://wonder.cdc.gov. 
+    */
+    .defer(d3.csv, "overdoses.csv")
+    .await(ready);
+  
+  function ready(error, us, overdoses) {
+    if (error) throw error;
 
-//filter only 2017 data
-var data = data.filter(function (d) {
-		return d.year === "2017"; })
-	
-  var dataArray = [];
-	for (var d = 0; d < data.length; d++) {
-	 dataArray.push(parseFloat(data[d].value));
-	}
+      // Initialize data to 1990
+      var currentYear = 1999;
 
-  console.log(data);
-  console.log(dataArray);
-	
-	// set minimum/maximum values for color scale
-	var minVal = d3.min(dataArray)
-	var maxVal = d3.max(dataArray)
-	// alternatively, set minVal and maxVal as static numbers (0, 60) to illustrate relative changes over time
-	
-	// construct color scale
-	var ramp = d3.scaleLinear()
-		.domain([minVal,maxVal])
-		.range([lowColor,highColor]);
-	// alternatively, use a premade D3 color scale, although this makes the legend construction tricky
-	// var ramp = d3.scaleSequential(d3.interpolateViridis)
-	//	 .domain([minVal,maxVal]);
-	
-  // load GeoJSON data and merge with states data
-  // source: https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/us-states.json
-  d3.json("us_states.json", function(json) {
+      // Add an overlay for the year label.
+      var box = label.node().getBBox();
+  
+      var overlay = svg.append("rect")
+        .attr("class", "overlay")
+        .attr("x", box.x)
+        .attr("y", box.y)
+        .attr("width", box.width)
+        .attr("height", box.height)
+        .on("mouseover", enableInteraction);
+  
+      // Start a transition that interpolates the data based on year.
+      svg.transition()
+        .duration(25000)
+        .ease(d3.easeLinear)
+        .tween("year", tweenYear)
+        //.each();
 
-    var json = json;
+      counties = svg.append("g")
+        .attr("class", "counties")
+        .selectAll("path")
+        .data(topojson.feature(us, us.objects.states).features)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .call(style,currentYear)
 
-    // loop through each state data value in the .csv file
-    for (var i = 0; i < data.length; i++) {
+      function style(counties, year){
+        newoverdoses = interpolateData(year);
 
-      // add state name
-      var dataState = data[i].state;
+      var rateById = {};
+      var nameById = {};
 
-      // add data value (death rates)
-      var dataValue = data[i].value;
+      newoverdoses.forEach(function(d) {
 
-      // add year value
-      var dataYear = data[i].year;
-
-      // add deaths
-      var dataDeaths = data[i].total_deaths;
-
-      // find the corresponding state inside the GeoJSON
-      for (var j = 0; j < json.features.length; j++) {
-
-        var jsonState = json.features[j].properties.name;
-
-        if (dataState == jsonState) {
-
-          // copy the data value into the JSON
-          json.features[j].properties.value = dataValue;
-          json.features[j].properties.year = dataYear;
-          json.features[j].properties.deaths = dataDeaths;
-
-          // stop looking through JSON
-          break;
-        }
-      }
+        rateById[d.id] = +d.rate;
+        nameById[d.id] = d.state;
+        
+      });
+      
+      counties.style("fill", function(d) { return color(rateById[d.id]); })
+        .on("mouseover", function(d) {      
+            div.transition()        
+              .duration(200)      
+              .style("opacity", .9);      
+            div.html('<strong> State: </strong>' + nameById[d.id] + 
+              '<br>' + 
+              '<strong> Year: </strong>' + Math.round(currentYear) +
+              '<br>' + 
+              '<strong> Rate: </strong>' + rateById[d.id])
+              .style("left", (d3.event.pageX) + "px")     
+              .style("top", (d3.event.pageY - 28) + "px");})   
+         // fade out tooltip on mouse out               
+         .on("mouseout", function(d) {       
+            div.transition()        
+             .duration(500)      
+             .style("opacity", 0);});
     }
 
-    //var data1 = json.features;
-    //console.log(data1);
-    console.log(json);
+    svg.append("path")
+      .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
+      .attr("fill", "none")
+      .attr("stroke", "white")
+      .attr("stroke-linejoin", "round")
+      .attr("d", path);
 
-   //var ninenine = json.features.filter(function (d) {return d.properties.year === "2017"; });
-    //console.log(ninenine);
+    // After the transition finishes, you can mouseover to change the year.
+    function enableInteraction() {
+      var yearScale = d3.scaleLinear()
+        .domain([1999, 2017])
+        .range([box.x + 10, box.x + box.width - 10])
+        .clamp(true);
 
-    // bind the data to the SVG and create one path per GeoJSON feature
-    svg.selectAll("path")
-      .data(json.features)
-      .enter()
-      .append("path")
-      .attr("d", path)
-      //.style("stroke", "#000000")
-      .style("stroke", "#fff")
-      .style("stroke-width", "1")
-      .style("fill", function(d) { return ramp(d.properties.value); })
-      // add tooltip
-	.on("mouseover", function(d) {      
-    	tooltip.transition()        
-      	   .duration(200)      
-           .style("opacity", .95);      
-           tooltip.html(
-           			"<b>State</b>: " + d.properties.name + 
-                    "<br/> <b>Deaths per 100k</b>: " + d.properties.value + 
-                    "<br/> <b>Total Deaths</b>: " + d.properties.deaths + 
-                    "<br/> <b>Year</b>: " + d.properties.year)
-               .style("left", (d3.event.pageX + 5) + "px")
-               .style("top", (d3.event.pageY - 28) + "px");  
-	})                
-    .on("mouseout", function(d) {       
-        tooltip.transition()        
-           .duration(500)      
-           .style("opacity", 0);   
-    });
+      // Cancel the current transition, if any.
+      svg.transition().duration(0);
 
-// add a legend
-// helpful: https://bl.ocks.org/wboykinm/dbbe50d1023f90d4e241712395c27fb3
-var w = 140, h = 400;
+      overlay
+        .on("mouseover", mouseover)
+        .on("mouseout", mouseout)
+        .on("mousemove", mousemove)
+        .on("touchmove", mousemove);
 
-var key = d3.select("body")
-	.append("svg")
-	.attr("width", w)
-	.attr("height", h)
-	.attr("class", "legend");
-
-var legend = key.append("defs")
-	.append("svg:linearGradient")
-	.attr("id", "gradient")
-	.attr("x1", "100%")
-	.attr("y1", "0%")
-	.attr("x2", "100%")
-	.attr("y2", "100%")
-	.attr("spreadMethod", "pad");
-
-legend.append("stop")
-	.attr("offset", "0%")
-	.attr("stop-color", highColor)
-	.attr("stop-opacity", 1);
-	
-legend.append("stop")
-	.attr("offset", "100%")
-	.attr("stop-color", lowColor)
-	.attr("stop-opacity", 1);
-
-key.append("rect")
-	.attr("width", w - 100)
-	.attr("height", h)
-	.style("fill", "url(#gradient)")
-	.attr("transform", "translate(0,10)");
-
-var y = d3.scaleLinear()
-	.range([h, 0])
-	.domain([minVal, maxVal]);
-
-var yAxis = d3.axisRight(y)
-    .ticks(7)
-    .tickSize(0);
-
-key.append("g")
-	.attr("class", "y axis")
-	.attr("transform", "translate(40,10)")
-	.call(yAxis)
-
-// add title to legend
-// helpful: http://dimplejs.org/advanced_examples_viewer.html?id=advanced_interactive_legends
-// key.selectAll("title_text")
-//   .data(["Overdose Deaths per 100,000"])
-//   .enter()
-//   .append("text")
-//     .attr("x", 0)
-//     .attr("y", 9)
-//     .style("font-family", "Lato")
-//     .style("font-size", "12px")
-//     .style("color", "Black")
-//     .text(function (d) { return d; });
-
-// nvm, add text this way lol its way easier
-svg.append("text") 
-  .html(function (d) {
-  return "<tspan x='.6em' dy='1.2em'>" + "Overdose deaths" + "</tspan>" 
-       + "<tspan x='.6em' dy='1.2em'>" + "per 100,000" + "</tspan>";
-})
-  .attr("x", 0)
-  .attr("y", 25)
-
-// add year banner
-svg.append("text")
-  .data(json.features)
-  .attr("class", "year")
-  .text(function (d) {
-    return d.properties.year;
-  })
-  .attr("x", 650)
-  .attr("y", 105)
-
-//// ANIMATION
-
-var update = function(){
-
-  // loop through each state data value in the .csv file
-    for (var i = 0; i < data2017.length; i++) {
-
-      // add state name
-      var dataState = data2017[i].state;
-
-      // add data value (death rates)
-      var dataValue = data2017[i].value;
-
-      // add year value
-      var dataYear = data2017[i].year;
-
-      // add deaths
-      var dataDeaths = data2017[i].total_deaths;
-
-      // find the corresponding state inside the GeoJSON
-      for (var j = 0; j < json.features.length; j++) {
-
-        var json2017 = json;
-
-        var jsonState = json2017.features[j].properties.name;
-
-        if (dataState == jsonState) {
-
-          // copy the data value into the JSON
-          json2017.features[j].properties.value = dataValue;
-          json2017.features[j].properties.year = dataYear;
-          json2017.features[j].properties.deaths = dataDeaths;
-
-          // stop looking through JSON
-          break;
-        }
-      }
+      function mouseover() { label.classed("active", true); }
+      function mouseout() { label.classed("active", false); }
+      function mousemove() { displayYear(yearScale.invert(d3.mouse(this)[0])); }
     }
 
-console.table(json2017);
+    // Tweens the entire chart by first tweening the year, and then the data.
+    // For the interpolated data, the dots and label are redrawn.
+    function tweenYear() {
+      var year = d3.interpolateNumber(1999, 2017);
+      return function(t) { displayYear(year(t)); };
+    }
 
-var u = svg.selectAll("path")
-    .data(json2017.features);
+    // Updates the display to show the specified year.
+    function displayYear(year) {
+      currentYear = year;
+      counties.call(style,year)
+      label.text(Math.round(year));
+    }
 
-u.exit().remove();
-
-u
-      .enter()
-      .append("path")
-     // .transition()
-     // .duration(1000)      
-      .attr("d", path)
-      //.style("stroke", "#000000")
-      .style("stroke", "#fff")
-      .style("stroke-width", "1")
-      .style("fill", function(d) { return ramp(d.properties.value); })
-      // add tooltip
-  .on("mouseover", function(d) {      
-      tooltip.transition()        
-           .duration(200)      
-           .style("opacity", .95);      
-           tooltip.html(
-                "<b>State</b>: " + d.properties.name + 
-                    "<br/> <b>Deaths per 100k</b>: " + d.properties.value + 
-                    "<br/> <b>Total Deaths</b>: " + d.properties.deaths + 
-                    "<br/> <b>Year</b>: " + d.properties.year)
-               .style("left", (d3.event.pageX + 5) + "px")
-               .style("top", (d3.event.pageY - 28) + "px");  
-  })                
-    .on("mouseout", function(d) {       
-        tooltip.transition()        
-           .duration(500)      
-           .style("opacity", 0);   
+    // Interpolates the dataset for the given (fractional) year.
+    function interpolateData(year) {
+      return overdoses.filter(function(row) {
+      return row['year'] == Math.round(year);
     });
-
-//svg.selectAll("path")
-//      .transition()
-//      .duration(1000)
-//      .style("fill", "black")
-//      .transition()
-//      .duration(1000)
-//      .style("fill", function(d) { return ramp(properties.value//); });
-//      repeat();
-//
-//      function repeat() {
-//
-// svg.selectAll("path")
-//      .transition()
-//      .duration(1000)
-//      .style("fill", "black")
-//      .transition()
-//      .duration(1000)
-//      .style("fill", function(d) { return ramp(properties.////value); })
-//        .on("end", repeat);  // when the transition finishes //start again
-//    };
-
+      }
 };
-
-//  update();
-
-  });
-});
-</script>
-</body>
+  </script> 
+  </body>
 </html>

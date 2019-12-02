@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>U.S. Overdose Deaths</title>
+<meta charset="utf-8">
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<style type="text/css">
+
+body {
+  font-family: 'Lato', sans-serif;
+	background-color: #ffffff;
+}
+        
+.legend {
+  position: absolute;
+	left:20px;
+	top:150px;
+	font-family: 'Lato', sans-serif;
+}
+
+.tooltip {	
+    position: absolute;			
+    text-align: left;								
+    padding: 4px;				
+    font-size: 12px; 
+  	font-family: 'Lato', sans-serif;	
+    background: lightgrey;	
+    border: 0px;		
+    border-radius: 8px;			
+    pointer-events: none;			
+}
+
+h1 {
+  text-align: center;
+  max-width: 960px;
+  font-weight: normal;
+}
+
+.year {
+  font-size: 35px;
+  font-family: 'Lato', sans-serif;  
+  font-weight: 60;
+}
+
+/* svg {
+   display: block;
+   margin: auto;
+  }
+*/
+
+</style>
+</head>
+<body>
+
+<h1>U.S. Overdose Deaths</h1>
+
+<script type="text/javascript">
+		
+// set width and height of map
+var width = 960;
+var height = 500;
+
+// set colors for ramp
+var lowColor = '#EAEAEA'
+var highColor = '#F80000'
+
+// D3 Projection
+var projection = d3.geoAlbersUsa()
+  .translate([width / 2, height / 2]) // translate to center of screen
+  .scale([1000]); // scale things down so see entire US
+
+// define path generator
+var path = d3.geoPath() // path generator that will convert GeoJSON to SVG paths
+  .projection(projection); // tell path generator to use albersUsa projection, defined above
+
+// create SVG element and append map to the SVG
+var svg = d3.select("body")
+  .append("svg")
+  .attr("width", width)
+  .attr("height", height);
+
+  // append tooltip to div
+var tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+// load in overdose data 
+// source: https://www.cdc.gov/nchs/pressroom/sosmap/drug_poisoning_mortality/drug_poisoning.htm
+d3.csv("overdoses.csv", function(data) {
+
+data.forEach(function (d) {
+    // coerce to number
+    d.value = +d.value;
+});
+
+//var data2017 = data.filter(function(d) {return d.year === "2017"});
+//var data2016 = data.filter(function(d) {return d.year === "2016"});
+//var data2015 = data.filter(function(d) {return d.year === "2015"});
+//var data2014 = data.filter(function(d) {return d.year === "2014"});
+//var data1999 = data.filter(function(d) {return d.year === "1999"});
+
+console.log(data);
+
+//filter only 2017 data
+var data = data.filter(function (d) {
+		return d.year === "2017"; })
+	
+  var dataArray = [];
+	for (var d = 0; d < data.length; d++) {
+	 dataArray.push(parseFloat(data[d].value));
+	}
+
+  console.log(data);
+  console.log(dataArray);
+	
+	// set minimum/maximum values for color scale
+	var minVal = d3.min(dataArray)
+	var maxVal = d3.max(dataArray)
+	// alternatively, set minVal and maxVal as static numbers (0, 60) to illustrate relative changes over time
+	
+	// construct color scale
+	var ramp = d3.scaleLinear()
+		.domain([minVal,maxVal])
+		.range([lowColor,highColor]);
+	// alternatively, use a premade D3 color scale, although this makes the legend construction tricky
+	// var ramp = d3.scaleSequential(d3.interpolateViridis)
+	//	 .domain([minVal,maxVal]);
+	
+  // load GeoJSON data and merge with states data
+  // source: https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/us-states.json
+  d3.json("us_states.json", function(json) {
+
+    var json = json;
+
+    // loop through each state data value in the .csv file
+    for (var i = 0; i < data.length; i++) {
+
+      // add state name
+      var dataState = data[i].state;
+
+      // add data value (death rates)
+      var dataValue = data[i].value;
+
+      // add year value
+      var dataYear = data[i].year;
+
+      // add deaths
+      var dataDeaths = data[i].total_deaths;
+
+      // find the corresponding state inside the GeoJSON
+      for (var j = 0; j < json.features.length; j++) {
+
+        var jsonState = json.features[j].properties.name;
+
+        if (dataState == jsonState) {
+
+          // copy the data value into the JSON
+          json.features[j].properties.value = dataValue;
+          json.features[j].properties.year = dataYear;
+          json.features[j].properties.deaths = dataDeaths;
+
+          // stop looking through JSON
+          break;
+        }
+      }
+    }
+
+    //var data1 = json.features;
+    //console.log(data1);
+    console.log(json);
+
+   //var ninenine = json.features.filter(function (d) {return d.properties.year === "2017"; });
+    //console.log(ninenine);
+
+    // bind the data to the SVG and create one path per GeoJSON feature
+    svg.selectAll("path")
+      .data(json.features)
+      .enter()
+      .append("path")
+      .attr("d", path)
+      //.style("stroke", "#000000")
+      .style("stroke", "#fff")
+      .style("stroke-width", "1")
+      .style("fill", function(d) { return ramp(d.properties.value); })
+      // add tooltip
+	.on("mouseover", function(d) {      
+    	tooltip.transition()        
+      	   .duration(200)      
+           .style("opacity", .95);      
+           tooltip.html(
+           			"<b>State</b>: " + d.properties.name + 
+                    "<br/> <b>Deaths per 100k</b>: " + d.properties.value + 
+                    "<br/> <b>Total Deaths</b>: " + d.properties.deaths + 
+                    "<br/> <b>Year</b>: " + d.properties.year)
+               .style("left", (d3.event.pageX + 5) + "px")
+               .style("top", (d3.event.pageY - 28) + "px");  
+	})                
+    .on("mouseout", function(d) {       
+        tooltip.transition()        
+           .duration(500)      
+           .style("opacity", 0);   
+    });
+
+// add a legend
+// helpful: https://bl.ocks.org/wboykinm/dbbe50d1023f90d4e241712395c27fb3
+var w = 140, h = 400;
+
+var key = d3.select("body")
+	.append("svg")
+	.attr("width", w)
+	.attr("height", h)
+	.attr("class", "legend");
+
+var legend = key.append("defs")
+	.append("svg:linearGradient")
+	.attr("id", "gradient")
+	.attr("x1", "100%")
+	.attr("y1", "0%")
+	.attr("x2", "100%")
+	.attr("y2", "100%")
+	.attr("spreadMethod", "pad");
+
+legend.append("stop")
+	.attr("offset", "0%")
+	.attr("stop-color", highColor)
+	.attr("stop-opacity", 1);
+	
+legend.append("stop")
+	.attr("offset", "100%")
+	.attr("stop-color", lowColor)
+	.attr("stop-opacity", 1);
+
+key.append("rect")
+	.attr("width", w - 100)
+	.attr("height", h)
+	.style("fill", "url(#gradient)")
+	.attr("transform", "translate(0,10)");
+
+var y = d3.scaleLinear()
+	.range([h, 0])
+	.domain([minVal, maxVal]);
+
+var yAxis = d3.axisRight(y)
+    .ticks(7)
+    .tickSize(0);
+
+key.append("g")
+	.attr("class", "y axis")
+	.attr("transform", "translate(40,10)")
+	.call(yAxis)
+
+// add title to legend
+// helpful: http://dimplejs.org/advanced_examples_viewer.html?id=advanced_interactive_legends
+// key.selectAll("title_text")
+//   .data(["Overdose Deaths per 100,000"])
+//   .enter()
+//   .append("text")
+//     .attr("x", 0)
+//     .attr("y", 9)
+//     .style("font-family", "Lato")
+//     .style("font-size", "12px")
+//     .style("color", "Black")
+//     .text(function (d) { return d; });
+
+// nvm, add text this way lol its way easier
+svg.append("text") 
+  .html(function (d) {
+  return "<tspan x='.6em' dy='1.2em'>" + "Overdose deaths" + "</tspan>" 
+       + "<tspan x='.6em' dy='1.2em'>" + "per 100,000" + "</tspan>";
+})
+  .attr("x", 0)
+  .attr("y", 25)
+
+// add year banner
+svg.append("text")
+  .data(json.features)
+  .attr("class", "year")
+  .text(function (d) {
+    return d.properties.year;
+  })
+  .attr("x", 650)
+  .attr("y", 105)
+
+//// ANIMATION
+
+var update = function(){
+
+  // loop through each state data value in the .csv file
+    for (var i = 0; i < data2017.length; i++) {
+
+      // add state name
+      var dataState = data2017[i].state;
+
+      // add data value (death rates)
+      var dataValue = data2017[i].value;
+
+      // add year value
+      var dataYear = data2017[i].year;
+
+      // add deaths
+      var dataDeaths = data2017[i].total_deaths;
+
+      // find the corresponding state inside the GeoJSON
+      for (var j = 0; j < json.features.length; j++) {
+
+        var json2017 = json;
+
+        var jsonState = json2017.features[j].properties.name;
+
+        if (dataState == jsonState) {
+
+          // copy the data value into the JSON
+          json2017.features[j].properties.value = dataValue;
+          json2017.features[j].properties.year = dataYear;
+          json2017.features[j].properties.deaths = dataDeaths;
+
+          // stop looking through JSON
+          break;
+        }
+      }
+    }
+
+console.table(json2017);
+
+var u = svg.selectAll("path")
+    .data(json2017.features);
+
+u.exit().remove();
+
+u
+      .enter()
+      .append("path")
+     // .transition()
+     // .duration(1000)      
+      .attr("d", path)
+      //.style("stroke", "#000000")
+      .style("stroke", "#fff")
+      .style("stroke-width", "1")
+      .style("fill", function(d) { return ramp(d.properties.value); })
+      // add tooltip
+  .on("mouseover", function(d) {      
+      tooltip.transition()        
+           .duration(200)      
+           .style("opacity", .95);      
+           tooltip.html(
+                "<b>State</b>: " + d.properties.name + 
+                    "<br/> <b>Deaths per 100k</b>: " + d.properties.value + 
+                    "<br/> <b>Total Deaths</b>: " + d.properties.deaths + 
+                    "<br/> <b>Year</b>: " + d.properties.year)
+               .style("left", (d3.event.pageX + 5) + "px")
+               .style("top", (d3.event.pageY - 28) + "px");  
+  })                
+    .on("mouseout", function(d) {       
+        tooltip.transition()        
+           .duration(500)      
+           .style("opacity", 0);   
+    });
+
+//svg.selectAll("path")
+//      .transition()
+//      .duration(1000)
+//      .style("fill", "black")
+//      .transition()
+//      .duration(1000)
+//      .style("fill", function(d) { return ramp(properties.value//); });
+//      repeat();
+//
+//      function repeat() {
+//
+// svg.selectAll("path")
+//      .transition()
+//      .duration(1000)
+//      .style("fill", "black")
+//      .transition()
+//      .duration(1000)
+//      .style("fill", function(d) { return ramp(properties.////value); })
+//        .on("end", repeat);  // when the transition finishes //start again
+//    };
+
+};
+
+//  update();
+
+  });
+});
+</script>
+</body>
+</html>
