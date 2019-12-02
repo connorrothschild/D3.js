@@ -7,31 +7,46 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 
-  <title>Overdose Deaths</title>
+  <title>Opioid-Involved Overdose Deaths in the US, 1999 to 2017</title>
 
-  <meta name="author" content="Connor Rothschild" />
+  <meta name="author" content="Connor Rothschild"/>
 
 <div class="container">
   <div class="row">
     <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
 
-      <article role="main" class="blog-post">
+      <article>
+        <h1> Opioid-Involved Overdose Deaths in the US, 1999 to 2017</h1>
         <svg width="960" height="600"></svg>
 
 <style>
+
+h1 {
+  font: 200 26px "Lato";
+  padding-left: 130px;
+}
+
 div.tooltip {   
   position: absolute;           
-  text-align: center; 
+  text-align: left; 
   vertical-align: middle;          
   width: auto;                 
-  height: auto;                 
-  padding: 2px;             
-  font: 12px sans-serif;    
-  color: white;    
-  background: gray;   
-  border: 0px;      
+  height: auto;   
+  -moz-border-radius:5px;
+  border-radius: 5px;
+  background: #fff;              
+  border: 1px solid #000;      
   border-radius: 8px;           
-  pointer-events: none;         
+  pointer-events: none; 
+  background: #fff;
+  opacity: 1;
+  color: black;
+  padding-right: 10px;
+  padding-left: 5px;
+  padding-top: 4px;
+  padding-bottom: 4px;  
+  font-size: 12px;
+  font-family: 'Lato', sans-serif;
 }
 
 .counties :hover {
@@ -49,7 +64,12 @@ div.tooltip {
 }
 
 .year.label {
-  font: 300 40px "Helvetica Neue";
+  font: 300 40px "Lato";
+  fill: gray;
+}
+
+.helper.label {
+  font: 150 12px "Lato";
   fill: gray;
 }
 
@@ -58,6 +78,12 @@ div.tooltip {
   pointer-events: all;
   cursor: ew-resize;
 }
+
+.caption {
+  font: 150 11px "Lato";
+
+}
+
 </style>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -87,6 +113,7 @@ div.tooltip {
   var g = svg.append("g")
     .attr("transform", "translate(0,40)");
 
+  // legend boxes
   g.selectAll("rect")
     .data(color.range().map(function(d){ return color.invertExtent(d); }))
     .enter()
@@ -96,38 +123,58 @@ div.tooltip {
       .attr("width", function(d){ return x(d[1]) - x(d[0]); })
       .attr("fill", function(d){ return color(d[0]); });
 
+  // legend title
   g.append("text")
     .attr("class", "caption")
     .attr("x", x.range()[0])
     .attr("y", -6)
     .attr("fill", "#000")
     .attr("text-anchor", "start")
-    .attr("font-weight", "bold")
-    .text("Overdose Death Rate (%)");
+    .attr("font-weight", 30)
+    .text("Overdose Death Rate (Per 100,000)");
 
+  // legend ticks
   g.call(d3.axisBottom(x)
     .tickSize(13)
     .tickFormat(format)
     .tickValues(color.range().slice(1).map(function(d){ return color.invertExtent(d)[0]; })))
-  .select(".domain")
+    .select(".domain")
     .remove();
 
+  // create tooltip
   var div = d3.select("body")
     .append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
+// label positions
+labely = height - 50
+labelx = width - 280
+
   // Add the year label; the value is set on transition.
   var label = svg.append("text")
     .attr("class", "year label")
-    .attr("text-anchor", "end")
-    .attr("y", height - 450)
-    .attr("x", width - 170)
+    .attr("text-anchor", "middle")
+    // position the label
+    .attr("y", labely)
+    .attr("x", labelx)
     .text(1999);
 
+  var helperlabel = svg.append("text")
+    .attr("class", "helper label")
+    .attr("text-anchor", "middle")
+    // position the label
+    .attr("y", labely + 20)
+    .attr("x", labelx)
+    .text("Hover to change year");
+
   queue()
+    // read in JSON which includes all of the complicated shape data for states/counties/etc.
     .defer(d3.json, "https://d3js.org/us-10m.v1.json")
-    /* NOTE ON DATA: 
+    // read in opioid data
+    .defer(d3.csv, "overdoses.csv")
+    /*
+    NOTE ON OVERDOSE DATA: 
     
     This CSV file was created via pulling data from CDC's WONDER database.
     
@@ -137,7 +184,6 @@ div.tooltip {
 
     Source: Multiple Cause of Death 1999–2017 on CDC Wide-ranging Online Data for Epidemiologic Research (CDC WONDER). Atlanta, GA: CDC, National Center for Health Statistics. 2018. Available at http://wonder.cdc.gov. 
     */
-    .defer(d3.csv, "overdoses.csv")
     .await(ready);
   
   function ready(error, us, overdoses) {
@@ -159,10 +205,9 @@ div.tooltip {
   
       // Start a transition that interpolates the data based on year.
       svg.transition()
-        .duration(25000)
+        .duration(10000)
         .ease(d3.easeLinear)
-        .tween("year", tweenYear)
-        //.each();
+        .tween("year", tweenYear);
 
       counties = svg.append("g")
         .attr("class", "counties")
@@ -181,6 +226,8 @@ div.tooltip {
 
       newoverdoses.forEach(function(d) {
 
+        // each state is encoded according to its ANSI/FIPS state code
+        // you can find states and their codes here https://en.wikipedia.org/wiki/List_of_U.S._state_abbreviations#ANSI_standard_INCITS_38:2009
         rateById[d.id] = +d.rate;
         nameById[d.id] = d.state;
         
@@ -190,12 +237,14 @@ div.tooltip {
         .on("mouseover", function(d) {      
             div.transition()        
               .duration(200)      
-              .style("opacity", .9);      
+              .style("opacity", .9);  
+
+        // add tooltip here    
             div.html('<strong> State: </strong>' + nameById[d.id] + 
               '<br>' + 
               '<strong> Year: </strong>' + Math.round(currentYear) +
               '<br>' + 
-              '<strong> Rate: </strong>' + rateById[d.id])
+              '<strong> Rate: </strong>' + rateById[d.id] + " per 100,000")
               .style("left", (d3.event.pageX) + "px")     
               .style("top", (d3.event.pageY - 28) + "px");})   
          // fade out tooltip on mouse out               
@@ -251,7 +300,7 @@ div.tooltip {
     function interpolateData(year) {
       return overdoses.filter(function(row) {
       return row['year'] == Math.round(year);
-    });
+       });
       }
 };
   </script> 
