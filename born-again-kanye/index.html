@@ -9,7 +9,7 @@
     
       
     h1 {
-      font: 200 1.5em "Lato";
+      font: 200 2em "Lato";
       text-align: center;
     }
 
@@ -24,13 +24,13 @@
 
     .middletext {
       text-align: center;
-      font-size: 1.5em;
+      font-size: 1.25em;
       color: black;
     }
 
     .dropdown {
       text-align-last:center;
-      font-size: 1.5em;
+      font-size: 1.1em;
       color: black;
       border: none;
       fill: none;
@@ -76,6 +76,34 @@
       margin-right: 10%;
     }
 
+    .topnav {
+      background-color: white;
+      border-style: solid;
+      border-width: 0px 0px 1px 0px;
+      padding: 14px 16px 14px 14px;
+      overflow: hidden;
+      font: 200 .9em "Lato";
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
+    }
+
+    /* Style the links inside the navigation bar */
+    .topnav a {
+      float: left;
+      color: black;
+      text-align: left;
+      padding: 14px 16px 14px 14px;
+      text-decoration: none;
+      font-size: 16px;
+    }
+
+    /* Change the color of links on hover */
+    .topnav a:hover {
+      background-color: #ddd;
+      color: black;
+    }
+
     </style>
 
  <body>
@@ -87,6 +115,12 @@
     <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
 
 <article>
+
+    <div class = "topnav">
+    <a href = "connorrothschild.github.io"><img src="https://github.com/connorrothschild/connorrothschild.github.io/blob/master/_assets/images/headshotCircle.png?raw=true" width = "40" height = "40"></a>
+    <a href = "connorrothschild.github.io"><b>Connor Rothschild</b><br>Back to home</a></div>
+
+
     <!-- title -->
     <h1> <img src="https://d063e17xn2-flywheel.netdna-ssl.com/wp-content/uploads/2019/10/https-hypebeast.com-image-2019-10-kanye-west-jesus-is-king-album-release-stream-spotify-apple-music-download-11-1-1.jpg" width = "78", height = "52", align = "center">Kanye West's Rebirth<img src="https://d063e17xn2-flywheel.netdna-ssl.com/wp-content/uploads/2019/10/https-hypebeast.com-image-2019-10-kanye-west-jesus-is-king-album-release-stream-spotify-apple-music-download-11-1-1.jpg" width = "78", height = "52", align = "center"></h1>
 
@@ -289,13 +323,19 @@ g.append("g")
     .transition()
     .duration(800)
     .attr("class", "textlabel-1")
-    .attr("x", function(d){ return x(d.score) +32;})
-    .attr("y", function(d){ return y(d.album_name) +8.5; })
+    .attr("x", function(d){ return x(d.score) +15;})
+    // I am not sure why this works, but y.bandwidth()/4 returns the labels to the middle of the bars. I would have thought /2 would work but oh well!
+    .attr("y", function(d){ return y(d.album_name) +y.bandwidth()/4; })
     .attr("alignment-baseline", "hanging")
-           .attr("text-anchor", "end")
+           .attr("text-anchor", "middle")
            .attr("font-family", "Lato")
-           .attr("font-size", "14px")
-       .attr("fill", "black")
+           .attr("font-size", "12px")
+    .attr("fill", function (d) {
+          if (d.album_name == "JESUS IS KING") {
+              return "#0534D7";
+          } else {
+              return "black";
+          };})
     .text(function(d){ return d3.format(",")(d.score.toFixed(2)); });
 
 // define the tooltip
@@ -323,7 +363,7 @@ String.prototype.toProperCase = function () {
                 if (d.album_name == "JESUS IS KING") {
                     return "#0534D7";
                 } else {
-                    return "grey";
+                    return "#B4B4B4";
                 };})
       // add the tooltip
         .on("mouseover", function(d) {
@@ -418,25 +458,29 @@ String.prototype.toProperCase = function () {
        .attr("width", function(d) { return x(d.score); })
        .attr("height", function(d){ return y.bandwidth(); })
        .attr("fill", function (d) {
-                if (d.album_name == "JESUS IS KING") {
-                    return "#0534D7";
-                } else {
-                    return "grey";
-                };});
+             if (d.album_name == "JESUS IS KING") {
+                 return "#0534D7";
+             } else {
+                 return "#B4B4B4";
+             };});
 
       // update the text labels
       d3.selectAll(".textlabel-1")
       .data(data)
       .transition().duration(1000)
       .attr("class", "textlabel-1")
-      .attr("x", function(d){ return x(d.score) +32;})
-      .attr("y", function(d){ return y(d.album_name) +8.5; })
+      .attr("x", function(d){ return x(d.score) + 15})
       .attr("alignment-baseline", "hanging")
-             .attr("text-anchor", "end")
+             .attr("text-anchor", "middle")
              .attr("font-family", "Lato")
-             .attr("font-size", "14px")
-         .attr("fill", "black")
-             .text(function(d){ return d3.format(",")(d.score.toFixed(2)); });
+             .attr("font-size", "12px")
+      .attr("fill", function (d) {
+             if (d.album_name == "JESUS IS KING") {
+                 return "#0534D7";
+             } else {
+                 return "black";
+             };})
+      .text(function(d){ return d3.format(",")(d.score.toFixed(2)); });
 
   }
 
