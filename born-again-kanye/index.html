@@ -2,91 +2,51 @@
     <meta charset="utf-8">
     <title>Kanye West's Rebirth</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
     <style type="text/css">
 
     @import url('https://fonts.googleapis.com/css?family=Lato');
     
+      
     h1 {
-       text-align: center;
-       font-family: 'Lato', sans-serif;
-        }
-
-    .pTitle {
-       font-size: 24px;
-       font-weight: 5px;
-       text-shadow: 0 1px 0 #fff;
-       fill: #474747;
-       font-weight: bold;
+      font: 200 1.5em "Lato";
+      text-align: center;
     }
+
+    h2 {
+      font: 200 1em "Lato";
+      text-align: left;
+      margin-right: 5%;
+      margin-left: 5%;
+    }
+
+    a { color: #0000EE; }
 
     .middletext {
       text-align: center;
-      font-size: 25px;
+      font-size: 1.5em;
       color: black;
     }
 
     .dropdown {
       text-align-last:center;
-      font-size: 25px;
+      font-size: 1.5em;
       color: black;
       border: none;
       fill: none;
     }
 
     .axis--x path {
-	  display: none;
-				}
-
-	  .axis--y path {
-	  display: none;
-				}
-
-    svg {
-       display: block;
-       max-width: 1000px;
-       margin: auto;
-    	}
-
-      #chart {
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        display:inline-block;
-         padding:0.35em 1.2em;
-         margin:0 0.3em 0.3em 0;
-         border-radius:0.12em;
-         box-sizing: border-box;
-         text-decoration:none;
-         transition: all 0.2s;
+    display: none;
         }
 
-    p {
-      max-width: 1000px;
-      margin-left: auto;
-      margin-right: auto;
-      font-family: 'Lato', sans-serif;
-   	  }
-
-    #data-source {
-      margin-right: auto;
-      margin-left: 0;
-      font-size: 10px;
-      margin-top: 3px;
-      margin-bottom: 10px;
-      font-family: 'Lato', sans-serif;
-    			}
+    .axis--y path {
+    display: none;
+        }
     
     .bar:hover {
       fill: #0534D7;
-    			}
-
-    select {
-  	 text-align: center;
-     position: center;
-      margin-left: auto;
-      margin-right: auto;
-		}
+          }
 
     div.tooltip {
       position: absolute;
@@ -105,29 +65,40 @@
       font-family: 'Lato', sans-serif;
     }
 
-    .footer {
-        padding: 0px 10px 0px 0px;
-        text-align: left;
-        position:absolute;
-        bottom:-0;
-        font-size: 8px;
+    footer {
+      font: 200 .9em "Lato";
+      text-align: left;
+      margin-top: 2em;
     }
 
+    .g {
+      padding: 10%;
+      margin-right: 10%;
+    }
 
     </style>
 
  <body>
 
+<meta name="author" content="Connor Rothschild"/>
+
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+<article>
+    <!-- title -->
     <h1> <img src="https://d063e17xn2-flywheel.netdna-ssl.com/wp-content/uploads/2019/10/https-hypebeast.com-image-2019-10-kanye-west-jesus-is-king-album-release-stream-spotify-apple-music-download-11-1-1.jpg" width = "78", height = "52", align = "center">Kanye West's Rebirth<img src="https://d063e17xn2-flywheel.netdna-ssl.com/wp-content/uploads/2019/10/https-hypebeast.com-image-2019-10-kanye-west-jesus-is-king-album-release-stream-spotify-apple-music-download-11-1-1.jpg" width = "78", height = "52", align = "center"></h1>
 
-    <p><span style = "font-weight:bold">Kanye West has been born again.
+    <h2><span style = "font-weight:bold">Kanye West has been born again.
     </span> His philosophy on life, his politics, and his faith have all undergone significant changes in less than a year. 
+    
     <br><br> 
-    But how does Kanye West's most recent album compare to his previous ones? Aside from his spiritual transformation, has he been musically born again? Using data from the <a href="https://developer.spotify.com/documentation/web-api/">Spotify API</a>, we can answer the question:</p>
+    But how does Kanye West's most recent album compare to his previous ones? Aside from his spiritual transformation, has he been musically born again? Using data from the <a href="https://developer.spotify.com/documentation/web-api/">Spotify API</a>, we can answer the question:</h2>
+    
+    <h2 class = "middletext">How does <span style = "color:#0534D7">Jesus is King</span> compare to Kanye West's other albums in 
 
-    <p class = "middletext">How does <span style = "color:#0534D7">Jesus is King</span> compare to Kanye West's other albums in 
-
-	<select id="filter" class = "dropdown">
+  <select id="filter" class = "dropdown">
       <option value=acousticness>Acousticness</option>
       <option value=danceability>Danceability</option>
       <option value=liveness>Liveness</option>
@@ -136,15 +107,15 @@
       <option value=valence>Valence</option>
     </select>
     ?
-    </p>
+    </h2>
 
-<div>
+    <!-- <svg width="960" height="600"></svg> -->
   <!-- If you'd like to add a title to each section:
   <p id="p0" class="pTitle Side">Acousticness</p> -->
-  <p id="p1">Acousticness is defined by Spotify as a confidence measure of whether the track is acoustic. In other words, the music seems to be composed through acoustic means rather than electronic ones.</p>
+  <h2 id="p1">Acousticness is defined by Spotify as a confidence measure of whether the track is acoustic. In other words, the music seems to be composed through acoustic means rather than electronic ones.</h2 >
 
   <!-- We're splitting this up in to multiple pieces (rather than just one sentence that changes on each attribute) so that we can add styling such as 'Jesus is King' in Blue and the ranking being in bold. -->
-  <p style = "font-size:20px">
+  <h2 style = "font-size:20px">
     <span>
       <span style = "color:#0534D7">Jesus is King</span> is the
     </span>
@@ -155,18 +126,19 @@
    <!-- If desired, add a witty remark here
     <br><br>
     <span id = "wittyremark"></span> -->
-  </p>
+  </h2>
 
+ <svg width="800" height="350"></svg>
+
+<footer>
+  Data cleaning, analysis, and visualization by <a href="http://connorrothschild.github.io/">Connor Rothschild</a>
+  <br>Data is pulled from the <a href="https://developer.spotify.com/documentation/web-api/">Spotify API</a>
+  <br>Find the code <a href="https://github.com/connorrothschild/D3.js/tree/master/born-again-kanye">here</a>
+</footer>
+
+</article>
 </div>
-
-<div id = "chart">
-    <svg></svg>
 </div>
-
-<!-- Add a footer, if desired:
-<div class = "footer">
-  <p>Data cleaning, analysis, and visualization by <a href="http://connorrothschild.github.io/">Connor Rothschild</a><br>Data is pulled from the <a href="https://developer.spotify.com/documentation/web-api/">Spotify API</a><br>Find the code <a href="https://github.com/connorrothschild/D3.js/tree/master/born-again-kanye">here</a></p>
-</div> -->
 
 </body>
 
@@ -177,15 +149,13 @@
 
 // This code was very helpful for creating the button functionality https://github.com/rlbarter/world_happiness_viz/blob/master/index.html
 
-var margin = {top:20, right:20, bottom:50, left:50},
+var margin = {top:20, right:200, bottom:50, left:50},
           width  = 1000 - margin.left - margin.right,
           height = 400 - margin.top - margin.bottom;
 
-      var svg = d3.select("body")
-              .append("svg")
-              .attr("width", "100%")
-              .attr("height", "100%")
-              .attr("viewBox", "0 0 " + (width + margin.left + margin.right) + " " + (height + margin.top + margin.bottom));
+var svg = d3.select("svg")
+  // resize plot when window is resized (see below)
+  .call(responsivefy);
 
 var x =  d3.scaleLinear()
           .range([0, width]);
@@ -200,6 +170,47 @@ var g = svg.append("g")
 var div = d3.select("body").append("div")
   .attr("class", "tooltip")
   .style("opacity", 0);
+
+// thanks to https://brendansudol.com/writing/responsive-d3 for this function!
+function responsivefy(svg) {
+  // container will be the DOM element
+  // that the svg is appended to
+  // we then measure the container
+  // and find its aspect ratio
+  const container = d3.select(svg.node().parentNode),
+      width = parseInt(svg.style('width'), 10),
+      height = parseInt(svg.style('height'), 10),
+      aspect = width / height;
+ 
+  // set viewBox attribute to the initial size
+  // control scaling with preserveAspectRatio
+  // resize svg on inital page load
+  svg.attr('viewBox', `0 0 ${width} ${height}`)
+      .attr('preserveAspectRatio', 'xMinYMid')
+      .call(resize);
+ 
+  // add a listener so the chart will be resized
+  // when the window resizes
+  // multiple listeners for the same event type
+  // requires a namespace, i.e., 'click.foo'
+  // api docs: https://goo.gl/F3ZCFr
+  d3.select(window).on(
+      'resize.' + container.attr('id'), 
+      resize
+  );
+ 
+  // this is the code that resizes the chart
+  // it will be called on load
+  // and in response to window resizes
+  // gets the width of the container
+  // and resizes the svg to fill it
+  // while maintaining a consistent aspect ratio
+  function resize() {
+      const w = parseInt(container.style('width'));
+      svg.attr('width', w);
+      svg.attr('height', Math.round(w / aspect));
+  }
+}
 
 // create a variable that will hold the loaded data
 var csv;
@@ -257,7 +268,7 @@ g.append("g")
          .attr("width", 28.5)
          .attr("height", 28.5)
          .attr("xlink:href", "assets/" +i+".jpg")
-	
+  
  });
 
 // and remove the text from the axis
@@ -379,23 +390,23 @@ String.prototype.toProperCase = function () {
     var data = csv.filter(function(d) {return d.group === value;});
 
     // resort the data, so that the bars are in ascending order
-  	data.sort(function(a, b) {
-  	  return d3.ascending(a.score, b.score)
-  	});
+    data.sort(function(a, b) {
+      return d3.ascending(a.score, b.score)
+    });
 
-  	// update domain
+    // update domain
     x.domain([0, d3.max(data, function(d) { return d.score * 1.1; })]);
-   	y.domain(data.map(function(d) { return d.album_name; }));
+    y.domain(data.map(function(d) { return d.album_name; }));
 
-  	// update x axis
-  	svg.select(".axis--x")
-  	 .transition().duration(1000)
+    // update x axis
+    svg.select(".axis--x")
+     .transition().duration(1000)
      .attr("transform", "translate(0," + height + ")")
      .call(d3.axisBottom(x));
 
      // update the y axis, so that the album covers move
     svg.select(".axis--y")
-  	 .transition().duration(1000)
+     .transition().duration(1000)
      .call(d3.axisLeft(y));
 
     // update the bars
@@ -415,20 +426,20 @@ String.prototype.toProperCase = function () {
 
       // update the text labels
       d3.selectAll(".textlabel-1")
-     	.data(data)
-     	.transition().duration(1000)
-     	.attr("class", "textlabel-1")
-     	.attr("x", function(d){ return x(d.score) +32;})
-     	.attr("y", function(d){ return y(d.album_name) +8.5; })
-     	.attr("alignment-baseline", "hanging")
-     	       .attr("text-anchor", "end")
-     	       .attr("font-family", "Lato")
-     	       .attr("font-size", "14px")
-     	   .attr("fill", "black")
-     	       .text(function(d){ return d3.format(",")(d.score.toFixed(2)); });
+      .data(data)
+      .transition().duration(1000)
+      .attr("class", "textlabel-1")
+      .attr("x", function(d){ return x(d.score) +32;})
+      .attr("y", function(d){ return y(d.album_name) +8.5; })
+      .attr("alignment-baseline", "hanging")
+             .attr("text-anchor", "end")
+             .attr("font-family", "Lato")
+             .attr("font-size", "14px")
+         .attr("fill", "black")
+             .text(function(d){ return d3.format(",")(d.score.toFixed(2)); });
 
   }
 
   });
 
-	</script>
+  </script>
