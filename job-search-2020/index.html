@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://d3js.org/d3.v3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/noframework.waypoints.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css?family=Lato');
+  
+  *{
+    margin:0;
+    padding:0;
+  }
+
+  html,
+  body{
+     height: 100%;
+     padding: 0;
+     scroll-behavior: smooth;
+     background: #f7f5f2;
+     color: #343434;
+     font-family: 'Lato', sans-serif;
+     font-weight: 300;
+  }
+
+  h2{
+    line-height: 1.25;
+    padding-top: 45px;
+    font-weight: 300;
+  }
+
+  svg{
+    padding: 20px;
+  }
+
+  text{
+    font-size: 10px;
+    fill: black;
+  }
+
+  strong{
+    font-weight: 600;
+  }
+
+  #graphic {
+    max-width:  1440px;
+    width: 100%;
+    position:   relative; 
+    height:  100%;
+    position:  relative; 
+    margin:auto;
+  }
+
+  .container {
+    height: 100%;
+    max-width: 440px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    height: 100%;
+    line-height: 1.5;
+    left: 500px;
+  }
+
+  .container div {
+    height: 100%;
+    display: block;
+    padding: 0 45px;
+  }
+
+  .fixed {
+    position: fixed;
+    max-width: 500px;
+    height: 500px;
+    top: 50px;
+  }
+
+  </style>
+</head>
+
+<body>
+  <div id="graphic">
+  <div class="container">
+    <div id="div1">
+      <h2>In <strong>2020</strong>, I applied to <strong>36</strong> summer internships.</h2>
+    </div>
+    <div id="div2">
+      <h2><strong>5</strong> of those internships were <span style = "color:black">policy-related</span>, and <strong>21</strong> were in <span style = "color:#99c125">data science.</span></h2>
+      <p></p>
+    </div>
+    <div id="div4">
+      <h2>Out of those <strong>36</strong> internships, <strong>12</strong> companies offered me an interview.</h2>
+    </div>
+    <div id="div6">
+      <h2><strong>4</strong> of those <strong>12</strong> offered me a summer internship. 
+    </div>
+    <div id="div8">
+      <h2>I chose <strong>1</strong>. 
+        <br><br>
+        I'm excited to join <strong>*company name goes here*</strong> this summer!</h2>
+    </div>
+    
+  </div>
+
+
+  <!-- svg -->
+  <div class="fixed"><svg id="viz" width="100%" height="100%"></svg></div>
+
+</div><!-- /graphic -->
+  
+  <!-- credit https://bl.ocks.org/baronwatts/2a50ae537d7c46670aa5eb30254ef751#index.html -->
+  
+  <script>
+
+		//svg
+    let svg = d3.select("svg");
+
+    //svg width and height
+    svg.attr('width',500)
+        .attr('height',500)
+
+    //set up grid spacing
+    let spacing = 40;
+    let rows = 10;
+    let column = 10;
+    let randnum = (min,max) => Math.round( Math.random() * (max-min) + min );
+
+    //Create an array of objects
+    let our_data = d3.range(36).map(i => 
+    ({ 'type': i < 5 ? 'policy' : 'data', 
+        'city': i < 1 ? 'COMPANY NAME' : 'NA'
+    }));
+
+    //create group and join our data to that group
+    let group = svg.selectAll('g')
+      .data(our_data)
+      .enter()
+      .append("g")
+
+    //create rectangles
+    let rects = group.append("rect")
+
+    //city data
+    d3.selectAll('g')
+      .append("text")
+      .text( (d) => d["city"])
+      .attr("fill", "gray")
+      .attr("class", "city")
+      .attr("dx", -500)
+
+    // square grid
+    let grid = () =>{
+      rects
+        .transition()
+        .delay((d, i) => 10 * i)
+        .duration(600)
+        .ease("elastic")
+        .attr("width", 20)
+        .attr("height", 20)
+        .attr("rx", 5)
+        .attr("ry", 5)
+        .attr("x", (d, i) => i % column * spacing)
+        .attr("y", (d, i) => Math.floor(i / 10) % rows * spacing)
+        .attr("fill", (d, i) => (i < 40 ? "#394147" : "#99c125"))
+        .attr("opacity", "1")
+    }
+        //divide
+    let divide = () =>{
+      rects
+        .transition()
+        .delay((d, i) => 10 * i)
+        .duration(600)
+        .ease("elastic")
+        .attr("width", 10)
+        .attr("height", 10)
+        .attr("rx", 0)
+        .attr("ry", 0)
+        .attr("x", (d, i) => d['type'] == "policy" ? randnum(100, 150) :  randnum(300, 350))
+        .attr("y", (d, i) => i * 20)
+        .attr("fill", (d, i) => d['type'] == "policy" ? "#394147": "#99c125")
+        .attr("opacity", (d,i)=> i < 36 ? 1 : 0 )
+
+      d3.selectAll('text.city')
+        .transition()
+        .delay( (d,i) => 40*i ) 
+        .duration(900)
+        .ease('elastic')
+        .attr("dx", -500)
+
+        } //only show 12 people
+
+    //circle grid
+    let grid2 = () =>{
+      rects
+        .transition()
+        .delay((d, i) => 10 * i)
+        .duration(600)
+        .ease("elastic")
+        .attr("width", 20)
+        .attr("height", 20)
+        .attr("rx", "50%")
+        .attr("ry", "50%")
+        .attr("x", (d, i) => i % column * spacing)
+        .attr("y", (d, i) => Math.floor(i / 10) % rows * spacing)
+        // change the below number for how many interviews you get (e.g. 8 interviews)
+        .attr("fill", (d, i) => (i > 12 ? "red" : "#99c125"))
+    }
+
+    //divide
+    let grid3 = () =>{
+      rects
+        .transition()
+        .delay((d, i) => 10 * i)
+        .duration(600)
+        .ease("elastic")
+        .attr("width", 20)
+        .attr("height", 20)
+        .attr("rx", "50%")
+        .attr("ry", "50%")
+        .attr("x", (d, i) => i % column * spacing)
+        .attr("y", (d, i) => Math.floor(i / 10) % rows * spacing)
+        .attr("fill", function(d,i) {
+            if (i >= 0 && i < 4) {return "#99c125"} // return green for 0-4
+            else if (i >= 4 && i < 12) { return "red" } // return red for 5-12
+            else {return "red"} // return none for 12+
+        ;})
+        .attr("opacity", function(d,i) {
+            if (i > 12) {return ".1"} // return green for 0-4
+            else {return "1"} // return none for 12+
+        ;});  
+
+      } 
+
+    //divide
+    let finalgrid = () =>{
+      rects
+        .transition()
+        .delay((d, i) => 10 * i)
+        .duration(600)
+        .ease("elastic")
+        .attr("width", 20)
+        .attr("height", 20)
+        .attr("rx", "50%")
+        .attr("ry", "50%")
+        .attr("x", (d, i) => i % column * spacing)
+        .attr("y", (d, i) => Math.floor(i / 10) % rows * spacing)
+        .attr("fill", function(d,i) {
+            if (i < 1) {return "#99c125"} // return green for 0-4
+            else {return "none"} // return none for 12+
+        ;})
+
+      //city text
+      d3.selectAll('text.city')
+        .transition()
+        .delay( (d,i) => 20*i ) 
+        .duration(900)
+        .ease('elastic')
+        //align text left
+        .attr("text-anchor", "end")
+        .attr("dx", 110)
+        .attr("dy", (d,i)=> (i * 17) + 13)
+        .attr("opacity", (d,i)=> i < 1 ? 1 : 0 ) // one company
+
+      }
+
+    //waypoints scroll constructor
+    function scroll(n, offset, func1, func2){
+      return new Waypoint({
+        element: document.getElementById(n),
+        handler: function(direction) {
+           direction == 'down' ? func1() : func2();
+        },
+        //start 75% from the top of the div
+        offset: offset
+      });
+    };
+
+    //triger these functions on page scroll
+    new scroll('div2', '75%', divide, grid);
+    new scroll('div4', '75%', grid2, divide);
+    new scroll('div6', '75%', grid3, divide);
+    new scroll('div8', '75%', finalgrid, grid3);
+
+    //start grid on page load
+    grid();
+ 
+
+  </script>
+</body>
