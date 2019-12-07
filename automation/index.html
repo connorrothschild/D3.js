@@ -10,74 +10,106 @@
 
 
 </head>
-    <style type="text/css">
 
-    /* custom css styles will go here */
+<style type="text/css">
 
-    @import url('https://fonts.googleapis.com/css?family=Lato');
+@import url('https://fonts.googleapis.com/css?family=Lato');
 
-		h1{
-			text-align: center;
-			font-family: 'Lato', sans-serif;
-		}
+h1 {
+  text-align: center;
+  font-family: 'Lato', sans-serif;
+}
 
-		svg {
-			max-width; 500px;
-			margin-left: auto;
-			margin-right: auto;
-			display: block;
-		}
+svg {
+  max-width; 500px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
 
-		p {
-			max-width: 700px;
-			margin-left: auto;
-			margin-right: auto;
-			font-family: 'Lato', sans-serif;
-		}
+p {
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  font-family: 'Lato', sans-serif;
+}
 
-		#data-source{
-			margin-right: auto;
-			margin-left: 0;
-			font-size: 10px;
-			margin-top: 3px;
-			margin-bottom: 10px;
-			font-family: 'Lato', sans-serif;
-		}
-	
-		body {
-		  font-size: 14px; 
-		  font-family: 'Lato', sans-serif;
-		}
+#data-source{
+  margin-right: auto;
+  margin-left: 0;
+  font-size: 10px;
+  margin-top: 3px;
+  margin-bottom: 10px;
+  font-family: 'Lato', sans-serif;
+}
 
-		.axis path,
-		.axis line {
-		  fill: none;
-		  stroke: #000;
-		  shape-rendering: crispEdges;
-		}
+body {
+  font-size: 14px; 
+  font-family: 'Lato', sans-serif;
+}
 
-		.dot {
-		  stroke: #000000;
-		  opacity: .75;
-		}
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
 
-		.tooltip {	
-		    position: absolute;			
-		    text-align: left;								
-		    padding: 4px;				
-		    font-size: 12px; 
-		  	font-family: 'Lato', sans-serif;	
-		    background: lightsteelblue;	
-		    border: 0px;		
-		    border-radius: 8px;			
-		    pointer-events: none;			
-		}
-  
+.dot {
+  stroke: #000000;
+  opacity: .75;
+}
+
+.tooltip {  
+    position: absolute;     
+    text-align: left;               
+    padding: 4px;       
+    font-size: 12px; 
+    font-family: 'Lato', sans-serif;  
+    background: lightsteelblue; 
+    border: 0px;    
+    border-radius: 8px;     
+    pointer-events: none;     
+}
+
+.topnav {
+  background-color: white;
+  border-style: solid;
+  border-width: 0px 0px 1px 0px;
+  padding: 0px 0px 0px 0px;
+  overflow: hidden;
+  font: 200 .9em "Lato";
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  color: black;
+  text-align: left;
+  padding: 14px 16px 14px 14px;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
 </style>
 
 <body>
 
-	<h1>Automation and Its Impact on Jobs</h1>
+<!-- sticky top navigation bar -->
+<div class = "topnav">
+<a href = "https://connorrothschild.github.io"><img src="https://github.com/connorrothschild/connorrothschild.github.io/blob/master/_assets/images/headshotCircle.png?raw=true" width = "40" height = "40"></a>
+<a href = "https://connorrothschild.github.io"><span style = "font-weight:900">Connor Rothschild</span><br><span style = "font-weight:lighter;color:#343434">Back to home</span></a></div>
+
+<h1>Automation and Its Impact on Jobs</h1>
 
 <script>
 var margin = {top: 20, right: 20, bottom: 40, left: 40},
