@@ -34,6 +34,8 @@ p {
   font-family: 'Lato', sans-serif;
 }
 
+a { color: #0000EE; }
+
 #data-source{
   margin-right: auto;
   margin-left: 0;
@@ -100,19 +102,46 @@ body {
   color: black;
 }
 
+footer {
+  font: 200 .9em "Lato";
+  text-align: left;
+  margin-top: 0em;
+  border-style: solid;
+  border-width: 1px 0px 0px 0px;
+  padding: 8px 0px 0px 6px;
+ }
+
+
 </style>
 
 <body>
 
 <!-- sticky top navigation bar -->
 <div class = "topnav">
-<a href = "https://connorrothschild.github.io"><img src="https://github.com/connorrothschild/connorrothschild.github.io/blob/master/_assets/images/headshotCircle.png?raw=true" width = "40" height = "40"></a>
-<a href = "https://connorrothschild.github.io"><span style = "font-weight:900">Connor Rothschild</span><br><span style = "font-weight:lighter;color:#343434">Back to home</span></a></div>
+  <a href = "https://connorrothschild.github.io">
+    <img src="https://github.com/connorrothschild/connorrothschild.github.io/blob/master/_assets/images/headshotCircle.png?raw=true" width = "40" height = "40">
+  </a>
+
+<a href = "https://connorrothschild.github.io">
+  <span style = "font-weight:900">Connor Rothschild</span>
+  <br>
+  <span style = "font-weight:lighter;color:#343434">Back to home</span>
+</a></div>
 
 <h1>Automation and Its Impact on Jobs</h1>
 
+<svg width="800" height="350"></svg>
+
+<footer>
+  <b>Design: </b><a href="http://connorrothschild.github.io/">Connor Rothschild</a>
+  <br>
+  <b>Source: </b><a href="https://connorrothschild.github.io/r/automation/#load-datasets">Bureau of Labor Statistics</a>
+</footer>
+
+</body>
+
 <script>
-var margin = {top: 20, right: 20, bottom: 40, left: 40},
+var margin = {top: 0, right: 130, bottom: 200, left: 50},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
@@ -136,11 +165,10 @@ color = d3.scale.category10();
 var circSize = function(d) { return d.TOT_EMP;} // data -> value
 
 // add the graph canvas to the body of the webpage
-var svg = d3.select("body").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
+var svg = d3.select("svg")
     .call(responsivefy)
-    .append("g")
+    
+var g = svg.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 function responsivefy(svg) {
@@ -290,15 +318,6 @@ var size = d3.scale.linear()
 	    .attr("cx", function(d) { return xScale(xValue(d));})
       	.attr("cy", function(d) { return yScale(yValue(d));})
 
-      // add axis labels
-      //text for x
-       svg.append("text")             
-	      .attr("transform",
-	            "translate(" + (width/2) + " ," + 
-	                           (height + margin.top + 20) + ")")
-	      .style("text-anchor", "middle")
-	      .text("Median Income");
-
 	  // text for  y
 	  svg.append("text")
 	      .attr("transform", "rotate(-90)")
@@ -357,6 +376,7 @@ svg
       .attr("class", "legend")
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
+  // make legend interactive (clickable)
   var clicked = ""
 
   legend.append("rect")
@@ -390,6 +410,6 @@ svg
       .text(function(d) { return d;})
   });
 
-</script>
-</body>
+    </script>
+  </body>
 </html>
