@@ -193,7 +193,7 @@
 
 // This code was very helpful for creating the button functionality https://github.com/rlbarter/world_happiness_viz/blob/master/index.html
 
-var margin = {top:20, right:200, bottom:50, left:50},
+var margin = {top:0, right:200, bottom:50, left:50},
           width  = 1000 - margin.left - margin.right,
           height = 400 - margin.top - margin.bottom;
 
@@ -291,13 +291,13 @@ d3.csv("long_kanye_data.csv", function(d) {
  y.domain(data.map(function(d) { return d.album_name; }));
  x.domain([0, d3.max(data, function(d) { return d.score * 1.1; })]);
 
- // add the axes
- g.append("g")
-     .attr("class", "axis axis--x")
-     .attr("transform", "translate(0," + height + ")")
-     .attr("font-family", "Lato")
-     .attr("font-size", "120px")
-     .call(d3.axisBottom(x));
+ // The decision to omit the x axis is intentional; because the measurements are on an abstract scale of 0-1 (with no clear definition) and because the comparison of interest is *between* bars, an x axis would provide no new additional information.
+ //g.append("g")
+ //    .attr("class", "axis axis--x")
+ //    .attr("transform", "translate(0," + height + ")")
+ //    .attr("font-family", "Lato")
+ //    .attr("font-size", "120px")
+ //    .call(d3.axisBottom(x));
 
 // append the images to the y axis
 g.append("g")
@@ -449,10 +449,10 @@ String.prototype.toProperCase = function () {
     y.domain(data.map(function(d) { return d.album_name; }));
 
     // update x axis
-    svg.select(".axis--x")
-     .transition().duration(1000)
-     .attr("transform", "translate(0," + height + ")")
-     .call(d3.axisBottom(x));
+    //svg.select(".axis--x")
+    // .transition().duration(1000)
+    // .attr("transform", "translate(0," + height + ")")
+    // .call(d3.axisBottom(x));
 
      // update the y axis, so that the album covers move
     svg.select(".axis--y")
