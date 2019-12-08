@@ -56,6 +56,11 @@ body {
   shape-rendering: crispEdges;
 }
 
+.axis {
+  font-size: 10px;
+  font-weight: 700;
+}
+
 .dot {
   stroke: #000000;
   opacity: .75;
@@ -71,6 +76,10 @@ body {
   border: 0px;    
   border-radius: 8px;     
   pointer-events: none;     
+}
+
+.legend {
+  font-size: 8px;
 }
 
 .topnav {
@@ -148,7 +157,9 @@ var margin = {top: 0, right: 130, bottom: 155, left: 50},
 var xValue = function(d) { return d.A_MEDIAN;}, // data -> value
     xScale = d3.scale.linear().range([0, width]), // value -> display
     xMap = function(d) { return xScale(xValue(d));}, // data -> display
-    xAxis = d3.svg.axis().scale(xScale).outerTickSize(0).orient("bottom");
+    xAxis = d3.svg.axis().scale(xScale).outerTickSize(0).
+    tickFormat(d3.format('$' + ','))
+      .orient("bottom");
 
 // setup y
 var yValue = function(d) { return d.probability*100;}, // data -> value
@@ -242,7 +253,7 @@ var size = d3.scale.linear()
 
   // x-axis
   svg.append("g")
-      .attr("class", "x axis")
+      .attr("class", "axis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis)
     .append("text")
@@ -254,16 +265,17 @@ var size = d3.scale.linear()
 
   // y-axis
   svg.append("g")
-      .attr("class", "y axis")
+      .attr("class", "axis")
       .call(yAxis)
     .append("text")
       .attr("class", "label")
-  		.attr("x", 165)
+  		.attr("x", 5)
       .attr("y", 1)
       .attr("dy", ".71em")
-      .style("text-anchor", "end")
+      .style("text-anchor", "start")
       .text("Probability of Automation");
 
+// define a comma format for big numbers
 var formatComma = d3.format(",");
 
   // draw dots
@@ -285,6 +297,7 @@ var formatComma = d3.format(",");
           tooltip.html("<b>Occupation</b>: " + d.occupation + 
                        "<br/><b>Typical Education</b>: " + d.typicaled + 
                        "<br/> <b>Income</b>: $" + formatComma(xValue(d)) + 
+                       "<br/> <b>Number of Workers</b>: " + formatComma(d.TOT_EMP) + 
                        "<br/> <b>Probability of Automation</b>: " + 
                        Math.round(yValue(d)) + "%")
                .style("left", (d3.event.pageX + 5) + "px")
@@ -296,20 +309,19 @@ var formatComma = d3.format(",");
                .style("opacity", 0);
       });
 
-      // add animation (new!)
-
+      // add animation 
       svg.selectAll("circle")
 	    .transition()
-	    .delay(function(d,i){return(i*3)})
+	    .delay(function(d,i){return(i*2)})
 	    .duration(800)
 	    .attr("cx", function(d) { return xScale(xValue(d));})
       .attr("cy", function(d) { return yScale(yValue(d));})
 
 // add circle legend
   var valuesToShow = [10000, 2500000, 5000000]
-  var xCircle = width/1.1
-  var xLabel = width/1.05
-  var yCircle = 250
+  var xCircle = width/1.05
+  var xLabel = width/1.125
+  var yCircle = 225
 
 svg
   .selectAll("circleLegend")
@@ -328,7 +340,7 @@ svg
   .data(valuesToShow)
   .enter()
   .append("line")
-    .attr('x1', function(d){ return xCircle + size(d) } )
+    .attr('x1', function(d){ return xCircle - size(d) } )
     .attr('x2', xLabel)
     .attr('y1', function(d){ return yCircle - size(d) } )
     .attr('y2', function(d){ return yCircle - size(d) } )
@@ -343,38 +355,35 @@ svg
   .append("text")
     .attr('x', xLabel)
     .attr('y', function(d){ return yCircle - size(d) } )
-    .text( function(d){ return d } )
+    .text( function(d){ return formatComma(d) } )
     .style("font-size", 10)
     .attr('alignment-baseline', 'middle')
+    .style("text-anchor", "end")
 
-// legend title
-svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(xAxis)
-  .append("text")
-  .attr("class", "label")
-      .attr("x", xCircle)
-      .attr("y", -75)
-      .style("text-anchor", "middle")
-      .style("font-size", "10px")
-      .text("Number of Workers");
+svg.append("text")
+    .attr("class", "axis")
+    .attr("x", width - 10)
+    .attr("y", 145)
+    .attr("dy", ".35em")
+    .style("text-anchor", "end")
+    .text("Number of Workers");
 
   // draw legend
   var legend = svg.selectAll(".legend")
       .data(color.domain())
-    .enter().append("g")
+      .enter().append("g")
       .attr("class", "legend")
-      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+      .attr("transform", function(d, i) { return "translate(0," + i * 12 + ")"; });
 
   // make legend interactive (clickable)
   var clicked = ""
 
   legend.append("rect")
     	.style("fill", function(d) { return color(d); })
-    	.attr("x", width - 18)
-    	.attr("width", 18)
-     	.attr("height", 18)
+      .attr("y", 20)
+    	.attr("x", width - 20)
+    	.attr("width", 9)
+     	.attr("height", 9)
   		.on("click",function(d){
    
 			   d3.selectAll("circle").style("opacity",.75)
@@ -394,11 +403,19 @@ svg.append("g")
 
   // draw legend text
   legend.append("text")
+      .attr("class", "legend")
       .attr("x", width - 24)
-      .attr("y", 9)
-      .attr("dy", ".35em")
+      .attr("y", 27)
       .style("text-anchor", "end")
       .text(function(d) { return d;})
+
+  svg.append("text")
+      .attr("class", "axis")
+      .attr("x", width - 10)
+      .attr("y", 5)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text("Typical Education Level");
 
   });
 
