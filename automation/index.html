@@ -21,7 +21,6 @@ h1 {
 }
 
 svg {
-  max-width; 500px;
   margin-left: auto;
   margin-right: auto;
   display: block;
@@ -63,15 +62,15 @@ body {
 }
 
 .tooltip {  
-    position: absolute;     
-    text-align: left;               
-    padding: 4px;       
-    font-size: 12px; 
-    font-family: 'Lato', sans-serif;  
-    background: lightsteelblue; 
-    border: 0px;    
-    border-radius: 8px;     
-    pointer-events: none;     
+  background-color:#E5E5E3;
+  position: absolute;     
+  text-align: left;               
+  padding: 4px;       
+  font-size: 12px; 
+  font-family: 'Lato', sans-serif;  
+  border: 0px;    
+  border-radius: 8px;     
+  pointer-events: none;     
 }
 
 .topnav {
@@ -130,7 +129,7 @@ footer {
 
 <h1>Automation and Its Impact on Jobs</h1>
 
-<svg width="800" height="350"></svg>
+<svg width="800" height="380"></svg>
 
 <footer>
   <b>Design: </b><a href="http://connorrothschild.github.io/">Connor Rothschild</a>
@@ -141,7 +140,7 @@ footer {
 </body>
 
 <script>
-var margin = {top: 0, right: 130, bottom: 200, left: 50},
+var margin = {top: 0, right: 130, bottom: 155, left: 50},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
@@ -222,40 +221,25 @@ d3.csv("https://raw.githubusercontent.com/connorrothschild/automation/master/aut
 
   // change string (from CSV) into number format
   data.forEach(function(d) {
-    //d.row = +d.row;
-    //d.occupation = +d.occupation;
-    //d.lessthanhs = +d.lessthanhs;
-    //d.hsdiploma = +d.hsdiploma;
-    //d.somecollege = +d.somecollege;
-    //d.associates = +d.associates;
-    //d.bachelors = +d.bachelors;
-    //d.masters = +d.masters;
-    //d.professional = +d.professional;
-    //d.hsorless = +d.hsorless;
-    //d.somecollegeorassociates = +d.somecollegeorassociates;
-    //d.postgrad = +d.postgrad;
+
     d.TOT_EMP = +d.TOT_EMP;
     d.A_MEDIAN = +d.A_MEDIAN;
-    //d.natlwage = +d.natlwage;
-    //d.typicaled = +d.typicaled;
-    //d.workexp = +d.workexp;
     d.probability = +d.probability;
-    //d.total =+d.total;
     return d;
-    //console.log(d);
+
   });
 
 // don't want dots overlapping axis, so add in buffer to data domain
   xScale.domain([d3.min(data, xValue) - (d3.min(data, xValue) * .25), 
                  d3.max(data, xValue) - (d3.max(data, xValue) * -.05)]);
 	yScale.domain([d3.min(data, yValue) - (d3.min(data, yValue) * 25), 
-                 d3.max(data, yValue) - (d3.max(data, yValue) * -.10)]);
+                 d3.max(data, yValue) - (d3.max(data, yValue) * -.15)]);
 
 // define size with dynamic #s
 var size = d3.scale.linear()
   .domain([0, d3.max(data, circSize)])  // What's in the data
-  .range([5, 30]);
-  
+  .range([3, 30]);
+
   // x-axis
   svg.append("g")
       .attr("class", "x axis")
@@ -280,6 +264,8 @@ var size = d3.scale.linear()
       .style("text-anchor", "end")
       .text("Probability of Automation");
 
+var formatComma = d3.format(",");
+
   // draw dots
   svg.selectAll(".dot")
      	.data(data)
@@ -297,7 +283,8 @@ var size = d3.scale.linear()
                .duration(200)
                .style("opacity", 1);
           tooltip.html("<b>Occupation</b>: " + d.occupation + 
-                       "<br/> <b>Income</b>: $" + xValue(d) + 
+                       "<br/><b>Typical Education</b>: " + d.typicaled + 
+                       "<br/> <b>Income</b>: $" + formatComma(xValue(d)) + 
                        "<br/> <b>Probability of Automation</b>: " + 
                        Math.round(yValue(d)) + "%")
                .style("left", (d3.event.pageX + 5) + "px")
@@ -316,16 +303,7 @@ var size = d3.scale.linear()
 	    .delay(function(d,i){return(i*3)})
 	    .duration(800)
 	    .attr("cx", function(d) { return xScale(xValue(d));})
-      	.attr("cy", function(d) { return yScale(yValue(d));})
-
-	  // text for  y
-	  svg.append("text")
-	      .attr("transform", "rotate(-90)")
-	      .attr("y", 0 - margin.left*2)
-	      .attr("x", 0 - (height / 2))
-	      .attr("dy", "1em")
-	      .style("text-anchor", "middle")
-	      .text("Probability of Automation");  
+      .attr("cy", function(d) { return yScale(yValue(d));})
 
 // add circle legend
   var valuesToShow = [10000, 2500000, 5000000]
@@ -369,6 +347,19 @@ svg
     .style("font-size", 10)
     .attr('alignment-baseline', 'middle')
 
+// legend title
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis)
+  .append("text")
+  .attr("class", "label")
+      .attr("x", xCircle)
+      .attr("y", -75)
+      .style("text-anchor", "middle")
+      .style("font-size", "10px")
+      .text("Number of Workers");
+
   // draw legend
   var legend = svg.selectAll(".legend")
       .data(color.domain())
@@ -408,6 +399,7 @@ svg
       .attr("dy", ".35em")
       .style("text-anchor", "end")
       .text(function(d) { return d;})
+
   });
 
     </script>
