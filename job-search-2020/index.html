@@ -24,12 +24,12 @@
 
   h2{
     line-height: 1.25;
-    padding-top: 45px;
+    padding-top: 60px;
     font-weight: 300;
   }
 
   svg{
-    padding: 20px;
+    padding-top: 20px;
   }
 
   text{
@@ -42,17 +42,17 @@
   }
 
   #graphic {
-    max-width:  1440px;
+    max-width:  720px;
     width: 100%;
     position:   relative; 
     height:  100%;
     position:  relative; 
-    margin:auto;
+    margin: auto;
   }
 
   .container {
     height: 100%;
-    max-width: 440px;
+    max-width: 360px;
     width: 100%;
     margin: 0;
     padding: 0;
@@ -65,14 +65,17 @@
   .container div {
     height: 100%;
     display: block;
-    padding: 0 45px;
   }
 
   .fixed {
     position: fixed;
-    max-width: 500px;
+    max-width: 360px;
     height: 500px;
     top: 50px;
+  }
+
+  .company {
+  	font-size: 18px;
   }
 
   </style>
@@ -121,14 +124,14 @@
 
     //set up grid spacing
     let spacing = 40;
-    let rows = 10;
+    let rows = 4;
     let column = 10;
     let randnum = (min,max) => Math.round( Math.random() * (max-min) + min );
 
     //Create an array of objects
     let our_data = d3.range(36).map(i => 
     ({ 'type': i < 5 ? 'policy' : 'data', 
-        'city': i < 1 ? 'COMPANY NAME' : 'NA'
+        'company': i < 1 ? 'COMPANY NAME' : 'NA'
     }));
 
     //create group and join our data to that group
@@ -140,12 +143,12 @@
     //create rectangles
     let rects = group.append("rect")
 
-    //city data
+    //company data
     d3.selectAll('g')
       .append("text")
-      .text( (d) => d["city"])
+      .text( (d) => d["company"])
       .attr("fill", "gray")
-      .attr("class", "city")
+      .attr("class", "company")
       .attr("dx", -500)
 
     // square grid
@@ -175,12 +178,12 @@
         .attr("height", 10)
         .attr("rx", 0)
         .attr("ry", 0)
-        .attr("x", (d, i) => d['type'] == "policy" ? randnum(100, 150) :  randnum(300, 350))
+        .attr("x", (d, i) => d['type'] == "policy" ? 0 : 100)
         .attr("y", (d, i) => i * 20)
         .attr("fill", (d, i) => d['type'] == "policy" ? "#394147": "#99c125")
         .attr("opacity", (d,i)=> i < 36 ? 1 : 0 )
 
-      d3.selectAll('text.city')
+      d3.selectAll('text.company')
         .transition()
         .delay( (d,i) => 40*i ) 
         .duration(900)
@@ -249,16 +252,16 @@
             else {return "none"} // return none for 12+
         ;})
 
-      //city text
-      d3.selectAll('text.city')
+      //company text
+      d3.selectAll('text.company')
         .transition()
         .delay( (d,i) => 20*i ) 
         .duration(900)
         .ease('elastic')
         //align text left
-        .attr("text-anchor", "end")
-        .attr("dx", 110)
-        .attr("dy", (d,i)=> (i * 17) + 13)
+        .attr("text-anchor", "middle")
+        .attr("dx", 103)
+        .attr("dy", (d,i)=> (i * 17) + 15)
         .attr("opacity", (d,i)=> i < 1 ? 1 : 0 ) // one company
 
       }
