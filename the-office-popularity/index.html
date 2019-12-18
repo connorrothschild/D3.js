@@ -28,9 +28,15 @@
 	</a></div>
 
 
-    <h1>Who is the Most Popular Character in <b>The Office?</b></h1>
+    <h1>
+    	Who is the Most Popular Character in <b>The Office?</b>
+    </h1>
     <h2>
-    	Other text goes here.
+    	Who's the <b>star</b> of The Office? Is it Michael? Dwight? Or some combination of Jim and Pam, given the focus on their relationship?
+    	<br><br>
+    	One way to answer that question is to see which character is <i>talked about the most</i>. This allows us to see both who's in conversation and who's the topic of conversation (perhaps behind that person's back!).
+      <br><br>
+      By using <a href="https://cran.r-project.org/package=schrute" target="_blank">transcript data</a> from all episodes of the Office, I analyze the frequency with which certain characters mention other characters throughout the show. In doing so, we can explore this question and answer: <b>Who is the most popular character in The Office?</b>
     </h2>
     
     <svg width="1000" height="500"></svg>
@@ -142,10 +148,12 @@ div.tooltip {
 
 // create the svg area
 var svg = d3.select("svg")
+  .attr("width", 1000)
+  .attr("height", 500)
   .call(responsivefy);
 
-var height = 500;
-var width = 1000;
+var height = 500,
+    width = 1000;
 
 var g = svg.append("g")
   .attr("transform", "translate(" + width/2 + "," + height/2 + ")");
@@ -366,6 +374,19 @@ group
     .text(function(d) { return d.value })
     .style("font-size", 9)
 
+// filter arcs 
+// for nadieh bremer-like storytelling
+//groupPath
+//    .transition().duration(1000)
+//    .style("opacity", function(d) {
+//      if(d.index != 1) {return .3;}
+//    });   
+//  
+//ribbons
+//    .transition().duration(1000)
+//    .style("opacity", function(d) {
+//      if(d.source.index != 1) {return .05;}
+//    });   
 
 // Returns an array of tick angles and values for a given group and step.
 function groupTicks(d, step) {
