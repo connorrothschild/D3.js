@@ -148,12 +148,13 @@ div.tooltip {
 
 // create the svg area
 var svg = d3.select("svg")
-  .attr("width", 1000)
+// make width dependent on window width. this allows for better mobile viewing
+  .attr("width", window.innerWidth > 1000 ? 1100 : 500)
   .attr("height", 500)
   .call(responsivefy);
 
 var height = 500,
-    width = 1000;
+    width = window.innerWidth > 1000 ? 1100 : 500;
 
 var g = svg.append("g")
   .attr("transform", "translate(" + width/2 + "," + height/2 + ")");
