@@ -43,7 +43,7 @@
     <!-- <svg width="960" height="600"></svg> -->
 
     <footer>
-     <b>Note:</b> Note goes here.<br><br>
+     <b>Note:</b> The size of the ribbons corresponds to the relative dialogue surrounding that character. If a ribbon matches the color of a source, that means that <i>that character mentioned his/her conversation partner more than they were mentioned</i>. Because all of Michael's ribbons are blue, this means he always mentioned others more than he was mentioned.<br><br>
      <b>Source:</b> 'schrute: The Entire Transcript from the Office in Tidy Format'. Available on CRAN at <a href="https://cran.r-project.org/package=schrute" target="_blank">https://cran.r-project.org/package=schrute.</a> </footer>
 
 </article>
@@ -148,13 +148,13 @@ div.tooltip {
 
 // create the svg area
 var svg = d3.select("svg")
-// make width dependent on window width. this allows for better mobile viewing
+// make svg width dependent on window width. this allows for better mobile viewing
   .attr("width", window.innerWidth > 1000 ? 1100 : 500)
   .attr("height", 500)
   .call(responsivefy);
 
 var height = 500,
-    width = window.innerWidth > 1000 ? 1100 : 500;
+    width = window.innerWidth > 1100 ? 1100 : 500;
 
 var g = svg.append("g")
   .attr("transform", "translate(" + width/2 + "," + height/2 + ")");
@@ -400,14 +400,24 @@ function groupTicks(d, step) {
 // Add names for each character, inside each of the arcs
 // From https://stackoverflow.com/questions/43259039/how-to-add-labels-into-the-arc-of-a-chord-diagram-in-d3-js
 group.append("text")
-		.attr("class", "labels")
-        .attr("x", 5)
+        .attr("dx", 5)
         .attr("dy", 16)
-        .attr("fill", "white")
+        //.attr("fill", "white")
       .append("textPath")
+        .attr("class", "labels")
 		.attr("xlink:href", function(d) { return "#group" + d.index; })
 		.text(function(d) { return names[d.index]; })
-//ALTERNATIVE OPTION: RETURN IMAGES WITH EACH CHARACTERS FACES
-// to do at later date
+        .attr("fill", "white")
+		//.style("fill", function(d,i) { return d3.rgb(colors[i]).brighter(3); });
+
+// not yet working: add images to the outside of the arcs
+//var images = group.append("image")
+//        .attr("x", 5)
+//        .attr("dy", 16)
+//        .attr("width", 28.5)	
+//        .attr("height", 28.5)
+//        .append("svg:image")
+//        .attr("xlink:href", function(d) { return "#group" + d.index; })
+//        .attr("xlink:href", function(d,i) {return "assets/" +i+".jpg";})
 
 </script>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <head>
   <meta charset="utf-8">
   <script src="https://d3js.org/d3.v3.min.js"></script>
@@ -89,7 +89,7 @@
       <h2>In <strong>2020</strong>, I applied to <strong>36</strong> summer internships.</h2>
     </div>
     <div id="div2">
-      <h2><strong>5</strong> of those internships were <span style = "color:black">policy-related</span>, and <strong>21</strong> were in <span style = "color:#99c125">data science.</span></h2>
+      <h2><strong>15</strong> of those internships were <span style = "color:black">policy-related</span>, and <strong>21</strong> were in <span style = "color:#99c125">data science.</span></h2>
       <p></p>
     </div>
     <div id="div4">
@@ -115,22 +115,59 @@
   
   <script>
 
-		//svg
-    let svg = d3.select("svg");
+//svg
+var svg = d3.select("svg")
+            //.call(responsivefy)
 
-    //svg width and height
-    svg.attr('width',500)
-        .attr('height',500)
+function responsivefy(svg) {
+  // container will be the DOM element
+  // that the svg is appended to
+  // we then measure the container
+  // and find its aspect ratio
+  const container = d3.select(svg.node().parentNode),
+      width = parseInt(svg.style('width'), 10),
+      height = parseInt(svg.style('height'), 10),
+      aspect = width / height;
+ 
+  // set viewBox attribute to the initial size
+  // control scaling with preserveAspectRatio
+  // resize svg on inital page load
+  svg.attr('viewBox', `0 0 ${width} ${height}`)
+      .attr('preserveAspectRatio', 'xMinYMid')
+      .call(resize);
+ 
+  // add a listener so the chart will be resized
+  // when the window resizes
+  // multiple listeners for the same event type
+  // requires a namespace, i.e., 'click.foo'
+  // api docs: https://goo.gl/F3ZCFr
+  d3.select(window).on(
+      'resize.' + container.attr('id'), 
+      resize
+  );
+ 
+  // this is the code that resizes the chart
+  // it will be called on load
+  // and in response to window resizes
+  // gets the width of the container
+  // and resizes the svg to fill it
+  // while maintaining a consistent aspect ratio
+  function resize() {
+      const w = parseInt(container.style('width'));
+      svg.attr('width', w);
+      svg.attr('height', Math.round(w / aspect));
+  }
+}
 
     //set up grid spacing
     let spacing = 40;
-    let rows = 4;
+    let rows = 6;
     let column = 10;
     let randnum = (min,max) => Math.round( Math.random() * (max-min) + min );
 
     //Create an array of objects
-    let our_data = d3.range(36).map(i => 
-    ({ 'type': i < 5 ? 'policy' : 'data', 
+    let our_data = d3.range(44).map(i => 
+    ({ 'type': i < 15 ? 'policy' : 'data', 
         'company': i < 1 ? 'COMPANY NAME' : 'NA'
     }));
 
@@ -164,8 +201,8 @@
         .attr("ry", 5)
         .attr("x", (d, i) => i % column * spacing)
         .attr("y", (d, i) => Math.floor(i / 10) % rows * spacing)
-        .attr("fill", (d, i) => (i < 40 ? "#394147" : "#99c125"))
-        .attr("opacity", "1")
+        .attr("fill", "#394147")
+        .attr("opacity", (d, i) => (i < 44 ? 1 : 0))
     }
         //divide
     let divide = () =>{
@@ -179,9 +216,9 @@
         .attr("rx", 0)
         .attr("ry", 0)
         .attr("x", (d, i) => d['type'] == "policy" ? 0 : 100)
-        .attr("y", (d, i) => i * 20)
+        .attr("y", (d, i) => i * 11)
         .attr("fill", (d, i) => d['type'] == "policy" ? "#394147": "#99c125")
-        .attr("opacity", (d,i)=> i < 36 ? 1 : 0 )
+        .attr("opacity", (d,i)=> i < 44 ? 1 : 0 )
 
       d3.selectAll('text.company')
         .transition()
@@ -206,7 +243,7 @@
         .attr("x", (d, i) => i % column * spacing)
         .attr("y", (d, i) => Math.floor(i / 10) % rows * spacing)
         // change the below number for how many interviews you get (e.g. 8 interviews)
-        .attr("fill", (d, i) => (i > 12 ? "red" : "#99c125"))
+        .attr("fill", (d, i) => (i > 13 ? "red" : "#99c125"))
     }
 
     //divide
@@ -228,7 +265,7 @@
             else {return "red"} // return none for 12+
         ;})
         .attr("opacity", function(d,i) {
-            if (i > 12) {return ".1"} // return green for 0-4
+            if (i > 13) {return ".1"} // return green for 0-4
             else {return "1"} // return none for 12+
         ;});  
 
