@@ -1,0 +1,72 @@
+[
+    {
+        "key": "Texas Policy Lab",
+        "region": "Work Experience",
+        "subregion": "Current",
+        "value":10000,
+        "description": "Description goes here."
+    },
+    {
+        "key": "Religion and Public Life Program",
+        "region": "Work Experience",
+        "subregion": "Current",
+        "value":10000,
+        "description": "Description goes here."
+    },
+    {
+        "key": "Baker Institute for Public Policy",
+        "region": "Work Experience",
+        "subregion": "Past",
+        "value":10000,
+        "description": "Description goes here."
+    },
+    {
+        "key": "Dunkin' Donuts",
+        "region": "Work Experience",
+        "subregion": "Past",
+        "value":10000,
+        "description": "Description goes here."
+    },
+    {
+        "key": "Rice University",
+        "region": "Education",
+        "subregion": "Current",
+        "value":10000,
+        "description": "Description goes here."
+    },
+    {
+        "key": "Kickapoo High School",
+        "region": "Education",
+        "subregion": "Past",
+        "value":10000,
+        "description": "Description goes here."
+    },
+    {
+        "key": "Coding",
+        "region": "Skills",
+        "subregion": "Technical",
+        "value":10000,
+        "description": "Description goes here."
+    },
+    {
+        "key": "Speaking",
+        "region": "Skills",
+        "subregion": "Interpersonal",
+        "value":10000,
+        "description": "Description goes here."
+    },
+    {
+        "key": "JavaScript Algorithms and Data Structures",
+        "region": "Certifications",
+        "subregion": "Technical",
+        "value":10000,
+        "description": "Issued by freeCodeCamp | DATE HERE"
+    },
+    {
+        "key": "Intro to SQL for Data Science",
+        "region": "Certifications",
+        "subregion": "Technical",
+        "value":10000,
+        "description": "DataCamp | DATE HERE"
+    }
+]
