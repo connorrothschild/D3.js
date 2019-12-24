@@ -1,22 +1,10 @@
-<!-- idea: select from dropdown your county/police department (?)
-	creates force-directed diagram like this one 
-	https://www.youtube.com/watch?v=FUJjNG4zkWY&t=261s
-	with faces on each bubble.
-	
-	Button functionality allows the user to sort by 
-		a) race,
-		b) unarmed,
-		c) age?
-
-	data is from here: 
-	https://docs.google.com/spreadsheets/d/1-8F6hBUh5cRhNem-LDe_M6QoRKoGc8w86s9f3NhspKg/edit#gid=1963060465
-
--->
 <!DOCTYPE html>
 <head>
   <meta charset="utf-8">
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <style>
+
+    @import url('https://fonts.googleapis.com/css?family=Lato');
 
     body { 
       margin:0;
@@ -25,7 +13,7 @@
       right:0;
       bottom:0;
       left:0;
-      font-family: sans-serif;
+      font-family: 'Lato', sans-serif;
     }
     
     .button {
@@ -79,7 +67,8 @@
       <h1>Police Shootings in 
       	<input list="cityState" id="locSelector" name="locSelector" class = "dropdown" value = "Miami, FL"/>
 		<datalist id="cityState">
-		  <option value="Springfield, MO">
+		<!-- options are defined here, and they are defined in a function below
+			<option value="Springfield, MO"> -->
 		</datalist>
 		<!-- <input list="cities" id="citySelector" name="citySelector" class = "dropdown"/>
 		<datalist id="cities">
@@ -95,7 +84,7 @@
     <div id="toolbar">
       <button id="all" class="button active">All</button>
       <button id="Race" class="button">By Race</button>
-      <button id="Age" class="button">By Age</button>
+      <!-- <button id="Age" class="button">By Age</button> -->
       <button id="Sex" class="button">By Sex</button>
       <button id="Armed Status" class="button">By Armed Status</button>
     </div>
@@ -106,18 +95,18 @@
   	// ht https://bl.ocks.org/SpaceActuary/d6b5ca8e5fb17842d652d0de21e88a05
   	// ht http://bl.ocks.org/eesur/be2abfb3155a38be4de4
 
- d3.csv('cleaned_data.csv')
-  .row(function (d) { return d.CityState })
+// create the option inputs for the datalist above. this relies on a clean list of (non-duplicated) city names.
+ d3.csv('city_data.csv')
+  .row(function(d){return d.CityState})
   .get(function (error, rows) {
     // The response from the server has arrived (maybe check for errors too?).
     // Let's create an empty selection of options inside a datalist:
    d3.select('datalist').selectAll('option')
-      .data(rows) // performing a data join
+      .data(function (d) {return rows})// performing a data join
       .enter() // extracting the entering selection
       .append('option') // adding an option to the selection of options
-      .attr('value', function (d) { return d; })
+      .attr('value', function(d){return d;})
   }); 
-
 
     console.clear()
     var w = 960, h = 500;
@@ -128,25 +117,16 @@
     			  //.domain(["Black", "White", "Asian", "Hispanic", "Unknown race", "Pacific Islander", "Native American"])
     			  //.range("nvm");
     var centerScale = d3.scalePoint().padding(1).range([0, w]);
-    var forceStrength = 0.05;
+    var forceStrength = 0.15;
 
     var svg = d3.select("body").append("svg")
       .attr("width", w)
       .attr("height", h)
 
-    var simulation = d3.forceSimulation()
-            .force("collide",d3.forceCollide( function(d){
-              	return d.r + 8 }).iterations(16) 
-            )
-            .force("charge", d3.forceManyBody())
-            .force("y", d3.forceY().y(h / 2))
-            .force("x", d3.forceX().x(w / 2))
-    
     var csv; 
-    var selected_loc = "Miami, FL"
-    //var selected_city = 'Springfield' 
-    //var selected_state = 'MO'
+    var selected_loc = "Miami, FL";
 
+    // 	data is from https://docs.google.com/spreadsheets/d/1-8F6hBUh5cRhNem-LDe_M6QoRKoGc8w86s9f3NhspKg/edit#gid=1963060465
     d3.csv("cleaned_data.csv", function(data){
       
       data.forEach(function(d){
@@ -162,11 +142,20 @@
 
      console.table(data); 
 
+    var simulation = d3.forceSimulation(data)
+            .force("collide",d3.forceCollide( function(d){
+              	return d.r + 8 }).iterations(16) 
+            )
+            .force("charge", d3.forceManyBody())
+            .force("y", d3.forceY().y(h / 2))
+            .force("x", d3.forceX().x(w / 2))
+            .on("tick", ticked);
+
       var body = d3.select("body");
            
       var defs = svg.append("defs");
 
-      defs.selectAll('circle-pattern')
+      defs.selectAll('circle')
       	.data(data)
       	.enter().append("pattern")
       	.attr('id', function(d) {return d.ID;})
@@ -202,7 +191,7 @@
       	// 	return d.Image })
       	.style("stroke", function(d, i){ return color(d.Race); })
       	// alt: return color(d.ID);})
-      	.style("stroke-width", 1)
+      	.style("stroke-width", 2)
       	.style("pointer-events", "all")
       	.call(d3.drag()
                 .on("start", dragstarted)
@@ -223,7 +212,7 @@
             // select element in current context
             d3.select(this)
               .transition()
-              .attr("r", function(d, i){ return d.r*2; })
+              .attr("r", function(d, i){ return d.r*3; })
           })
           // set back
           .on('mouseleave', function() {
@@ -234,16 +223,12 @@
           });
       
       function ticked() {
-        //console.log("tick")
-        //console.log(data.map(function(d){ return d.x; }));
+        // console.log("tick")
+        // console.log(data.map(function(d){ return d.x; }));
         circles
             .attr("cx", function(d){ return d.x; })
             .attr("cy", function(d){ return d.y; });
       }   
-
-      simulation
-            .nodes(data)
-            .on("tick", ticked);
       
       function dragstarted(d,i) {
         //console.log("dragstarted " + i)
@@ -269,7 +254,7 @@
         
        // MODIFY ALL CIRCLES UPON CLICK 
        d3.selectAll("circle")
-         .style("stroke-width", "1")
+         .style("stroke-width", "2")
       
       // MODIFY SELECTED CIRCLE UPON CLICK
        d3.selectAll("circle.selected")
@@ -319,16 +304,19 @@
         titles.enter().append('text')
           	.attr('class', 'title')
         	.merge(titles)
-            .attr('x', function (d) { return scale(d); })
-            .attr('y', 400)
+            .attr('x', function (d) {
+            	return scale(d); })
+            // if(byVar === 'Age') {return [100,800]}
+            // else { return scale(d); }})
+            .attr('y', 450)
+            // above: .attr('y', 50)
             .attr('text-anchor', 'middle')
-            .text(function (d) { return d; });
-            // work on age
-            //byVar + ' ' + d; });
+            .text(function (d) { return d });
+            	// if(byVar === 'Age') {return [d3., 80]; } 
+            	// else {return d}});
         
         titles.exit().remove() 
       }
-
 
       function setupButtons() {
         d3.selectAll('.button')
@@ -369,55 +357,59 @@ d3.select("#locSelector").on("change", function() {
 
     // filter the data
     data = csv.filter(function(d){return d.CityState == selected_loc}); 
+    
     console.log(data)
 
-    d3.selectAll("circle").remove();
+     var t = d3.transition()
+          .duration(750);
 
-	svg.selectAll('circle-pattern')
-		.data(data)
-      	.enter().append("pattern")
-      	.attr('id', function(d) {return d.ID;})
-      	.attr("width", "100%")
-	    .attr("height", "100%")
-	    .attr("patternContentUnits", "objectBoundingBox")
-	    .append("svg:image")
-	    .attr("xlink:href", function(d) { 
-	     if(d.Image !== '') { 
-	    		return d.Image
-	     } else {
-	    	return "default.jpg"
-      		}
-  		})
-  		.on("error", function(d){
-  			this.setAttribute("href", "default.jpg")
-  		})
-	    .attr("width", 1)
-	    .attr("height", 1);
- 
-// still don't have solved yet :( 
+     // defs
+     // 	.data(data).exit().remove();
 
-  simulation.force("x").initialize(data);
-  simulation.force("collide").initialize(data);
+     // defs
+     // 	.transition(t)
 
-     svg.selectAll("circle")
-      	.data(data)
-      	.enter().append("svg:circle")
-      	.attr("class", "circle")
-      	.attr("r", function(d, i){ return d.r; })
-        .attr("cx", function(d, i){ return 175 + 25 * i + 2 * i ** 2; })
-		.attr("cy", function(d, i){ return 250; })
-      	.attr("fill", function(d) { 
-      		return "url(#" + d.ID + ")"
-      })
-      	.style("stroke", function(d, i){ return color(d.Race); })
-      	.style("stroke-width", 1)
-      	.style("pointer-events", "all")
-      	.call(d3.drag()
-                .on("start", dragstarted)
-                .on("drag", dragged)
-                .on("end", dragended));
+     // defs = defs
+     // 	 .enter()
+	    //  .append("pattern")
+	    //  .merge(defs);
 
-}
+     circles
+     	.data(data).exit().remove();
+
+// this is where we style/update the new circles.
+// example: .attr("r", function(d){ return d.r*5;});
+     circles
+        .transition(t)
+	        .attr('id', function(d) {return d.ID;})
+		    .attr("xlink:href", function(d) { 
+		     if(d.Image !== '') { 
+		    		return d.Image
+		     } else {
+		    	return "default.jpg"
+	      		}
+	  		})
+            .attr("fill", function(d) { 
+      		return "url(#" + d.ID + ")"})
+            .attr("r", function(d){ return d.r*5; });
+
+     circles = circles
+	     .enter()
+	     .append("circle")
+	     .merge(circles);
+
+          // Update and restart the simulation.
+      simulation
+      	.nodes(data)
+        .force("collide", d3.forceCollide().strength(1).radius(function(d){ return d.r + 8; }))
+        .force("charge", d3.forceManyBody())
+        .force("y", d3.forceY().y(h / 2))
+        .force("x", d3.forceX().x(w / 2));
+
+   // d3.selectAll("circle").remove();
+          // still don't have solved yet :( 
+
+	}
 
 });
     
