@@ -65,7 +65,7 @@
 
     <header>
       <h1>Police Shootings in 
-      	<input list="cityState" id="locSelector" name="locSelector" class = "dropdown" value = "Miami, FL"/>
+      	<input list="cityState" id="locSelector" name="locSelector" class = "dropdown" value = "Springfield, MO"/>
 		<datalist id="cityState">
 		<!-- options are defined here, and they are defined in a function below
 			<option value="Springfield, MO"> -->
@@ -78,7 +78,7 @@
 		<datalist id="states">
 		  <option value="MO"> -->
 		</datalist>
-      <h2>Since 2013, Miami, FL police have killed 45 people.</h2>
+      <h2>Since 2013, Springfield, MO police have killed 9 people.</h2>
       <h3>Click for more information on a shooting.</h3>
 
     <div id="toolbar">
@@ -124,7 +124,7 @@
       .attr("height", h)
 
     var csv; 
-    var selected_loc = "Miami, FL";
+    var selected_loc = "Springfield, MO";
 
     // 	data is from https://mappingpoliceviolence.org/
     // add this to footnote probably https://mappingpoliceviolence.org/aboutthedata
@@ -201,7 +201,6 @@
       	.attr("fill", function(d) { 
       		return "url(#" + d.ID + ")"
       })
-      	// 	return d.Image })
       	.style("stroke", function(d, i){ return color(d.Race); })
       	// alt: return color(d.ID);})
       	.style("stroke-width", 2)
@@ -385,33 +384,72 @@ d3.select("#locSelector").on("change", function() {
 
     // filter the data
     data = csv.filter(function(d){return d.CityState === selected_loc}); 
-    console.log(data)
+    console.table(data)
 
     length = data.length
 
     d3.select("h2").html("Since 2013, " + selected_loc + " police have killed " + length + " people.")
 
-     var t = d3.transition()
-          .duration(750);
+    var simulation = d3.forceSimulation(data)
+            .force("collide",d3.forceCollide( function(d){
+                return d.r + 8 }).iterations(16) 
+            )
+            .force("charge", d3.forceManyBody())
+            .force("y", d3.forceY().y(h / 2))
+            .force("x", d3.forceX().x(w / 2))
+            .on("tick", ticked);
 
-// this is where we style/update the new circles
-    circles
-      .data(data).exit().remove();
+    var body = d3.select("body");
+           
+    var defs = svg.append("defs");
 
-     circles
-        .transition(t)
+    var patterns = defs.selectAll('circle')
+        .data(data)
+        .enter().append("pattern")
+        .attr('id', function(d) {return d.ID;})
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .attr("patternContentUnits", "objectBoundingBox")
+
+    var images = patterns
+        .append("svg:image")
+        .attr("xlink:href", function(d) { 
+         if(d.Image !== '') { 
+            return d.Image
+         } else {
+          return "default.jpg"
+            }
+        })
+        // if image is undefined, return default
+        // https://stackoverflow.com/questions/39988146/how-to-catch-svg-image-fail-to-load-in-d3
+        .on("error", function(d){
+          this.setAttribute("href", "default.jpg")
+        })
+        .attr("width", 1)
+        .attr("height", 1);
+
+      var circles = svg.selectAll("circle")
+        .data(data)
+        .enter().append("svg:circle")
+        .attr("class", "circle")
+        .attr("r", function(d, i){ return d.r; })
+        .attr("cx", function(d, i){ return 175 + 25 * i + 2 * i ** 2; })
+        .attr("cy", function(d, i){ return 250; })
+    // append images to circles. see https://www.youtube.com/watch?v=FUJjNG4zkWY&t=261s
         .attr("fill", function(d) { 
-          return "url(#" + d.ID + ")"})
-         //// debug: .attr("r", function(d){ return d.r*5; })
+          return "url(#" + d.ID + ")"
+      })
         .style("stroke", function(d, i){ return color(d.Race); })
-        .style("stroke-width", 2);
+        // alt: return color(d.ID);})
+        .style("stroke-width", 2)
+        .style("pointer-events", "all")
+        .call(d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended));
 
-     circles = circles
-       .enter()
-       .append("circle")
-       .merge(circles);
-
-    circles
+  // make the image grow a little on mouse over and add the text details on click
+  var setEvents = circles
           // change top level text on click
           .on('click', function (d) {
               d3.select("h2").html(function() {
@@ -451,8 +489,201 @@ d3.select("#locSelector").on("change", function() {
               .attr("r", function(d, i){ return d.r; })
 
           });
+      
+      function ticked() {
+        // console.log("tick")
+        // console.log(data.map(function(d){ return d.x; }));
+        circles
+            .attr("cx", function(d){ return d.x; })
+            .attr("cy", function(d){ return d.y; });
+      }   
+      
+      function dragstarted(d,i) {
+        //console.log("dragstarted " + i)
+        if (!d3.event.active) simulation.alpha(1).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+      }
 
-// update patterns (ids for each)
+      function dragged(d,i) {
+        //console.log("dragged " + i)
+        d.fx = d3.event.x;
+        d.fy = d3.event.y;
+      }
+
+      function dragended(d,i) {
+        //console.log("dragended " + i)
+        if (!d3.event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+        var me = d3.select(this)
+        console.log(me.classed("selected"))
+       me.classed("selected", !me.classed("selected"))
+        
+       // MODIFY ALL CIRCLES UPON CLICK 
+       d3.selectAll("circle")
+         .style("stroke-width", "2")
+      
+      // MODIFY SELECTED CIRCLE UPON CLICK
+       d3.selectAll("circle.selected")
+         .style("stroke-width", "5")
+        
+      } 
+      
+      function groupBubbles() {
+        hideTitles();
+
+        // @v4 Reset the 'x' force to draw the bubbles to the center.
+        simulation.force('x', d3.forceX().strength(forceStrength).x(w / 2));
+
+        // @v4 We can reset the alpha value and restart the simulation
+        simulation.alpha(1).restart();
+      }
+      
+      function splitBubbles(byVar) {
+        
+        centerScale.domain(data.map(function(d){ return d[byVar]; }));
+        
+        if(byVar == "all"){
+          hideTitles()
+        } else {
+          showTitles(byVar, centerScale);
+        }
+        
+        // @v4 Reset the 'x' force to draw the bubbles to their centers
+        simulation.force('x', d3.forceX().strength(forceStrength).x(function(d){ 
+          return centerScale(d[byVar]);
+        }));
+
+        // @v4 We can reset the alpha value and restart the simulation
+        simulation.alpha(2).restart();
+      }
+      
+      function hideTitles() {
+        svg.selectAll('.title').remove();
+      }
+
+      function showTitles(byVar, scale) {
+
+        var titles = svg.selectAll('.title')
+          .data(scale.domain());
+        
+        titles.enter().append('text')
+            .attr('class', 'title')
+          .merge(titles)
+            .attr('x', function (d) {
+              return scale(d); })
+            .attr('y', 450)
+            // above circles: .attr('y', 50)
+            .attr('text-anchor', 'middle')
+            .text(function (d) { return d });
+              //+ " (" + d.length + ")"});
+        
+        titles.exit().remove() 
+      }
+
+      function setupButtons() {
+        d3.selectAll('.button')
+          .on('click', function () {
+            
+            // Remove active class from all buttons
+            d3.selectAll('.button').classed('active', false);
+            // Find the button just clicked
+            var button = d3.select(this);
+
+            // Set it as the active button
+            button.classed('active', true);
+
+            // Get the id of the button
+            var buttonId = button.attr('id');
+
+            console.log(buttonId)
+            // Toggle the bubble chart based on
+            // the currently clicked button.
+            splitBubbles(buttonId);
+          });
+      }
+      
+      setupButtons()
+
+     var t = d3.transition()
+          .duration(750);
+
+// this is where we style/update the new circles
+
+var circles = d3.selectAll("circle");
+
+    circles
+      .data(data)
+      .exit()
+      .remove();
+
+     circles
+        .transition(t)
+        .attr("fill", function(d) { 
+          return "url(#" + d.ID + ")"})
+         //// debug: .attr("r", function(d){ return d.r*5; })
+        .style("stroke", function(d, i){ return color(d.Race); })
+
+     circles = circles
+       .enter()
+       .append("circle")
+       .merge(circles);
+
+    circles
+          // change top level text on click
+          .on('click', function (d) {
+              d3.select("h2").html(function() {
+                // introducing a function for conditional formatting of h2
+                // https://stackoverflow.com/questions/34454246/d3-js-conditional-tooltip-html
+                if(d.Name == "Name withheld by police") {
+                  return "Since 2013, " + selected_loc + " police have killed " + length + " people."
+                    + "<br>"
+                    + "<b>"
+                    + "This victim's name was withheld by police."
+                  } else {
+                return "Since 2013, " + selected_loc + " police have killed " + length + " people."
+                + "<br>"
+                + "<b>" + d.Name + "</b> was one of them."
+              }
+            })
+              d3.select("h3").html(function() {
+                // same as above
+                if(d.Name == "Name withheld by police") {
+                  return "Take me to a " + "<a href='" + d.Link + "', target = '_blank'>"  + "news article describing the death of this victim⇢</a>"
+                } else {
+                  return "Take me to a " + "<a href='" + d.Link + "', target = '_blank'>"  + "news article describing the death of " + d.Name + " ⇢</a>"
+                }
+              }); 
+           })
+          .on('mouseenter', function() {
+            // select element in current context
+            d3.select(this)
+              .transition()
+              .attr("r", function(d, i){ return d.r*3; })
+          })
+          // set back
+          .on('mouseleave', function() {
+            d3.select(this)
+              .transition()
+              .attr("r", function(d, i){ return d.r; })
+
+          });
+
+    // setEvents
+    //   .data(data).exit().remove();
+
+    // setEvents
+    //   .transition(t)
+
+    // setEvents = setEvents
+    //   .enter()
+    //   .append("pattern")
+    //   .merge(setEvents);
+
+console.table(circles);
+
+// update patterns (ids for each) 
      patterns
       .data(data).exit().remove();
 
@@ -464,6 +695,8 @@ d3.select("#locSelector").on("change", function() {
        .enter()
        .append("pattern")
        .merge(patterns);
+
+console.table(patterns);
 
 // update images
     images
@@ -484,23 +717,27 @@ d3.select("#locSelector").on("change", function() {
        .append("svg:image")
        .merge(images);
 
+console.table(images);
+
       // Update and restart the simulation.
 
-    var centerScale = d3.scalePoint().padding(1).range([0, w]);
-    var forceStrength = 0.15;
+// it is necessary to include the code below; otherwise clicking removes images
+// https://bl.ocks.org/mbostock/1095795
+  simulation.nodes(data)
+            .force("collide",d3.forceCollide( function(d){
+                return d.r + 8 }).iterations(16))
+            .on("tick", ticked)
+            .alpha(1)
+            .restart();
 
-   simulation
-    .nodes(data)
-    .alpha(1)
-    .alphaTarget(1)
-    .restart();
 
+  // DO NOT INCLUDE THE FOLLOWING CODE OR ANY VERSION OF IT!
   // simulation.force("x").initialize(data);
   // simulation.force("y").initialize(data);
   // simulation.force("charge").initialize(data)
   // simulation.force("collide").initialize(data);
  
-  simulation.force('x', d3.forceX().strength(forceStrength).x(w / 2));
+  // simulation.force('x', d3.forceX().strength(forceStrength).x(w / 2));
 
 	}
 
