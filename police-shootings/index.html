@@ -33,6 +33,18 @@
       color: #fff;
     }
 
+    .tooltip {  
+      background-color:white;
+      position: absolute;     
+      text-align: left;               
+      padding: 4px;       
+      font-size: 12px; 
+      font-family: 'Lato', sans-serif;  
+      border-radius: 8px;     
+      pointer-events: none;   
+      border: .5px solid black;
+    }
+
     .dropdown {
       text-align-last:left;
       padding-left:10px;
@@ -92,20 +104,21 @@
       <!-- <button id="Age" class="button">By Age</button> -->
       <button id="Sex" class="button">By Sex</button>
       <button id="Armed Status" class="button">By Armed Status</button>
+      <button id="Symptoms of mental illness?" class="button">By Mental Illness</button>
     </div>
 
     </header>
 
   <script>
-  	// ht https://bl.ocks.org/SpaceActuary/d6b5ca8e5fb17842d652d0de21e88a05
-  	// ht http://bl.ocks.org/eesur/be2abfb3155a38be4de4
+// ht https://bl.ocks.org/SpaceActuary/d6b5ca8e5fb17842d652d0de21e88a05
+// ht http://bl.ocks.org/eesur/be2abfb3155a38be4de4
 
-// create the option inputs for the datalist above. this relies on a clean list of (non-duplicated) city names.
+// create the option inputs for the datalist above. 
+// this relies on a clean list of (non-duplicated) city names.
+// from https://stackoverflow.com/questions/36804916/create-elements-for-datalist-in-d3
  d3.csv('city_data.csv')
   .row(function(d){return d.CityState})
   .get(function (error, rows) {
-    // The response from the server has arrived (maybe check for errors too?).
-    // Let's create an empty selection of options inside a datalist:
    d3.select('datalist').selectAll('option')
       .data(function (d) {return rows})// performing a data join
       .enter() // extracting the entering selection
@@ -119,18 +132,18 @@
     var color = d3.scaleOrdinal(d3.schemeCategory20)
     			  //.domain(["Black", "White", "Asian", "Hispanic", "Unknown race", "Pacific Islander", "Native American"])
     			  //.range("nvm");
+
+    // define some forceDiagram parameters
     var centerScale = d3.scalePoint().padding(1).range([0, w]);
     var forceStrength = 0.15;
 
+    // define svg
     var svg = d3.select("body").append("svg")
       .attr("width", w)
       .attr("height", h)
 
+    // create empty csv
     var csv; 
-
-    locFunction = function(selected_loc) {
-      if(selected_loc.trim() == "") {return "Houston, TX"} else {return selected_loc}
-    }
 
     var selected_loc = "Houston, TX"
     var selected_city = selected_loc.split(",")[0]
@@ -139,16 +152,23 @@
     // add this to footnote probably https://mappingpoliceviolence.org/aboutthedata
     d3.csv("cleaned_data.csv", function(data){
 
+    // put all data in a csv (for later filtering)
     csv = data;
 
+    // define data according to selected_loc
     data = data.filter(function(d){return d.CityState == selected_loc});
 
     // number of rows. this is for responsive header text defined later
     length = data.length
 
-// i should use a switch statement but its 1am 
+// functions based on length etc, which change circle parameters, text, etc. according to length (number of people)
+    // i should use a switch statement but its 1am 
     radiusFunction = function(length) {
       if(length > 90) {return 10} else if(length > 60) {return 12} else if(length > 30) {return 16} else {return 30};
+    }
+
+    locFunction = function(selected_loc) {
+      if(selected_loc.trim() == "") {return "Houston, TX"} else {return selected_loc}
     }
 
     personFunction = function(length) {
@@ -158,6 +178,24 @@
     oneOfThemFunction = function(length) {
       if(length == 1) {return " was that person."} else {return " was one of them."};
     }
+
+    pronounFunction = function(sex) {
+      if(sex == "Male") {return "He was"} else if(sex == "Female") {return "She was"} else {return "They were"}
+    }
+
+    ageFunction = function(age) {
+      if(isNaN(age)) {return "an unknown age "} else if(age == 0) {return "an unknown age "} else {return "a " + age + " year old "}
+    }
+
+  // h/t https://stackoverflow.com/questions/20438352/how-to-convert-date-to-words-in-html
+  var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+   dateFunction = function(date_str) {
+    temp_date = date_str.split("/");
+    return months[Number(temp_date[0] - 1)] + " " + temp_date[1] + ", 20" + temp_date[2];
+    }
+
+    //console.log(dateFunction("12/6/18"))
 
     var radius = radiusFunction(length);
 
@@ -182,6 +220,11 @@
     var body = d3.select("body");
            
     var defs = svg.append("defs");
+
+    // add the tooltip area to the webpage
+    var tooltip = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
 
     var patterns = defs.selectAll('circle')
       	.data(data)
@@ -264,31 +307,49 @@ d3.selection.prototype.moveToFront = function() {
            })
 
           .on('mouseenter', function() {
-            // select element in current context
-            d3.select(this)
-            // defined above!
-              .moveToFront()
+            d3.select(this) // select element in current context
+              .moveToFront() // defined above! move it to the front
               .transition()
-              .attr("r", function(d, i){ return 45; })
+              .attr("r", function(d, i){ return 45; }) // change the radius
           })
-          // set back
           .on('mouseleave', function() {
             d3.select(this)
               .transition()
-              .attr("r", function(d, i){ return d.r; })
+              .attr("r", function(d, i){ return d.r; }) // set back to normal radius
+          })
 
-          });
+        .on("mouseover", function(d) {
+          tooltip.transition()
+               .duration(200)
+               .style("opacity", 1);
+          // the following creates a sentence like: 
+          /* James E. Lewis  was a 44 year old Black male.
+          He was killed by gunshot and taser by the Springfield Police Department on January 1, 2017. */
+          tooltip.html("<b>" + d.Name + "</b> " // James E. Lewis
+                       + " was " + ageFunction(d.Age) // was a 44 year old
+                       + d.Race // Black
+                       + " " + d.Sex.toLowerCase() + "." // male. 
+                       + "<br>"
+                       + pronounFunction(d.Sex) + " killed by " // He was killed by
+                       + d["Cause of death"].toLowerCase().replace(","," and") //gunshot and taser
+                       + " by the " + d["Agency responsible for death"] // by the Springfield Police Department
+                       + " on " + dateFunction(d.Date) + ".") // on January 1, 2017.
+               .style("left", (d3.event.pageX + 5) + "px")
+               .style("top", (d3.event.pageY - 28) + "px");
+      })
+        .on("mouseout", function(d) {
+          tooltip.transition()
+               .duration(500)
+               .style("opacity", 0)
+      });
       
       function ticked() {
-        // console.log("tick")
-        // console.log(data.map(function(d){ return d.x; }));
         circles
             .attr("cx", function(d){ return d.x; })
             .attr("cy", function(d){ return d.y; });
       }   
       
       function dragstarted(d,i) {
-        //console.log("dragstarted " + i)
         if (!d3.event.active) simulation.alpha(1)
           //.restart();
         d.fx = d.x;
@@ -296,28 +357,28 @@ d3.selection.prototype.moveToFront = function() {
       }
 
       function dragged(d,i) {
-        //console.log("dragged " + i)
         d.fx = d3.event.x;
         d.fy = d3.event.y;
       }
 
       function dragended(d,i) {
-        //console.log("dragended " + i)
         if (!d3.event.active) simulation.alphaTarget(0);
         d.fx = null;
         d.fy = null;
         var me = d3.select(this)
         console.log(me.classed("selected"))
-       me.classed("selected", !me.classed("selected"))
+        me.classed("selected", !me.classed("selected"))
         
-       // MODIFY ALL CIRCLES UPON CLICK 
-       d3.selectAll("circle")
-         .style("stroke-width", "2")
-      
-      // MODIFY SELECTED CIRCLE UPON CLICK
-       d3.selectAll("circle.selected")
-         .style("stroke-width", "5")
-      	
+      // modify all other circles upon click
+      // https://www.d3-graph-gallery.com/graph/arc_highlight.html
+        circles
+          .style('stroke-width', "2")
+
+      // modify just selected circles upon click
+        d3.select(this)
+          .style('stroke-width', "4")
+
+    
       } 
       
       function groupBubbles() {
@@ -364,9 +425,10 @@ d3.selection.prototype.moveToFront = function() {
             .attr('x', function (d) {
             	return scale(d); })
             .attr('y', 475)
-            // above circles: .attr('y', 50)
+            // put text above above circles: .attr('y', 50)
             .attr('text-anchor', 'middle')
             .text(function (d) { return d });
+              // to do: add # of obs after text (e.g. "Unarmed (6 people)")
               //+ " (" + d.length + ")"});
         
         titles.exit().remove() 
@@ -404,22 +466,34 @@ d3.select("#locSelector").on("change", function() {
     	}
     );
 
-//  // call this whenever the filter changes
+//// call this whenever the filter changes
   function applyFilter(selected_loc) {
 
+  // change button selection to "all"
+    // unselect all buttons
+    d3.selectAll('.button').classed('active', false);
+    // define button as first ('all)')
+    var button = d3.select('.button');
+    // set it as the active button
+    button.classed('active', true);
+    // hide titles
+    hideTitles()
+
+  // redefine selected location, city, etc./
     var selected_loc = selected_loc;
     var selected_city = selected_loc.split(",")[0]
     console.log(selected_loc)
     console.log(selected_city)
 
-    // filter the data
+  // filter the data
     data = csv.filter(function(d){return d.CityState === selected_loc}); 
     console.table(data)
 
-    length = data.length
-
+  // redefine length, radius
+    var length = data.length
     var radius = radiusFunction(length);
 
+  // redefine data
     data.forEach(function(d){
         d.Age = +d.Age;
         d.r = radius;
@@ -427,12 +501,16 @@ d3.select("#locSelector").on("change", function() {
         d.y = h / 2;
       })
 
+  // change top level text
     d3.select("h2").html("Since 2013, " + selected_city + " police have killed " + length + personFunction(length) + ".")
+    d3.select("h3").html("Click for more information on an incident.")
 
+  // repeat code from before the function.
+  // i am not sure if this is necessary
+  // but it worked
     var simulation = d3.forceSimulation(data)
             .force("collide",d3.forceCollide( function(d){
-                return d.r })
-            )
+                return d.r }))
             .force("charge", d3.forceManyBody())
             .force("y", d3.forceY().y(h / 2))
             .force("x", d3.forceX().x(w / 2))
@@ -515,19 +593,39 @@ d3.select("#locSelector").on("change", function() {
            })
 
           .on('mouseenter', function() {
-            // select element in current context
-            d3.select(this)
+            d3.select(this) // select element in current context
+              .moveToFront() // defined above! move it to the front
               .transition()
-              .attr("r", function(d, i){ return d.r*3; })
+              .attr("r", function(d, i){ return 45; }) // change the radius
           })
-          // set back
           .on('mouseleave', function() {
             d3.select(this)
               .transition()
-              .attr("r", function(d, i){ return d.r; })
+              .attr("r", function(d, i){ return d.r; }) // set back to normal radius
+          })
 
-          });
-      
+        .on("mouseover", function(d) {
+          tooltip.transition()
+               .duration(200)
+               .style("opacity", 1);
+          tooltip.html("<b>" + d.Name + "</b> " // James E. Lewis
+                       + " was " + ageFunction(d.Age) // was a 44 year old
+                       + d.Race // Black
+                       + " " + d.Sex.toLowerCase() + "." // male. 
+                       + "<br>"
+                       + pronounFunction(d.Sex) + " killed by " // He was killed by
+                       + d["Cause of death"].toLowerCase().replace(","," and") //gunshot and taser
+                       + " by the " + d["Agency responsible for death"] // by the Springfield Police Department
+                       + " on " + dateFunction(d.Date) + ".") // on January 1, 2017.
+               .style("left", (d3.event.pageX + 5) + "px")
+               .style("top", (d3.event.pageY - 28) + "px");
+      })
+        .on("mouseout", function(d) {
+          tooltip.transition()
+               .duration(500)
+               .style("opacity", 0)
+      });
+
       function ticked() {
         // console.log("tick")
         // console.log(data.map(function(d){ return d.x; }));
@@ -550,23 +648,21 @@ d3.select("#locSelector").on("change", function() {
         d.fy = d3.event.y;
       }
 
-      function dragended(d,i) {
-        //console.log("dragended " + i)
+     function dragended(d,i) {
         if (!d3.event.active) simulation.alphaTarget(0);
         d.fx = null;
         d.fy = null;
         var me = d3.select(this)
         console.log(me.classed("selected"))
-       me.classed("selected", !me.classed("selected"))
+        me.classed("selected", !me.classed("selected"))
         
-       // MODIFY ALL CIRCLES UPON CLICK 
-       d3.selectAll("circle")
-         .style("stroke-width", "2")
-      
-      // MODIFY SELECTED CIRCLE UPON CLICK
-       d3.selectAll("circle.selected")
-         .style("stroke-width", "5")
-        
+      // modify all other circles upon click
+      // https://www.d3-graph-gallery.com/graph/arc_highlight.html
+        circles.style('stroke-width', "2")
+
+      // modify just selected circles upon click
+        d3.select(this).style('stroke-width', "4")
+    
       } 
       
       function groupBubbles() {
@@ -649,7 +745,6 @@ d3.select("#locSelector").on("change", function() {
           .duration(750);
 
 // this is where we style/update the new circles
-
 var circles = d3.selectAll("circle");
 
     circles
@@ -710,18 +805,7 @@ var circles = d3.selectAll("circle");
 
           });
 
-    // setEvents
-    //   .data(data).exit().remove();
-
-    // setEvents
-    //   .transition(t)
-
-    // setEvents = setEvents
-    //   .enter()
-    //   .append("pattern")
-    //   .merge(setEvents);
-
-console.table(circles);
+// console.table(circles);
 
 // update patterns (ids for each) 
      patterns
@@ -736,7 +820,7 @@ console.table(circles);
        .append("pattern")
        .merge(patterns);
 
-console.table(patterns);
+// console.table(patterns);
 
 // update images
     images
@@ -757,15 +841,13 @@ console.table(patterns);
        .append("svg:image")
        .merge(images);
 
-console.table(images);
+// console.table(images);
 
-      // Update and restart the simulation.
+// Update and restart the simulation.
 
 // it is necessary to include the code below; otherwise clicking removes images
 // https://bl.ocks.org/mbostock/1095795
   simulation.nodes(data)
-            // .force("collide",d3.forceCollide( function(d){
-            //     return d.r }))
             .on("tick", ticked)
             .alpha(1)
             .restart();
