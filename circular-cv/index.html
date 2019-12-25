@@ -6,12 +6,14 @@ Generic treemap, based on http://bost.ocks.org/mike/treemap/
 <html>
 <head>
 <meta charset="utf-8">
-<title>Zoomable treemap template</title>
+<title>Curriculum Vitae</title>
 <style>
+
+@import url('https://fonts.googleapis.com/css?family=Lato');
 
 #chart {
   background: #fff;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Lato", sans-serif;
 }
 
 .title {
@@ -58,7 +60,7 @@ rect.parent {
 
 .children rect.parent {
   fill: #bbb;
-  fill-opacity: .5;
+  fill-opacity: .05;
 }
 
 .children:hover rect.child {
@@ -88,7 +90,7 @@ var defaults = {
     rootname: "TOP",
     format: ",d",
     title: "",
-    width: 960,
+    width: 1000,
     height: 500
 };
 
@@ -228,8 +230,8 @@ function main(o, data) {
         .attr("class", "child")
         .call(rect)
       .append("title")
-        .text(function(d) { return d.description + "ADD DESCRIPTION HERE"; });
-        // ?? " (" + formatNumber(d.value) + ")"; });
+      // This assigns the title that appears on hover
+        .text(function(d) { return d.description; });
     children.append("text")
         .attr("class", "ctext")
         .text(function(d) { return d.key; })
@@ -261,7 +263,13 @@ function main(o, data) {
     t.call(text);
 
     g.selectAll("rect")
-        .style("fill", function(d) { return color(d.key); });
+        //.style("fill", function(d) { return color(d.key); });
+        .style("fill", function(d) { 
+       //   if (!d._children) {
+       //   return color(d.region); 
+       // } else { 
+          return color(d.subregion); });
+      // });
 
     function transition(d) {
       if (transitioning || !d) return;
@@ -307,13 +315,13 @@ function main(o, data) {
         .attr("x", function(d) { return x(d.x) + 6; })
     text.attr("x", function(d) { return x(d.x) + 6; })
         .attr("y", function(d) { return y(d.y) + 6; })
-        .style("opacity", function(d) { return this.getComputedTextLength() < x(d.x + d.dx) - x(d.x) ? 1 : 0; });
+        //.style("opacity", function(d) { return this.getComputedTextLength() < x(d.x + d.dx) - x(d.x) ? 1 : 0; });
   }
 
   function text2(text) {
     text.attr("x", function(d) { return x(d.x + d.dx) - this.getComputedTextLength() - 6; })
         .attr("y", function(d) { return y(d.y + d.dy) - 6; })
-        .style("opacity", function(d) { return this.getComputedTextLength() < x(d.x + d.dx) - x(d.x) ? 1 : 0; });
+        //.style("opacity", function(d) { return this.getComputedTextLength() < x(d.x + d.dx) - x(d.x) ? 1 : 0; });
   }
 
   function rect(rect) {
@@ -325,7 +333,7 @@ function main(o, data) {
 
   function name(d) {
     return d.parent
-        ? name(d.parent) + " / " + d.key
+        ? name(d.parent) + " / " + d.key + " (Click to go back)"
         : d.key;
   }
 }
