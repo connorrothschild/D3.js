@@ -129,9 +129,12 @@
     console.clear()
     var w = 960, h = 500;
     
-    var color = d3.scaleOrdinal(d3.schemeCategory20)
-    			  //.domain(["Black", "White", "Asian", "Hispanic", "Unknown race", "Pacific Islander", "Native American"])
-    			  //.range("nvm");
+    // map colors to race
+    var color = d3.scaleOrdinal()
+    			  .domain(["Black", "White", "Asian", "Hispanic", "Unknown Race", 
+    			  	"Unknown race", "Pacific Islander", "Native American"])
+    			  .range(["#BE3137","#FFC600", "#59B359", "#4E070C", "#7B48AD", 
+    			  	"#7B48AD", "#E96200", "#5F96CE"]);
 
     // define some forceDiagram parameters
     var centerScale = d3.scalePoint().padding(1).range([0, w]);
@@ -162,6 +165,7 @@
     length = data.length
 
 // functions based on length etc, which change circle parameters, text, etc. according to length (number of people)
+    
     // i should use a switch statement but its 1am 
     radiusFunction = function(length) {
       if(length > 90) {return 10} else if(length > 60) {return 12} else if(length > 30) {return 16} else {return 30};
@@ -297,7 +301,6 @@ d3.selection.prototype.moveToFront = function() {
               }
             })
               d3.select("h3").html(function() {
-                // same as above
                 if(d.Name == "Name withheld by police") {
                   return "Take me to a " + "<a href='" + d.Link + "', target = '_blank'>"  + "news article describing the death of this victim⇢</a>"
                 } else {
