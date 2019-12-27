@@ -159,6 +159,7 @@
       <button id="Sex" class="button">By Sex</button>
       <button id="Armed Status" class="button">By Armed Status</button>
       <button id="Symptoms of mental illness?" class="button">By Mental Illness</button>
+      <button id="Cause of death" class="button">By Cause of Death</button>
     </div>
 
 <div>
@@ -410,9 +411,10 @@ d3.selection.prototype.moveToFront = function() {
                        + d["Cause of death"].toLowerCase().replace(","," and") //gunshot and taser
                        + " by the " + d["Agency responsible for death"] // by the Springfield Police Department
                        + " on " + dateFunction(d.Date) + ".") // on January 1, 2017.
-               .style("left", (d3.event.pageX + 5) + "px")
-               .style("top", (d3.event.pageY - 28) + "px");
-      })
+               .style("left", (d3.event.pageX + 30) + "px")
+               .style("top", (d3.event.pageY - 30) + "px")
+           })
+
         .on("mouseout", function(d) {
           tooltip.transition()
                .duration(500)
