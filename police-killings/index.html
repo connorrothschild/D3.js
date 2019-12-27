@@ -15,7 +15,8 @@
       bottom:0;
       left:0;
       font-family: 'Lato', sans-serif;
-      background-color: #f8f8ff;
+      background-color: #F1F2F6;
+      /* background-color: #f8f8ff; */
     }
     
     .button {
@@ -55,7 +56,7 @@
       padding-left:10px;
       padding-top:2px;
       padding-bottom:2px;
-      font-size: 36px;
+      font-size: 30px;
       background-color: white;
       /*background-color: #f2f2f2;*/
       border-top-style: none;
@@ -76,13 +77,13 @@
     	color:#0000EE
     }
 
-    h1 { font-size: 36px; margin: 10px 25px; font-weight: lighter;}
-    h2 { font-size: 24px; margin: 10px 25px; font-weight: normal;}
-    h3 { font-size: 18px; margin: 10px 25px ; font-weight: normal;}
+    h1 { font-size: 30px; margin: 15px 25px; font-weight: normal;}
+    h2 { font-size: 18px; margin: 0px 25px; font-weight: normal;}
+    h3 { font-size: 16px; margin: 10px 25px; font-weight: normal; color:#1B1B1B;}
     header {padding: 20px; position: absolute; top: 0; left: 0;}
 
 	footer {
-	  font: 200 .9em "Lato";
+	  font: 200 12px "Lato";
 	  text-align: left;
 	  margin-top: 0em;
 	  border-style: solid;
@@ -141,7 +142,7 @@
 
 	<div>
       <h1>Police Killings in 
-      	<input list="cityState" id="locSelector" name="locSelector" class = "dropdown" value = "Houston, TX"/>
+      	<input list="cityState" id="locSelector" name="locSelector" class = "dropdown" placeholder = "Insert City Here"/>
 		<datalist id="cityState" class = "dropdown">
 		<!-- options are defined here, but they are defined in a function below
 			e.g. <option value="Springfield, MO"> -->
@@ -238,7 +239,7 @@
     
     // i should use a switch statement but its 1am 
     radiusFunction = function(length) {
-      if(length > 90) {return 10} else if(length > 60) {return 12} else if(length > 30) {return 16} else {return 30};
+      if(length > 60) {return 12} else if(length > 30) {return 16} else {return 30};
     }
 
     locFunction = function(selected_loc) {
@@ -709,8 +710,8 @@ function namePlural(length) {
                        + d["Cause of death"].toLowerCase().replace(","," and") //gunshot and taser
                        + " by the " + d["Agency responsible for death"] // by the Springfield Police Department
                        + " on " + dateFunction(d.Date) + ".") // on January 1, 2017.
-               .style("left", (d3.event.pageX + 5) + "px")
-               .style("top", (d3.event.pageY - 28) + "px");
+               .style("left", (d3.event.pageX + 30) + "px")
+               .style("top", (d3.event.pageY - 30) + "px")
       })
         .on("mouseout", function(d) {
           tooltip.transition()
