@@ -20,7 +20,6 @@
     
     .button {
       margin-top: 5px;
-      margin-left: 5px;
       min-width: 130px;
       padding: 5px 5px;
       cursor: pointer;
@@ -28,6 +27,10 @@
       font-size: 13px;
       border: 1px solid #e0e0e0;
       text-decoration: none;
+    }
+
+    #toolbar {
+      margin-left: 25px;
     }
 
     .button.active {
@@ -65,17 +68,17 @@
       font-weight: 100;
     }
 
-    text {
-    	font-size: 20px;
+    .title {
+    	font-size: 16px;
     }
 
     a {
     	color:#0000EE
     }
 
-    h1 { font-size: 36px; margin: 10px 5px; font-weight: lighter;}
-    h2 { font-size: 24px; margin: 5px 5px; font-weight: normal;}
-    h3 { font-size: 18px; margin: 5px 5px ; font-weight: normal;}
+    h1 { font-size: 36px; margin: 10px 25px; font-weight: lighter;}
+    h2 { font-size: 24px; margin: 10px 25px; font-weight: normal;}
+    h3 { font-size: 18px; margin: 10px 25px ; font-weight: normal;}
     header {padding: 20px; position: absolute; top: 0; left: 0;}
 
 	footer {
@@ -139,13 +142,13 @@
 	<div>
       <h1>Police Killings in 
       	<input list="cityState" id="locSelector" name="locSelector" class = "dropdown" value = "Houston, TX"/>
-      </h1>
 		<datalist id="cityState" class = "dropdown">
-		<!-- options are defined here, and they are defined in a function below
+		<!-- options are defined here, but they are defined in a function below
 			e.g. <option value="Springfield, MO"> -->
 		</datalist>
-		</datalist>
-      <h2>Since 2013, Houston police have killed <u>84 people.</u></h2>
+		      </h1>
+      <h2>Since 2013, Houston police have killed <u>84 people.</u>
+      <br>Do you know their names?</h2>
       <h3>Click for more information on an incident.</h3>
   </div>
 
@@ -159,7 +162,7 @@
     </div>
 
 <div>
-     <svg width="960" height="300"></svg>
+     <svg width="960" height="400"></svg>
 </div>
 
   <footer>
@@ -574,9 +577,15 @@ d3.select("#locSelector").on("change", function() {
         d.y = h / 2;
       })
 
+
+function namePlural(length) {
+	if (length > 1) {return "names"} else { return "name" } 
+}
+
   // change top level text
     d3.select("h2").html("Since 2013, " + selected_city + " police have killed " 
-    	+ "<u>" + length + personFunction(length) + "</u>.")
+    	+ "<u>" + length + personFunction(length) + "</u>."
+    	+ "<br> Do you know their " + namePlural(length) + "?")
     d3.select("h3").html("Click for more information on an incident.")
 
   // repeat code from before the function.
