@@ -22,7 +22,7 @@
 		  </a>
 
 		<a href = "https://connorrothschild.github.io">
-		  <span style = "font-weight:900">Connor Rothschild</span>
+		  <span style = "font-weight:normal">Connor Rothschild</span>
 		  <br>
 		  <span style = "font-weight:lighter;color:#343434">Back to home</span>
 		</a></div>
@@ -43,22 +43,26 @@
 
 <style>
 
-@import url('https://fonts.googleapis.com/css?family=Lato');
+@import url('https://rsms.me/inter/inter.css');
+html { font-family: 'Inter', sans-serif; }
+@supports (font-variation-settings: normal) {
+  html { font-family: 'Inter var', sans-serif; }
+}
 
 h1 {
-  font: 200 1.5em "Lato";
+  font: 200 1.5em "Inter";
   text-align: center;
 }
 
 h2 {
-  font: 200 1em "Lato";
+  font: 200 1em "Inter";
   text-align: left;
   margin-right: 5%;
   margin-left: 5%;
 }
 
 footer {
-  font: 200 .9em "Lato";
+  font: 200 .9em "Inter";
   text-align: left;
   margin-top: 2em;
   border-style: solid;
@@ -88,7 +92,7 @@ div.tooltip {
   padding-top: 4px;
   padding-bottom: 4px;  
   font-size: 1.1em;
-  font-family: 'Lato', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .states :hover {
@@ -97,12 +101,12 @@ div.tooltip {
 }
 
 .year.label {
-  font: 300 2.5em "Lato";
+  font: 300 2.5em "Inter";
   fill: gray;
 }
 
 .helper.label {
-  font: 150 1em "Lato";
+  font: 150 1em "Inter";
   fill: gray;
 }
 
@@ -113,7 +117,7 @@ div.tooltip {
 }
 
 .caption {
-  font: 150 1.1em "Lato";
+  font: 150 1.1em "Inter";
 }
 
 .topnav {
@@ -122,7 +126,7 @@ div.tooltip {
   border-width: 0px 0px 1px 0px;
   padding: 6px 0px 6px 6px;
   overflow: hidden;
-  font: 200 .9em "Lato";
+  font: 200 .9em "Inter";
   position: -webkit-sticky;
   position: sticky;
   top: 0;

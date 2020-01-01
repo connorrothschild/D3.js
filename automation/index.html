@@ -13,11 +13,16 @@
 
 <style type="text/css">
 
-@import url('https://fonts.googleapis.com/css?family=Lato');
+@import url('https://rsms.me/inter/inter.css');
+html { font-family: 'Inter', sans-serif; }
+@supports (font-variation-settings: normal) {
+  html { font-family: 'Inter var', sans-serif; }
+}
 
 h1 {
   text-align: center;
-  font-family: 'Lato', sans-serif;
+  font-family: 'Inter', sans-serif;
+  font-weight:normal;
 }
 
 svg {
@@ -30,7 +35,7 @@ p {
   max-width: 700px;
   margin-left: auto;
   margin-right: auto;
-  font-family: 'Lato', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 a { color: #0000EE; }
@@ -41,12 +46,12 @@ a { color: #0000EE; }
   font-size: 10px;
   margin-top: 3px;
   margin-bottom: 10px;
-  font-family: 'Lato', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 body {
   font-size: 14px; 
-  font-family: 'Lato', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .axis path,
@@ -58,7 +63,7 @@ body {
 
 .axis {
   font-size: 10px;
-  font-weight: 700;
+  font-weight: normal;
 }
 
 .dot {
@@ -72,7 +77,7 @@ body {
   text-align: left;               
   padding: 4px;       
   font-size: 12px; 
-  font-family: 'Lato', sans-serif;  
+  font-family: 'Inter', sans-serif;  
   border: 0px;    
   border-radius: 8px;     
   pointer-events: none;     
@@ -88,7 +93,7 @@ body {
   border-width: 0px 0px 1px 0px;
   padding: 6px 0px 6px 6px;
   overflow: hidden;
-  font: 200 .9em "Lato";
+  font: 200 .9em "Inter";
   position: -webkit-sticky;
   position: sticky;
   top: 0;
@@ -111,7 +116,7 @@ body {
 }
 
 footer {
-  font: 200 .9em "Lato";
+  font: 200 .9em "Inter";
   text-align: left;
   margin-top: 0em;
   border-style: solid;
@@ -131,7 +136,7 @@ footer {
   </a>
 
 <a href = "https://connorrothschild.github.io">
-  <span style = "font-weight:900">Connor Rothschild</span>
+  <span style = "font-weight:normal">Connor Rothschild</span>
   <br>
   <span style = "font-weight:lighter;color:#343434">Back to home</span>
 </a></div>
