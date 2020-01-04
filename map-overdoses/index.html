@@ -72,32 +72,9 @@ footer {
 
 a { color: #0000EE; }
 
-div.tooltip {   
-  position: absolute;           
-  text-align: left; 
-  vertical-align: middle;          
-  width: auto;                 
-  height: auto;   
-  -moz-border-radius:5px;
-  border-radius: 5px;
-  background: #fff;              
-  border: 1px solid #000;      
-  border-radius: 8px;           
-  pointer-events: none; 
-  background: #fff;
-  opacity: 1;
-  color: black;
-  padding-right: 10px;
-  padding-left: 5px;
-  padding-top: 4px;
-  padding-bottom: 4px;  
-  font-size: 1.1em;
-  font-family: 'Inter', sans-serif;
-}
-
 .states :hover {
-  stroke: black;
-  stroke-width: 2px;
+  stroke: white;
+  stroke-width: 8px;
 }
 
 .year.label {
@@ -149,13 +126,21 @@ div.tooltip {
 }
 
 .d3-tip {
-  line-height: 1;
-  padding: 6px;
-  background: wheat;
-  border-radius: 4px solid black;
+  line-height: .8;
+  padding-right: 6px;
+  padding-left: 6px;
+  padding-bottom: 6px;
+  background: #fff;
+  border: 1px solid black;
   font-size: 12px;
+  pointer-events: none !important;
 }
 
+/* .my_chart {
+	width: 90%;
+	padding-left: 15%;
+	padding-right: 10%;
+} */
 
 </style>
 
@@ -184,8 +169,10 @@ A special thanks to Robert Hosbach for his viz here (and his willingness to resp
 */  
 
 var svg = d3.select("svg")
+  .attr("class", "my_chart")
   // resize plot when window is resized (see below)
   .call(responsivefy);
+
 var path = d3.geoPath();
 var format = d3.format("");
 var height = 600;
@@ -327,11 +314,17 @@ function ready(error, us, overdoses) {
     var currentYear = 1999;
     var rateById = {};
     var nameById = {};
+    // var yearById = {};
+
+    //console.table(overdoses)
 
     overdoses.forEach(function(d){
    	  rateById[d.id] = +d.rate;
       nameById[d.id] = d.state;
-   	});
+      d.year = d.year;
+  });
+
+   	console.table(overdoses)
 
     // Add an overlay for the year label.
     var box = label.node().getBBox();
@@ -344,10 +337,29 @@ function ready(error, us, overdoses) {
       .attr("height", box.height)
       .on("mouseover", enableInteraction);
 
+  var x_tooltip = d3.scaleLinear()
+    .domain(d3.extent(overdoses, function(d) { return d.year; }))
+    .range([ 0, 130 ]);
+  
+  var y_tooltip = d3.scaleLinear()
+    .domain([0, 45])
+    .range([ 45, 0 ]);
+  
+  // define line function
+  var line = d3.line()
+    .x(function(d) {
+      return x_tooltip(d.year);
+    })
+    .y(function(d) {
+      return y_tooltip(+d.rate);
+    })
+
   var tool_tip = d3.tip()
   .attr("class", "d3-tip")
   .offset([20, 120])
-  .html("<p>This is a SVG inside a tooltip:</p><div id='tipDiv'></div>");
+  .html(
+  	"<p>Opioid-involved deaths over time:</p><div id='tipDiv'></div>"
+  );
 
 	svg.call(tool_tip);
 
@@ -364,39 +376,101 @@ function ready(error, us, overdoses) {
       .enter()
       .append("path")
       .attr("d", path)
-      .on('mouseover', function(d) {
+      // appending svg inside of tooltip for year by year change.
+      // h/t https://bl.ocks.org/maelafifi/ee7fecf90bb5060d5f9a7551271f4397
+      // h/t https://stackoverflow.com/questions/43904643/add-chart-to-tooltip-in-d3
+       .on('mouseover', function(d) {
+
+       	current_state = nameById[d.id]
+
 	    tool_tip.show();
 	    var tipSVG = d3.select("#tipDiv")
 	      .append("svg")
-	      .attr("width", 200)
+	      .attr("width", 220)
 	      .attr("height", 50);
 
-	    tipSVG.append("rect")
-	      .attr("fill", "steelblue")
-	      .attr("y", 10)
-	      .attr("width", 0)
-	      .attr("height", 30)
-	      .transition()
-	      .duration(1000)
-	      .attr("width", rateById[d.id] * 6);
+	    tipSVG.append("path")
+	      .datum(overdoses.filter(function(d) {return nameById[d.id] == current_state}))
+	     // .data(overdoses)
+	      .style("stroke", function() {
+	      	if (rateById[d.id] < 10) {
+	      		return "grey"
+	      	} else {
+	      	return color(rateById[d.id])
+	      	}
+	  	  })
+	      .style("stroke-width", 1.5)
+	      .style("fill", "none")
+	      // .transition()
+	      // .duration(1000)
+	      .attr("d", line)
 
 	    tipSVG.append("text")
-	      .text(rateById[d.id] + " per 100,000")
-	      .attr("x", 10)
-	      .attr("y", 30)
+	      .text(rateById[d.id] + " deaths")
 	      .transition()
 	      .duration(1000)
-	      .attr("x", 6 + rateById[d.id] * 6)
-	  })
-  .on('mouseout', tool_tip.hide)
+	      .attr("x", 140)
+	      .attr("y", function() {
+	      	if (y_tooltip(rateById[d.id]) < 15) { return 10 }
+	      		else { return y_tooltip(rateById[d.id]) - 7 }
+	      	})
 
-      .call(style,currentYear)
+		tipSVG.append("text")
+	      .text("per 100,000")
+	      .transition()
+	      .duration(1000)
+	      .attr("x", 140)
+	      .attr("y", function() {
+	      	if (y_tooltip(rateById[d.id]) < 15) { return 24 }
+	      		else { return y_tooltip(rateById[d.id]) + 7 }
+	      	})
+
+	    tipSVG.append("text")
+	      .html(current_state)
+	      // .transition()
+	      // .duration(1000)
+	      .attr("x", 0)
+	      .attr("y", 15)
+	      .style("font-size", 18)
+
+	  })
+  	  .on('mouseout', tool_tip.hide)
+      .call(style, currentYear)
+
+ // FOR BAR CHART //
+   //    .on('mouseover', function(d) {
+	  //   tool_tip.show();
+	  //   var tipSVG = d3.select("#tipDiv")
+	  //     .append("svg")
+	  //     .attr("width", 200)
+	  //     .attr("height", 50);
+
+	  //   tipSVG.append("rect")
+	  //     .attr("fill", color(rateById[d.id]))
+	  //     .attr("y", 10)
+	  //     .attr("width", 0)
+	  //     .attr("height", 30)
+	  //     .transition()
+	  //     .duration(1000)
+	  //     .attr("width", rateById[d.id] * 6);
+
+	  //   tipSVG.append("text")
+	  //     .text(rateById[d.id] + " per 100,000")
+	  //     .attr("x", 10)
+	  //     .attr("y", 30)
+	  //     .transition()
+	  //     .duration(1000)
+	  //     .attr("x", 6 + rateById[d.id] * 6)
+	  // })
+  	//   .on('mouseout', tool_tip.hide)
+   //    .call(style, currentYear)
 
     function style(states, year){
       newoverdoses = interpolateData(year);
 
     var rateById = {};
     var nameById = {};
+    var yearById = {};
 
     newoverdoses.forEach(function(d) {
 
@@ -404,6 +478,7 @@ function ready(error, us, overdoses) {
       // you can find states and their codes here https://en.wikipedia.org/wiki/List_of_U.S._state_abbreviations#ANSI_standard_INCITS_38:2009
       rateById[d.id] = +d.rate;
       nameById[d.id] = d.state;
+      yearById[d.id] = +d.year;
       
     });
     
@@ -433,7 +508,7 @@ function ready(error, us, overdoses) {
     .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
     .attr("fill", "none")
     .attr("stroke", "white")
-    .attr("stroke-linejoin", "round")
+    // .attr("stroke-linejoin", "round")
     .attr("d", path)
    }
 
