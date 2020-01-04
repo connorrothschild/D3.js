@@ -342,8 +342,8 @@ function ready(error, us, overdoses) {
     .range([ 0, 130 ]);
   
   var y_tooltip = d3.scaleLinear()
-    .domain([0, 45])
-    .range([ 45, 0 ]);
+    .domain([0, 60])
+    .range([ 50, 0 ]);
   
   // define line function
   var line = d3.line()
@@ -356,7 +356,13 @@ function ready(error, us, overdoses) {
 
   var tool_tip = d3.tip()
   .attr("class", "d3-tip")
-  .offset([20, 120])
+  // if the mouse position is greater than 650 (~ Kentucky/Missouri), 
+  // offset tooltip to the left instead of the right
+  // credit https://stackoverflow.com/questions/28536367/in-d3-js-how-to-adjust-tooltip-up-and-down-based-on-the-screen-position
+  .offset(function() {if(current_position[0] > 650) {
+  	return [-20,-120] } 
+  	else { return [20,120]}
+  })
   .html(
   	"<p>Opioid-involved deaths over time:</p><div id='tipDiv'></div>"
   );
@@ -381,17 +387,21 @@ function ready(error, us, overdoses) {
       // h/t https://stackoverflow.com/questions/43904643/add-chart-to-tooltip-in-d3
        .on('mouseover', function(d) {
 
+       	// define and store the mouse position. this is used to define
+       	// tooltip offset, seen above.
+		current_position = d3.mouse(this); 				
+       	//console.log(current_position[0])
+
        	current_state = nameById[d.id]
 
 	    tool_tip.show();
 	    var tipSVG = d3.select("#tipDiv")
 	      .append("svg")
 	      .attr("width", 220)
-	      .attr("height", 50);
+	      .attr("height", 55);
 
 	    tipSVG.append("path")
 	      .datum(overdoses.filter(function(d) {return nameById[d.id] == current_state}))
-	     // .data(overdoses)
 	      .style("stroke", function() {
 	      	if (rateById[d.id] < 10) {
 	      		return "grey"
@@ -401,14 +411,25 @@ function ready(error, us, overdoses) {
 	  	  })
 	      .style("stroke-width", 1.5)
 	      .style("fill", "none")
-	      // .transition()
-	      // .duration(1000)
 	      .attr("d", line)
+	      
+	    tipSVG.append("circle")
+	      .attr("fill", function() {
+	      	if (rateById[d.id] < 10) {
+	      		return "grey"
+	      	} else {
+	      	return color(rateById[d.id])
+	      	}
+	  	  })
+          .attr("stroke", "black")
+	      .attr("cx", 130)
+    	  .attr("cy", y_tooltip(rateById[d.id]))
+    	  .attr("r", 3)
 
 	    tipSVG.append("text")
 	      .text(rateById[d.id] + " deaths")
-	      .transition()
-	      .duration(1000)
+	      // .transition()
+	      // .duration(1000)
 	      .attr("x", 140)
 	      .attr("y", function() {
 	      	if (y_tooltip(rateById[d.id]) < 15) { return 10 }
@@ -417,8 +438,8 @@ function ready(error, us, overdoses) {
 
 		tipSVG.append("text")
 	      .text("per 100,000")
-	      .transition()
-	      .duration(1000)
+	      // .transition()
+	      // .duration(1000)
 	      .attr("x", 140)
 	      .attr("y", function() {
 	      	if (y_tooltip(rateById[d.id]) < 15) { return 24 }
@@ -470,7 +491,6 @@ function ready(error, us, overdoses) {
 
     var rateById = {};
     var nameById = {};
-    var yearById = {};
 
     newoverdoses.forEach(function(d) {
 
@@ -478,12 +498,13 @@ function ready(error, us, overdoses) {
       // you can find states and their codes here https://en.wikipedia.org/wiki/List_of_U.S._state_abbreviations#ANSI_standard_INCITS_38:2009
       rateById[d.id] = +d.rate;
       nameById[d.id] = d.state;
-      yearById[d.id] = +d.year;
+      d.year = d.year;
       
     });
     
     // add fill according to death rates, for each id (state)
     states.style("fill", function(d) { return color(rateById[d.id]); })
+    // OLD TOOLTIP // 
       // .on("mouseover", function(d) {      
       //     div.transition()        
       //       .duration(200)      
