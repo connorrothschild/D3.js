@@ -132,7 +132,7 @@ a { color: #0000EE; }
   padding-bottom: 6px;
   background: #fff;
   border: 1px solid black;
-  font-size: 12px;
+  font-size: 13px;
   pointer-events: none !important;
 }
 
@@ -364,7 +364,7 @@ function ready(error, us, overdoses) {
   	else { return [20,120]}
   })
   .html(
-  	"<p>Opioid-involved deaths over time:</p><div id='tipDiv'></div>"
+  	"<p>Opioid-involved deaths over time in</p><div id='tipDiv'></div>"
   );
 
 	svg.call(tool_tip);
@@ -447,12 +447,14 @@ function ready(error, us, overdoses) {
 	      	})
 
 	    tipSVG.append("text")
-	      .html(current_state)
+	      .text(current_state)
 	      // .transition()
 	      // .duration(1000)
 	      .attr("x", 0)
 	      .attr("y", 15)
 	      .style("font-size", 18)
+	      .style("font-weight", 400)
+
 
 	  })
   	  .on('mouseout', tool_tip.hide)
