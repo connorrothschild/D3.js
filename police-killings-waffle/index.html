@@ -3,6 +3,7 @@
   
   <head>
     <meta charset="utf-8">
+    <meta name="twitter:image" content="https://farm6.staticflickr.com/5510/14338202952_93595258ff_z.jpg" />
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="//d3js.org/topojson.v1.min.js"></script>
     
@@ -83,12 +84,13 @@
       <option value=White>white</option>
       <option value=Asian>Asian</option>
       <option value=Hispanic>Hispanic</option>
-      <option value='Unknown Race'>unknown race</option>
+      <option value=All>of any race</option>
     </select>
 
     <select id="sexFilter" class = "dropdown">
       <option value=Male>men</option>
       <option value=Female>women</option>
+      <option value=All>of either sex</option>
     </select>
 
     under the age of 
@@ -182,9 +184,15 @@ var months = ["January", "February", "March", "April", "May", "June", "July", "A
 
     // color on mouseover is determined by previous state, not hardcoded colors
     // http://jsfiddle.net/kUneX/
-    var color = function(d){
-      return (d.Race == selected_race && d.Sex == selected_sex && d.Age < selected_age ? 'black' : '#e2c642')
-    };
+    color = function(d){
+        if (selected_race != "All" && selected_sex != "All") {
+            {return (d.Race == selected_race && d.Sex == selected_sex && d.Age < selected_age ? 'black' : '#e2c642')}
+            } else if (selected_race != "All" && selected_sex == "All") {
+            {return (d.Race == selected_race && d.Age < selected_age ? 'black' : '#e2c642')}
+         } else if (selected_sex != "All" && selected_race == "All") {
+            {return (d.Sex == selected_sex && d.Age < selected_age ? 'black' : '#e2c642')}
+         } else {return (d.Age < selected_age ? 'black' : '#e2c642')}
+               };
 
     var rects = plots.selectAll(".rect")
       .data(function(d){ return d.values})
@@ -283,13 +291,45 @@ function applyFilter() {
       .transition()
       .duration(600)
       .style("fill", function(d){
-        if (d.Race == selected_race && d.Sex == selected_sex && d.Age < selected_age) 
-          {return "black"
-         } else {return "#e2c642"}})
+        if (selected_race != "All" && selected_sex != "All") {
+          if (d.Race == selected_race && d.Sex == selected_sex && d.Age < selected_age) 
+            { return "black"
+            } else {return "#e2c642"}
+         } else if (selected_race != "All" && selected_sex == "All") {
+          if (d.Race == selected_race && d.Age < selected_age) 
+            { return "black"
+            } else {return "#e2c642"}
+         } else if (selected_sex != "All" && selected_race == "All") {
+          if (d.Sex == selected_sex && d.Age < selected_age) 
+            { return "black"
+            } else {return "#e2c642"}
+         } else { 
+          if (d.Age < selected_age)
+            { return "black"
+            } else {return "#e2c642"}
+       }});
 
-    filteredData = data.filter(function(d){return d.Sex == selected_sex 
-                                               && d.Race == selected_race 
-                                               && d.Age < selected_age})
+    div.on("mouseout", function(d){
+            div.transition()
+            .duration(500)
+            div.style("visibility", "hidden")
+            var element = d3.select(this)
+            element.style("fill", color)
+          })
+
+    filteredData = data.filter(function(d){
+          if (selected_race != "All" && selected_sex != "All") {
+            { return d.Sex == selected_sex 
+                   && d.Race == selected_race 
+                   && d.Age < selected_age}
+            } else if (selected_race != "All" && selected_sex == "All") {
+            { return d.Race == selected_race 
+                   && d.Age < selected_age}
+         } else if (selected_sex != "All" && selected_race == "All") {
+            { return d.Sex == selected_sex 
+                   && d.Age < selected_age}
+         } else {return d.Age < selected_age}
+               });
 
     d3.select("h3").html(function() {
           return filteredData.length + " victims ("  
