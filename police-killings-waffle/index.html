@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    <meta charset="utf-8">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="//d3js.org/topojson.v1.min.js"></script>
+    
+  <style type="text/css">
+
+    @import url('https://rsms.me/inter/inter.css');
+   html { font-family: 'Inter', sans-serif; }
+   @supports (font-variation-settings: normal) {
+     html { font-family: 'Inter var', sans-serif; }
+   }
+ 
+   body { 
+     margin:0;
+     position:fixed;
+     top:0;
+     right:0;
+     bottom:0;
+     left:0;
+     font-family: 'Inter', sans-serif;
+     background-color: #F1F2F6;
+     /* background-color: #f8f8ff; */
+   }
+
+   a {
+     color:#0000EE
+   }
+ 
+   h1 { font-size: 30px; margin: 15px 30px; font-weight: normal;}
+   h2 { font-size: 18px; margin: 0px 30px; font-weight: normal;}
+   h3 { font-size: 16px; margin: 10px 30px; font-weight: normal; color:#1B1B1B;}
+   header {padding: 20px; position: absolute; top: 0; left: 0;}
+
+  footer {
+    font: 200 12px "Inter";
+    text-align: left;
+    margin-top: 0em;
+    border-style: solid;
+    border-width: 1px 0px 0px 0px;
+    padding: 8px 0px 0px 6px;
+   }
+
+  div.tooltip { 
+      position: absolute;     
+      text-align: left;       
+      padding: 5px;       
+      font: 14px sans-serif;    
+      background: white; 
+      border: rgba(0,0,0,0.3) solid 1px;
+      pointer-events: none;  
+      opacity: 0.5;   
+  }
+
+
+  .dropdown {
+    text-align-last:left;
+    font-size: 1em;
+    color: black;
+    border: none;
+    fill: none;
+  }
+
+  .age {
+    max-width: 26px;
+  }
+
+  </style>
+  
+  </head>
+
+<body>
+
+<h1>Each square represents one person who was killed by police between 2013 and 2018.</h1>
+
+<h2>How many victims were 
+
+  <select id="raceFilter" class = "dropdown">
+      <option value=Black>black</option>
+      <option value=White>white</option>
+      <option value=Asian>Asian</option>
+      <option value=Hispanic>Hispanic</option>
+      <option value='Unknown Race'>unknown race</option>
+    </select>
+
+    <select id="sexFilter" class = "dropdown">
+      <option value=Male>men</option>
+      <option value=Female>women</option>
+    </select>
+
+    under the age of 
+    <input type="text" id="ageFilter" class = "dropdown age" placeholder="18">?</h2>
+
+<h3>64 victims (1% of total)</h3>
+
+<script>
+// h/t https://bl.ocks.org/JulienAssouline/b98116bb991e13beb5418c45a2e64a14
+
+var w = window.innerWidth * .9;
+var h = window.innerHeight * .9;
+var numCols = 140;
+var selected_race = "Black",
+    selected_sex = "Male",
+    selected_age = "18";
+
+var margin = {
+  right: 30,
+  left: 30,
+  top: 15,
+  bottom: 30
+}
+
+var width = w - margin.right - margin.left;
+var height = h - margin.top - margin.bottom;
+
+var svg = d3.select("body")
+  .append("svg")
+  .attr("id", "chart")
+  .attr("width", w)
+  .attr("height", h)
+  .append("g")
+  .attr("transform", "translate(0" + margin.left + "," + margin.top + ")");
+
+var div = d3.select("body")
+        .append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0)
+
+d3.csv("cleaned_data.csv", function(error, data){
+
+  // functions based on length etc, which change circle parameters, text, etc. according to length (number of people)
+    
+  // i should use a switch statement but its 1am 
+  radiusFunction = function(length) {
+    if(length > 60) {return 12} else if(length > 30) {return 16} else {return 30};
+  }
+
+  locFunction = function(selected_loc) {
+    if(selected_loc.trim() == "") {return "Houston, TX"} else {return selected_loc}
+  }
+
+  personFunction = function(length) {
+    if(length == 1) {return " person"} else {return " people"};
+  }
+
+  oneOfThemFunction = function(length) {
+    if(length == 1) {return " was that person."} else {return " was one of them."};
+  }
+
+  pronounFunction = function(sex) {
+    if(sex == "Male") {return "He was"} else if(sex == "Female") {return "She was"} else {return "They were"}
+  }
+
+  ageFunction = function(age) {
+    if(isNaN(age)) {return "an unknown age "} else if(age == 0) {return "an unknown age "} else {return "a " + age + " year old "}
+  }
+
+// h/t https://stackoverflow.com/questions/20438352/how-to-convert-date-to-words-in-html
+var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+ dateFunction = function(date_str) {
+  temp_date = date_str.split("/");
+  return months[Number(temp_date[0] - 1)] + " " + temp_date[1] + ", 20" + temp_date[2];
+  }
+
+  var total_victims = data.length
+  var filteredData = data
+
+  console.log(data)
+
+  var id = d3.nest()
+    .key(function(d){ return d.Id })
+    .entries(data)
+
+    var plots = svg.selectAll("g")
+      .data(id)
+      .enter()
+      .append("g")
+
+    // color on mouseover is determined by previous state, not hardcoded colors
+    // http://jsfiddle.net/kUneX/
+    var color = function(d){
+      return (d.Race == selected_race && d.Sex == selected_sex && d.Age < selected_age ? 'black' : '#e2c642')
+    };
+
+    var rects = plots.selectAll(".rect")
+      .data(function(d){ return d.values})
+      .enter()
+      .append("rect")
+      .attr("width", 8)
+      .attr("height", 8)
+      .attr("x", function(d, i){
+        var colIndex = i % numCols
+        return colIndex * 10
+      })
+      .attr("y", function(d, i){
+        var rowIndex = Math.floor(i/numCols)
+        return rowIndex * 10
+      })
+      .attr("r", 6)
+      .style("fill", function(d) {if (d.Race == selected_race && d.Sex == selected_sex && d.Age < selected_age) 
+          {return "black"
+         } else {return "#e2c642"}})
+      .style("stroke", "none")
+      .on("mouseover", function(d){
+              div.transition()
+              .duration(100)
+              .style("opacity", 1)
+              var element = d3.select(this)
+              element.style("fill", "Black")
+          /* James E. Lewis  was a 44 year old Black male.
+          He was killed by gunshot and taser by the Springfield Police Department on January 1, 2017. */
+          div.html("<b>" + d.Name + "</b> " // James E. Lewis
+                       + " was " + ageFunction(d.Age) // was a 44 year old
+                       + d.Race // Black
+                       + " " + d.Sex.toLowerCase() + "." // male. 
+                       + "<br>"
+                       + pronounFunction(d.Sex) + " killed by " // He was killed by
+                       + d["Cause of death"].toLowerCase().replace(","," and") //gunshot and taser
+                       + " by the " + d["Agency responsible for death"] // by the Springfield Police Department
+                       + " on " + dateFunction(d.Date) + ".") // on January 1, 2017.
+                  .style("font-family", "Inter")
+            div.style("visibility", "visible")
+            .style("left", (d3.event.pageX - 20) + "px")    
+            .style("top", (d3.event.pageY - 35) + "px")
+          })
+            .on("mousemove", function(d){
+            div.style("left", (d3.event.pageX - 20) + "px")    
+            .style("top", (d3.event.pageY - 65) + "px")
+          })
+          .on("mouseout", function(d){
+            div.transition()
+            .duration(500)
+            div.style("visibility", "hidden")
+            var element = d3.select(this)
+            element.style("fill", color)
+          })
+
+  d3.select("#raceFilter").on("change", function() {
+
+    // this needs to be a function that reruns for all three parameters when one is changed
+    // applyFilter()
+    // SEE THIS https://stackoverflow.com/questions/53325355/implementing-multiple-filters-on-same-dataset-in-d3-js
+
+    selected_race = this.value
+    console.log(selected_race)
+
+    applyFilter();
+
+  });
+
+  d3.select("#sexFilter").on("change", function() {
+
+    // this needs to be a function that reruns for all three parameters when one is changed
+    // applyFilter()
+    // SEE THIS https://stackoverflow.com/questions/53325355/implementing-multiple-filters-on-same-dataset-in-d3-js
+
+    selected_sex = this.value
+    console.log(selected_sex)
+
+    applyFilter();
+
+  });
+
+  d3.select("#ageFilter").on("change", function() {
+
+    // this needs to be a function that reruns for all three parameters when one is changed
+    // applyFilter()
+    // SEE THIS https://stackoverflow.com/questions/53325355/implementing-multiple-filters-on-same-dataset-in-d3-js
+
+    selected_age = this.value
+    console.log(selected_age)
+
+    applyFilter();
+
+  });
+
+function applyFilter() {
+    rects
+      .transition()
+      .duration(600)
+      .style("fill", function(d){
+        if (d.Race == selected_race && d.Sex == selected_sex && d.Age < selected_age) 
+          {return "black"
+         } else {return "#e2c642"}})
+
+    filteredData = data.filter(function(d){return d.Sex == selected_sex 
+                                               && d.Race == selected_race 
+                                               && d.Age < selected_age})
+
+    d3.select("h3").html(function() {
+          return filteredData.length + " victims ("  
+                 + Math.round(filteredData.length/total_victims*100, 2) 
+                 + "% of total)"
+            })
+
+  }
+
+});
+
+
+  </script>
+    
+  </body>
+</html>

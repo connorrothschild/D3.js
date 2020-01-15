@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+
+  <title>Opioid-Involved Overdose Deaths in the US, 1999 to 2017</title>
+
+  <meta name="author" content="Connor Rothschild"/>
+
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+      <article>
+
+    <!-- sticky top navigation bar -->
+    <div class = "topnav">
+      <a href = "https://connorrothschild.github.io">
+        <img src="https://github.com/connorrothschild/connorrothschild.github.io/blob/master/_assets/images/headshotCircle.png?raw=true" width = "40" height = "40">
+      </a>
+
+    <a href = "https://connorrothschild.github.io">
+      <span style = "font-weight:900">Connor Rothschild</span>
+      <br>
+      <span style = "font-weight:lighter;color:#343434">Back to home</span>
+    </a></div>
+
+        <h1> Opioid-Involved Overdose Deaths in the US, 1999 to 2017</h1>
+        <h2>In 2017, the US Department of Health and Human Services declared the overprescription and abuse of opioids a <a href="https://www.hhs.gov/about/news/2017/10/26/hhs-acting-secretary-declares-public-health-emergency-address-national-opioid-crisis.html" target="_blank">public health crisis</a>, following 42,000 deaths the year prior. 
+        <br>
+        <br>
+        Opioids kill roughly <a href="https://www.hhs.gov/opioids/about-the-epidemic/index.html" target="_blank">130 Americans per day</a>, making them more deadly than both <a href="https://crashstats.nhtsa.dot.gov/Api/Public/ViewPublication/812451" target="_blank">car crashes</a> and <a href="https://www.gunviolencearchive.org/" target="_blank">gun violence</a>.
+        How did we get here? The overuse and abuse of opioids is a new phenomenon, partially driven by <a href="https://www.bmj.com/content/359/bmj.j4792" target="_blank">surgeon overprescription.</a> Follow the map below to see how this crisis has unfolded since 1999.
+        </h2>
+        
+        <svg width="960" height="600"></svg>
+
+        <footer>
+       <b>Note:</b> A death is coded as opioid-involved if it has one of the following causes: opioids, natural/semisynthetic opioids, methadone, heroin, synthetic opioids other than methadone, or cocaine. Deaths may include multiple opioids as a cause and thus are not mutually exclusive.<br><br>
+       <b>Source:</b> Multiple Cause of Death 1999–2017 on CDC Wide-ranging Online Data for Epidemiologic Research (CDC WONDER). Atlanta, GA: CDC, National Center for Health Statistics. 2018. Available at <a href="http://wonder.cdc.gov" target="_blank">http://wonder.cdc.gov.</a> </footer>
+
+<style>
+
+  
+@import url('https://rsms.me/inter/inter.css');
+html { font-family: 'Inter', sans-serif; }
+@supports (font-variation-settings: normal) {
+  html { font-family: 'Inter var', sans-serif; }
+}
+
+h1 {
+  font: 200 1.5em "Inter";
+  text-align: center;
+}
+
+h2 {
+  font: 200 1em "Inter";
+  text-align: left;
+  margin-right: 5%;
+  margin-left: 5%;
+}
+
+footer {
+  font: 200 .9em "Inter";
+  text-align: left;
+  margin-top: 2em;
+  border-style: solid;
+  border-width: 1px 0px 0px 0px;
+  padding: 8px 0px 0px 6px;
+ }
+
+a { color: #0000EE; }
+
+div.tooltip {   
+  position: absolute;           
+  text-align: left; 
+  vertical-align: middle;          
+  width: auto;                 
+  height: auto;   
+  -moz-border-radius:5px;
+  border-radius: 5px;
+  background: #fff;              
+  border: 1px solid #000;      
+  border-radius: 8px;           
+  pointer-events: none; 
+  background: #fff;
+  opacity: 1;
+  color: black;
+  padding-right: 10px;
+  padding-left: 5px;
+  padding-top: 4px;
+  padding-bottom: 4px;  
+  font-size: 1.1em;
+  font-family: 'Inter', sans-serif;
+}
+
+.states :hover {
+  stroke: black;
+  stroke-width: 2px;
+}
+
+.year.label {
+  font: 300 2.5em "Inter";
+  fill: gray;
+}
+
+.helper.label {
+  font: 150 1em "Inter";
+  fill: gray;
+}
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+  cursor: ew-resize;
+}
+
+.caption {
+  font: 150 1.1em "Inter";
+}
+
+.topnav {
+  background-color: white;
+  border-style: solid;
+  border-width: 0px 0px 1px 0px;
+  padding: 6px 0px 6px 6px;
+  overflow: hidden;
+  font: 200 .9em "Inter";
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  color: black;
+  text-align: left;
+  padding: 6px 6px 6px 6px;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+</style>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+
+<script src="https://d3js.org/topojson.v1.min.js"></script>
+
+<script src="https://d3js.org/queue.v1.min.js"></script>
+
+<script>
+
+/* This viz was made a lot easier thanks to the following code:
+
+* animation using TweenYear
+http://bl.ocks.org/jgujgu/bfbb41f5e8b90ff09d7805f71ef2538e
+* choropleth map of us states (using json fips state ids)
+https://bl.ocks.org/chucklam/f628765b873d707a3d0e44ffc78deab8
+* another choropleth; although I didn't end up following its structure it was a helpful introduction
+https://bl.ocks.org/wboykinm/dbbe50d1023f90d4e241712395c27fb3
+
+A special thanks to Robert Hosbach for his viz here (and his willingness to respond to my email!): https://rahosbach.github.io/2018-10-27-d3UnemploymentChoropleth/
+*/  
+
+var svg = d3.select("svg")
+  // resize plot when window is resized (see below)
+  .call(responsivefy);
+var path = d3.geoPath();
+var format = d3.format("");
+var height = 600;
+var width = 960;
+
+// thanks to https://brendansudol.com/writing/responsive-d3 for this function!
+function responsivefy(svg) {
+  // container will be the DOM element
+  // that the svg is appended to
+  // we then measure the container
+  // and find its aspect ratio
+  const container = d3.select(svg.node().parentNode),
+      width = parseInt(svg.style('width'), 10),
+      height = parseInt(svg.style('height'), 10),
+      aspect = width / height;
+ 
+  // set viewBox attribute to the initial size
+  // control scaling with preserveAspectRatio
+  // resize svg on inital page load
+  svg.attr('viewBox', `0 0 ${width} ${height}`)
+      .attr('preserveAspectRatio', 'xMinYMid')
+      .call(resize);
+ 
+  // add a listener so the chart will be resized
+  // when the window resizes
+  // multiple listeners for the same event type
+  // requires a namespace, i.e., 'click.foo'
+  // api docs: https://goo.gl/F3ZCFr
+  d3.select(window).on(
+      'resize.' + container.attr('id'), 
+      resize
+  );
+ 
+  // this is the code that resizes the chart
+  // it will be called on load
+  // and in response to window resizes
+  // gets the width of the container
+  // and resizes the svg to fill it
+  // while maintaining a consistent aspect ratio
+  function resize() {
+      const w = parseInt(container.style('width'));
+      svg.attr('width', w);
+      svg.attr('height', Math.round(w / aspect));
+  }
+}
+
+// options for color scheme: https://github.com/d3/d3-scale-chromatic
+var colorScheme = d3.schemeReds[9];
+colorScheme.unshift("#eee");
+
+// building the legend at the top
+var color = d3.scaleQuantize()
+  .domain([0, 50])
+  .range(colorScheme);
+var x = d3.scaleLinear()
+  .domain(d3.extent(color.domain()))
+  // the range specifies the x position of the legend
+  .rangeRound([600,860]);
+var g = svg.append("g")
+  .attr("transform", "translate(0,40)");
+
+// legend boxes
+g.selectAll("rect")
+  .data(color.range().map(function(d){ return color.invertExtent(d); }))
+  .enter()
+  .append("rect")
+    .attr("height", 8)
+    .attr("x", function(d){ return x(d[0]); })
+    .attr("width", function(d){ return x(d[1]) - x(d[0]); })
+    .attr("fill", function(d){ return color(d[0]); });
+
+// legend title
+g.append("text")
+  .attr("class", "caption")
+  .attr("x", x.range()[0])
+  .attr("y", -6)
+  .attr("fill", "#000")
+  .attr("text-anchor", "start")
+  .attr("font-weight", 30)
+  .text("Overdose Death Rate (Per 100,000)");
+
+// legend ticks
+g.call(d3.axisBottom(x)
+  .tickSize(13)
+  .tickFormat(format)
+  .tickValues(color.range().slice(1).map(function(d){ return color.invertExtent(d)[0]; })))
+  .select(".domain")
+  .remove();
+
+// create tooltip
+var div = d3.select("body")
+  .append("div")
+  .attr("class", "tooltip")
+  .style("opacity", 0);
+
+// label positions
+labely = height - 50
+labelx = width - 280
+
+// Add the year label; the value is set on transition.
+var label = svg.append("text")
+  .attr("class", "year label")
+  .attr("text-anchor", "middle")
+  // position the label
+  .attr("y", labely)
+  .attr("x", labelx)
+  .text(1999);
+
+var helperlabel = svg.append("text")
+  .attr("class", "helper label")
+  .attr("text-anchor", "middle")
+  // position the label
+  .attr("y", labely + 20)
+  .attr("x", labelx)
+  .text("Hover to change year");
+
+queue()
+  // read in JSON which includes all of the complicated shape data for states/counties/etc.
+  .defer(d3.json, "https://d3js.org/us-10m.v1.json")
+  // read in opioid data
+  .defer(d3.csv, "overdoses.csv")
+  /*
+  NOTE ON OVERDOSE DATA: 
+  
+  This CSV file was created via pulling data from CDC's WONDER database.
+  
+  I pulled all deaths from the National Vital Statistics System's multiple cause-of-death mortality files which had one of the following causes of death: opioids (T40.0, T40.1, T40.2, T40.3, T40.4, or T40.6)**; natural/semisynthetic opioids (T40.2); methadone (T40.3); heroin (T40.1); synthetic opioids other than methadone (T40.4); cocaine (T40.5). I followed the methodology of this paper: https://www.cdc.gov/mmwr/volumes/67/wr/mm675152e1.htm?s_cid=mm675152e1_w. Deaths may include multiple opioids as a cause and thus are not mutually exclusive.
+
+  You can replicate the data pull on CDC WONDER with this link: https://wonder.cdc.gov/mcd-icd10.html
+
+  Source: Multiple Cause of Death 1999–2017 on CDC Wide-ranging Online Data for Epidemiologic Research (CDC WONDER). Atlanta, GA: CDC, National Center for Health Statistics. 2018. Available at http://wonder.cdc.gov. 
+  */
+  .await(ready);
+
+function ready(error, us, overdoses) {
+  if (error) throw error;
+
+    // Initialize data to 1990
+    var currentYear = 1999;
+
+    // Add an overlay for the year label.
+    var box = label.node().getBBox();
+
+    var overlay = svg.append("rect")
+      .attr("class", "overlay")
+      .attr("x", box.x)
+      .attr("y", box.y)
+      .attr("width", box.width)
+      .attr("height", box.height)
+      .on("mouseover", enableInteraction);
+
+    // Start a transition that interpolates the data based on year.
+    svg.transition()
+      .duration(10000)
+      .ease(d3.easeLinear)
+      .tween("year", tweenYear);
+
+    states = svg.append("g")
+      .attr("class", "states")
+      .selectAll("path")
+      .data(topojson.feature(us, us.objects.states).features)
+      .enter()
+      .append("path")
+      .attr("d", path)
+      .call(style,currentYear)
+
+    function style(states, year){
+      newoverdoses = interpolateData(year);
+
+    var rateById = {};
+    var nameById = {};
+
+    newoverdoses.forEach(function(d) {
+
+      // each state is encoded according to its ANSI/FIPS state code
+      // you can find states and their codes here https://en.wikipedia.org/wiki/List_of_U.S._state_abbreviations#ANSI_standard_INCITS_38:2009
+      rateById[d.id] = +d.rate;
+      nameById[d.id] = d.state;
+      
+    });
+    
+    // add fill according to death rates, for each id (state)
+    states.style("fill", function(d) { return color(rateById[d.id]); })
+      .on("mouseover", function(d) {      
+          div.transition()        
+            .duration(200)      
+            .style("opacity", .9);  
+
+      // add tooltip here    
+          div.html('<strong> State: </strong>' + nameById[d.id] + 
+            '<br>' + 
+            '<strong> Year: </strong>' + Math.round(currentYear) +
+            '<br>' + 
+            '<strong> Rate: </strong>' + rateById[d.id] + " per 100,000")
+            .style("left", (d3.event.pageX) + "px")     
+            .style("top", (d3.event.pageY - 28) + "px");})   
+       // remove tooltip on mouse out               
+       .on("mouseout", function(d) {       
+          div.transition()        
+           .duration(500)      
+           .style("opacity", 0);});
+  }
+
+  // create the actual state objects
+  svg.append("path")
+    .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
+    .attr("fill", "none")
+    .attr("stroke", "white")
+    .attr("stroke-linejoin", "round")
+    .attr("d", path);
+
+  // after the transition finishes, mouseover to change  year.
+  function enableInteraction() {
+    var yearScale = d3.scaleLinear()
+      .domain([1999, 2017])
+      .range([box.x + 10, box.x + box.width - 10])
+      .clamp(true);
+
+    // Cancel the current transition, if any.
+    svg.transition().duration(0);
+
+    overlay
+      .on("mouseover", mouseover)
+      .on("mouseout", mouseout)
+      .on("mousemove", mousemove)
+      .on("touchmove", mousemove);
+
+    function mouseover() { label.classed("active", true); }
+    function mouseout() { label.classed("active", false); }
+    function mousemove() { displayYear(yearScale.invert(d3.mouse(this)[0])); }
+  }
+
+  // Tweens the entire chart by first tweening the year, and then the data.
+  // For the interpolated data, the dots and label are redrawn.
+  function tweenYear() {
+    var year = d3.interpolateNumber(1999, 2017);
+    return function(t) { displayYear(year(t)); };
+  }
+
+  // Updates the display to show the specified year.
+  function displayYear(year) {
+    currentYear = year;
+    states.call(style,year)
+    label.text(Math.round(year));
+  }
+
+  // Interpolates the dataset for the given (fractional) year.
+  function interpolateData(year) {
+    return overdoses.filter(function(row) {
+    return row['year'] == Math.round(year);
+     });
+    }
+};
+    </script> 
+  </body>
+</html>
