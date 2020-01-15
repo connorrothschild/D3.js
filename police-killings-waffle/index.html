@@ -3,13 +3,6 @@
   
   <head>
     <meta charset="utf-8">
-  <meta name='twitter:card' content='summary_large_image' />
-  <meta name='twitter:site' content='https://connorrothschild.github.io/D3.js/police-killings-waffle/' />
-  <meta name='twitter:creator' content='testing1929124' />
-  <meta name='twitter:title' content='What is your emoji essence?' />
-  <meta name='twitter:description' content='Find your name hidden within the emojiverse.' />
-  <meta name='twitter:image:src' content='https://russellgoldenberg.github.io/emoji-essence/og.png' />
-
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="//d3js.org/topojson.v1.min.js"></script>
     
@@ -40,6 +33,7 @@
    h1 { font-size: 30px; margin: 15px 30px; font-weight: normal;}
    h2 { font-size: 18px; margin: 0px 30px; font-weight: normal;}
    h3 { font-size: 16px; margin: 10px 30px; font-weight: normal; color:#1B1B1B;}
+   p { font-size: 12px; margin: 10px 30px; font-weight: normal; color:#1B1B1B;}
    header {padding: 20px; position: absolute; top: 0; left: 0;}
 
   footer {
@@ -62,7 +56,6 @@
       opacity: 0.5;   
   }
 
-
   .dropdown {
     text-align-last:left;
     font-size: 1em;
@@ -72,7 +65,7 @@
   }
 
   .age {
-    max-width: 26px;
+    max-width: 44px;
   }
 
   </style>
@@ -100,9 +93,11 @@
     </select>
 
     under the age of 
-    <input type="text" id="ageFilter" class = "dropdown age" placeholder="18">?</h2>
+    <input type="number" id="ageFilter" class = "dropdown age" placeholder="18">?</h2>
 
 <h3>64 victims (1% of total)</h3>
+
+<p></p>
 
 <script>
 // h/t https://bl.ocks.org/JulienAssouline/b98116bb991e13beb5418c45a2e64a14
@@ -112,7 +107,7 @@ var h = window.innerHeight * .9;
 var numCols = 140;
 var selected_race = "Black",
     selected_sex = "Male",
-    selected_age = "18";
+    selected_age = 18;
 
 var margin = {
   right: 30,
@@ -224,6 +219,7 @@ var months = ["January", "February", "March", "April", "May", "June", "July", "A
               .duration(100)
               .style("opacity", 1)
               var element = d3.select(this)
+              console.log(element)
               element.style("fill", "Black")
           /* James E. Lewis  was a 44 year old Black male.
           He was killed by gunshot and taser by the Springfield Police Department on January 1, 2017. */
@@ -252,6 +248,14 @@ var months = ["January", "February", "March", "April", "May", "June", "July", "A
             var element = d3.select(this)
             element.style("fill", color)
           })
+      .on("click", function(d) {
+                  d3.select("p").html(function() {
+                if(d.Name == "Name withheld by police") {
+                  return "Take me to a " + "<a href='" + d.Link + "', target = '_blank'>"  + "news article describing the death of this victim⇢</a>"
+                } else {
+                  return "Take me to a " + "<a href='" + d.Link + "', target = '_blank'>"  + "news article describing the death of " + d.Name + " ⇢</a>"
+                }}
+              )});
 
   d3.select("#raceFilter").on("change", function() {
 
@@ -268,10 +272,6 @@ var months = ["January", "February", "March", "April", "May", "June", "July", "A
 
   d3.select("#sexFilter").on("change", function() {
 
-    // this needs to be a function that reruns for all three parameters when one is changed
-    // applyFilter()
-    // SEE THIS https://stackoverflow.com/questions/53325355/implementing-multiple-filters-on-same-dataset-in-d3-js
-
     selected_sex = this.value
     console.log(selected_sex)
 
@@ -281,11 +281,7 @@ var months = ["January", "February", "March", "April", "May", "June", "July", "A
 
   d3.select("#ageFilter").on("change", function() {
 
-    // this needs to be a function that reruns for all three parameters when one is changed
-    // applyFilter()
-    // SEE THIS https://stackoverflow.com/questions/53325355/implementing-multiple-filters-on-same-dataset-in-d3-js
-
-    selected_age = this.value
+    selected_age = +this.value
     console.log(selected_age)
 
     applyFilter();
@@ -293,6 +289,7 @@ var months = ["January", "February", "March", "April", "May", "June", "July", "A
   });
 
 function applyFilter() {
+
     rects
       .transition()
       .duration(600)
@@ -322,6 +319,16 @@ function applyFilter() {
             var element = d3.select(this)
             element.style("fill", color)
           })
+
+    rects
+      .on("click", function(d) {
+                  d3.select("p").html(function() {
+                if(d.Name == "Name withheld by police") {
+                  return "Take me to a " + "<a href='" + d.Link + "', target = '_blank'>"  + "news article describing the death of this victim⇢</a>"
+                } else {
+                  return "Take me to a " + "<a href='" + d.Link + "', target = '_blank'>"  + "news article describing the death of " + d.Name + " ⇢</a>"
+                }}
+              )});
 
     filteredData = data.filter(function(d){
           if (selected_race != "All" && selected_sex != "All") {
