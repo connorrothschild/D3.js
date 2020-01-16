@@ -22,8 +22,8 @@
      bottom:0;
      left:0;
      font-family: 'Inter', sans-serif;
-     background-color: #F1F2F6;
-     /* background-color: #f8f8ff; */
+     /* background-color: #F1F2F6; */
+     background-color: white; 
    }
 
    a {
@@ -33,7 +33,7 @@
    h1 { font-size: 30px; margin: 15px 30px; font-weight: normal;}
    h2 { font-size: 18px; margin: 0px 30px; font-weight: normal;}
    h3 { font-size: 16px; margin: 10px 30px; font-weight: normal; color:#1B1B1B;}
-   p { font-size: 12px; margin: 10px 30px; font-weight: normal; color:#1B1B1B;}
+    p { font-size: 12px; margin: 10px 30px; font-weight: normal; color:#1B1B1B;}
    header {padding: 20px; position: absolute; top: 0; left: 0;}
 
   footer {
@@ -66,7 +66,7 @@
 
   .age {
     max-width: 44px;
-  }
+  } 
 
   </style>
   
@@ -92,22 +92,34 @@
       <option value=All>of either sex</option>
     </select>
 
-    under the age of 
-    <input type="number" id="ageFilter" class = "dropdown age" placeholder="18">?</h2>
+    between the ages of
+    <input type="number" id="ageMinFilter" class = "dropdown age" placeholder="0"> and 
+    <input type="number" id="ageMaxFilter" class = "dropdown age" placeholder="18">?
+  </h2>
 
-<h3>64 victims (1% of total)</h3>
+<h3>64 victims (1% of total).</h3>
 
-<p></p>
+<!--  <div id="toolbar">
+    <button id="all" class="button">Show me only complete data.</button>
+  </div>
+-->
 
 <script>
 // h/t https://bl.ocks.org/JulienAssouline/b98116bb991e13beb5418c45a2e64a14
 
+var aspectRatio = window.innerWidth/window.innerHeight;
+
+console.log(aspectRatio);
+
 var w = window.innerWidth * .9;
 var h = window.innerHeight * .9;
-var numCols = 140;
+// var w = window.innerWidth > window.innerHeight ? window.innerWidth * .9 : window.innerHeight * .9;
+// var h = window.innerHeight * .9;
+
 var selected_race = "Black",
     selected_sex = "Male",
-    selected_age = 18;
+    selected_age_min = 0,
+    selected_age_max = 18;
 
 var margin = {
   right: 30,
@@ -118,6 +130,19 @@ var margin = {
 
 var width = w - margin.right - margin.left;
 var height = h - margin.top - margin.bottom;
+
+colsCalc = d3.scaleLinear()
+  .domain([0, 2])
+  .range([50, 125]);
+
+console.log(Math.round(colsCalc(aspectRatio)));
+
+var numCols = Math.round(width / 10);
+//Math.round(colsCalc(aspectRatio));;
+
+console.log("Number of columns: " + numCols)
+console.log("Width is " + width)
+console.log("If each rectangle is 8px (with 1pt padding on both sides), the canvas should be showing " + width/10 + " rectangles.")
 
 var svg = d3.select("body")
   .append("svg")
@@ -187,12 +212,12 @@ var months = ["January", "February", "March", "April", "May", "June", "July", "A
     // http://jsfiddle.net/kUneX/
     color = function(d){
         if (selected_race != "All" && selected_sex != "All") {
-            {return (d.Race == selected_race && d.Sex == selected_sex && d.Age < selected_age ? 'black' : '#e2c642')}
+            {return (d.Race == selected_race && d.Sex == selected_sex && d.Age > selected_age_min && d.Age < selected_age_max ? 'black' : '#e2c642')}
             } else if (selected_race != "All" && selected_sex == "All") {
-            {return (d.Race == selected_race && d.Age < selected_age ? 'black' : '#e2c642')}
+            {return (d.Race == selected_race && d.Age > selected_age_min && d.Age < selected_age_max ? 'black' : '#e2c642')}
          } else if (selected_sex != "All" && selected_race == "All") {
-            {return (d.Sex == selected_sex && d.Age < selected_age ? 'black' : '#e2c642')}
-         } else {return (d.Age < selected_age ? 'black' : '#e2c642')}
+            {return (d.Sex == selected_sex && d.Age > selected_age_min && d.Age < selected_age_max ? 'black' : '#e2c642')}
+         } else {return (d.Age > selected_age_min && d.Age < selected_age_max ? 'black' : '#e2c642')}
                };
 
     var rects = plots.selectAll(".rect")
@@ -209,8 +234,7 @@ var months = ["January", "February", "March", "April", "May", "June", "July", "A
         var rowIndex = Math.floor(i/numCols)
         return rowIndex * 10
       })
-      .attr("r", 6)
-      .style("fill", function(d) {if (d.Race == selected_race && d.Sex == selected_sex && d.Age < selected_age) 
+      .style("fill", function(d) {if (d.Race == selected_race && d.Sex == selected_sex && d.Age > selected_age_min && d.Age < selected_age_max) 
           {return "black"
          } else {return "#e2c642"}})
       .style("stroke", "none")
@@ -249,11 +273,11 @@ var months = ["January", "February", "March", "April", "May", "June", "July", "A
             element.style("fill", color)
           })
       .on("click", function(d) {
-                  d3.select("p").html(function() {
+                  d3.select("h3").html(function() {
                 if(d.Name == "Name withheld by police") {
-                  return "Take me to a " + "<a href='" + d.Link + "', target = '_blank'>"  + "news article describing the death of this victim⇢</a>"
+                  return "64 victims (1% of total). Take me to a " + "<a href='" + d.Link + "', target = '_blank'>"  + "news article describing the death of this victim⇢</a>"
                 } else {
-                  return "Take me to a " + "<a href='" + d.Link + "', target = '_blank'>"  + "news article describing the death of " + d.Name + " ⇢</a>"
+                 return "64 victims (1% of total). Take me to a " + "<a href='" + d.Link + "', target = '_blank'>"  + "news article describing the death of " + d.Name + " ⇢</a>"
                 }}
               )});
 
@@ -279,10 +303,19 @@ var months = ["January", "February", "March", "April", "May", "June", "July", "A
 
   });
 
-  d3.select("#ageFilter").on("change", function() {
+  d3.select("#ageMinFilter").on("change", function() {
 
-    selected_age = +this.value
-    console.log(selected_age)
+    selected_age_min = +this.value
+    console.log(selected_age_min)
+
+    applyFilter();
+
+  });
+
+  d3.select("#ageMaxFilter").on("change", function() {
+
+    selected_age_max = +this.value
+    console.log(selected_age_max)
 
     applyFilter();
 
@@ -295,19 +328,19 @@ function applyFilter() {
       .duration(600)
       .style("fill", function(d){
         if (selected_race != "All" && selected_sex != "All") {
-          if (d.Race == selected_race && d.Sex == selected_sex && d.Age < selected_age) 
+          if (d.Race == selected_race && d.Sex == selected_sex && d.Age > selected_age_min && d.Age < selected_age_max) 
             { return "black"
             } else {return "#e2c642"}
          } else if (selected_race != "All" && selected_sex == "All") {
-          if (d.Race == selected_race && d.Age < selected_age) 
+          if (d.Race == selected_race && d.Age > selected_age_min && d.Age < selected_age_max) 
             { return "black"
             } else {return "#e2c642"}
          } else if (selected_sex != "All" && selected_race == "All") {
-          if (d.Sex == selected_sex && d.Age < selected_age) 
+          if (d.Sex == selected_sex && d.Age > selected_age_min && d.Age < selected_age_max) 
             { return "black"
             } else {return "#e2c642"}
          } else { 
-          if (d.Age < selected_age)
+          if (d.Age > selected_age_min && d.Age < selected_age_max)
             { return "black"
             } else {return "#e2c642"}
        }});
@@ -320,35 +353,39 @@ function applyFilter() {
             element.style("fill", color)
           })
 
-    rects
-      .on("click", function(d) {
-                  d3.select("p").html(function() {
-                if(d.Name == "Name withheld by police") {
-                  return "Take me to a " + "<a href='" + d.Link + "', target = '_blank'>"  + "news article describing the death of this victim⇢</a>"
-                } else {
-                  return "Take me to a " + "<a href='" + d.Link + "', target = '_blank'>"  + "news article describing the death of " + d.Name + " ⇢</a>"
-                }}
-              )});
-
     filteredData = data.filter(function(d){
           if (selected_race != "All" && selected_sex != "All") {
             { return d.Sex == selected_sex 
                    && d.Race == selected_race 
-                   && d.Age < selected_age}
+                   && d.Age > selected_age_min && d.Age < selected_age_max}
             } else if (selected_race != "All" && selected_sex == "All") {
             { return d.Race == selected_race 
-                   && d.Age < selected_age}
+                   && d.Age > selected_age_min && d.Age < selected_age_max}
          } else if (selected_sex != "All" && selected_race == "All") {
             { return d.Sex == selected_sex 
-                   && d.Age < selected_age}
-         } else {return d.Age < selected_age}
+                   && d.Age > selected_age_min && d.Age < selected_age_max}
+         } else {return d.Age > selected_age_min && d.Age < selected_age_max}
                });
 
     d3.select("h3").html(function() {
           return filteredData.length + " victims ("  
                  + Math.round(filteredData.length/total_victims*100, 2) 
-                 + "% of total)"
+                 + "% of total). "
             })
+
+    rects
+      .on("click", function(d) {
+                  d3.select("h3").html(function() {
+                if(d.Name == "Name withheld by police") {
+                  return filteredData.length + " victims ("  
+                 + Math.round(filteredData.length/total_victims*100, 2) 
+                 + "% of total). Take me to a " + "<a href='" + d.Link + "', target = '_blank'>"  + "news article describing the death of this victim⇢</a>"
+                } else {
+                 return filteredData.length + " victims ("  
+                 + Math.round(filteredData.length/total_victims*100, 2) 
+                 + "% of total). Take me to a " + "<a href='" + d.Link + "', target = '_blank'>"  + "news article describing the death of " + d.Name + " ⇢</a>"
+                }}
+              )});
 
   }
 
