@@ -171,6 +171,8 @@ A special thanks to Robert Hosbach for his viz here (and his willingness to resp
 
 var svg = d3.select("svg")
   .attr("class", "my_chart")
+  .attr("height", 600)
+  .attr("width", 960)
   // resize plot when window is resized (see below)
   .call(responsivefy);
 
