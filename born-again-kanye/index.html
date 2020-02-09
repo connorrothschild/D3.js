@@ -267,7 +267,7 @@ var csv;
 
 // couldn't get selected variable to update with other selected_variable
 // for the tooltip:
-var selected_variable = "Value"
+var selected_variable = "Acousticness";
 
 // load the data
 d3.csv("long_kanye_data.csv", function(d) {
@@ -386,10 +386,7 @@ String.prototype.toProperCase = function () {
           tooltip.transition()
                .duration(200)
                .style("opacity", 1);
-          tooltip.html("<b>Album</b>: " + d.album_name + 
-                       "<br/> <b>" + selected_variable.toProperCase() + "</b>: " + 
-  //round to two digits https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-only-if-necessary
-                       Math.round(d.score * 100)/100)
+          tooltip.html("<b>" + d.album_name + "</b> has a(n) <b>" + selected_variable.toLowerCase() + "</b> score of " + (Math.round(d.score * 100)/100))
                .style("left", (d3.event.pageX + 5) + "px")
                .style("top", (d3.event.pageY - 28) + "px");
       })
@@ -405,7 +402,9 @@ String.prototype.toProperCase = function () {
       
       applyFilter(this.value);
 
-      var selected_variable = this.value;
+      selected_variable = this.value;
+      selected_value = selected_variable;
+      console.log(selected_variable)
 
 // this function rewrites the paragraph text that accompanies each view. Using `selected_variable` (defined above), it then changes #p0, #p1, and #ranking to the correct text.
 
