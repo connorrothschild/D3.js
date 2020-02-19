@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+<style type="text/css">
+	
+	.circ {
+		stroke: black;
+
+		cursor: pointer;
+	}
+
+
+</style>
+
+</head>
+<body>
+
+
+
+
+<script type="text/javascript">
+
+var width = 960,
+	height = 500,
+	radius = 10;	
+
+var svg = d3.select('body').append('svg')
+			.attr('width', width)
+            .attr('height', height)
+
+var x = d3.scaleLinear()
+
+var xAxis = d3.axisBottom(x)
+
+d3.csv("long_kanye_data.csv", function(d) {
+  
+  d.score = +d.score;
+  return d;
+
+}, function(error, datafile) {
+  if (error) throw error;
+
+  // put the original data in csv
+  csv = datafile;
+  console.log(csv);
+
+  const sq = "danceability";
+
+  // filter the data based on the inital value
+  var data = csv.filter(function(d) { 
+    return d.group === sq;
+  });
+
+  console.log(d3.min(data, function(d) { return d.score * .9; }))
+  console.log(d3.max(data, function(d) { return d.score * 1.1; }))
+  
+  x.domain([d3.min(data, function(d) { return d.score * .9; }), d3.max(data, function(d) { return d.score * 1.1; })])
+   .range([0,width]);
+
+  xAxis.ticks(10, ".2r")
+        .tickSizeOuter(0)
+        
+  svg.append("g")
+    .attr("transform", `translate(0,${height/1.8})`)
+    .call(xAxis);
+
+  console.log(data)
+
+  average = d3.mean(data, function(d) { return d.score;})
+
+  console.log(average)
+
+  averageAnnotation = svg.append('g')
+        				.attr("class", "average-annotation")
+                        .attr("opacity", 0)
+        
+        avg = averageAnnotation.selectAll("g")
+        	.data([average])
+        	.enter()
+        
+        svg.append("line")
+            .style("stroke", "black")
+            .attr("y1",0)
+            .attr("y2",height/1.8)
+            .attr("x1",x(average))
+            .attr("x2",x(average))
+          	// .attr("class", "average-line")
+
+        svg.append('text')
+        	.attr("y", 30)
+          	.attr("x", x(average)/.99)
+          	.html(function(d) {return "Average: " + d3.format(",.4f")(average)})
+          	.attr("alignment-baseline", "center")
+              // .attr("class", "average-text")
+              
+        svg.append('text')
+        	.attr("y", height/1.5)
+            .attr("x", 0)
+          	.html(function(d) {return "&larr; Lower " + sq;})
+          	.attr("alignment-baseline", "center")
+              // .attr("class", "annotation")
+              
+        svg.append('text')
+        	.attr("y", height/1.5)
+            .attr("x", width/1.2)
+          	.html(function(d) {return "Higher " + sq + " &rarr;";})
+          	.attr("alignment-baseline", "right")
+          	// .attr("class", "annotation")
+
+	function tick(){
+
+		d3.selectAll('.circ')
+			.attr('cx', function(d){return d.x})
+            .attr('cy', function(d){return d.y})
+	}
+
+
+	svg.selectAll('.circ')
+		.data(data)
+		.enter().append('circle').classed('circ', true)
+		.attr('r', radius)
+		.attr('cx', function(d){return x(d.score);})
+        .attr('cy', function(){return height/2;})
+        .attr("fill", function (d) {
+          if (d.album_name == "JESUS IS KING") {
+              return "#0534D7";
+          } else {
+              return "grey";
+          };})		
+          .on('click', function(d){
+            console.log(d.album_name)
+            console.log(d.group)
+            console.log(d.score)
+		})
+
+	var simulation = d3.forceSimulation(data)
+		.force('x', d3.forceX(function(d){
+				return x(d.score)
+			}).strength(0.99)
+		)
+		.force('y', d3.forceY(height/2).strength(0.05))	
+		.force('collide', d3.forceCollide(radius))
+		.alphaDecay(0)
+		.alpha(0.12)
+		.on('tick', tick)	
+
+
+	// var init_decay; 
+	// init_decay = setTimeout(function(){
+	// 	console.log('init alpha decay')
+	// 	simulation.alphaDecay(0.1);
+	// }, 10000);
+
+	// d3.selectAll('.d_sel').on('click', function(){
+
+	// 	console.log(album)
+
+	// 	simulation.force('x', d3.forceX(function(d){
+	// 		return x(d.score)
+	// 	}))
+
+	// 	simulation
+	// 		.alphaDecay(0)
+	// 		.alpha(0.12)
+	// 		.restart()
+
+	// 	clearTimeout(init_decay);
+
+	// 	init_decay = setTimeout(function(){
+	// 		console.log('init alpha decay');
+	// 		simulation.alphaDecay(0.1);
+	// 	}, 8000);
+	// })
+
+
+
+
+
+})		
+
+</script>
+
+</body>
+</html>
