@@ -479,4 +479,4 @@ function display(data) {
 }
 
 // load data and display
-d3.csv('long_kanye_data.csv', display);
+d3.csv('data/long_kanye_data.csv', display);
