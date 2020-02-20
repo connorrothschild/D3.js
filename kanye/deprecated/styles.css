@@ -570,48 +570,6 @@ h2 {
 	width: 350px;
 }
 
-#wrapper {
-	max-width: 900px;
-	margin: 0 auto;
-}
-.circle {
-	pointer-events: none;
-}
-.circle-bg {
-	stroke: steelblue;
-	fill: steelblue;
-	fill-opacity: .3;
-	pointer-events: none;
-}
-.circle-hover {
-	opacity: 0;
-}
-.axis .domain {
-	display: none;
-}
-.axis text {
-	font-size: 1.2em;
-}
-.axis.y.right .tick text {
-	/* fill: steelblue; */
-}
-.axis.y .tick line {
-	stroke: #eee;
-	stroke-width: 10px;
-}
-.axis.x .tick line {
-	stroke: #ccc;
-}
-.tip {
-	position: absolute;
-	text-align: left;
-	background-color: black;
-	color: white;
-	padding: 10px;
-	opacity: 0;
-	/* text-shadow: -1px -1px 1px #ffffff, -1px 0px 1px #ffffff, -1px 1px 1px #ffffff, 0px -1px 1px #ffffff, 0px 1px 1px #ffffff, 1px -1px 1px #ffffff, 1px 0px 1px #ffffff, 1px 1px 1px #ffffff; */
-}
-
 #myinput {
 	font-family: 'Inter';
 

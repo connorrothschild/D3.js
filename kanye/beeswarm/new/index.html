@@ -42,11 +42,11 @@
       } 
       .tip {
         position: absolute;
-		text-align: left;
-		background-color: black;
-		color: white;
-		padding: 10px;
-		opacity: 0;
+        text-align: left;
+        background-color: black;
+        color: white;
+        padding: 10px;
+        opacity: 0;
         /* text-shadow: -1px -1px 1px #ffffff, -1px 0px 1px #ffffff, -1px 1px 1px #ffffff, 0px -1px 1px #ffffff, 0px 1px 1px #ffffff, 1px -1px 1px #ffffff, 1px 0px 1px #ffffff, 1px 1px 1px #ffffff; */
 	  }
 	  
@@ -56,8 +56,8 @@
     <div id="wrapper"></div>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://unpkg.com/d3-moveto@0.0.3/build/d3-moveto.min.js"></script>
-	<script src="https://unpkg.com/jeezy@1.12.13/lib/jeezy.min.js"></script>
-	<script src="https://d3js.org/d3-voronoi.v1.min.js"></script>
+  	<script src="https://unpkg.com/jeezy@1.12.13/lib/jeezy.min.js"></script>
+	  <script src="https://d3js.org/d3-voronoi.v1.min.js"></script>
 
     <script>
       var radius = 12;
@@ -100,14 +100,25 @@
       var tip = d3.select("#wrapper").append("div")
           .attr("class", "tip");
 
-      d3.csv("song_data.csv", function(error, data){
-		if (error) throw error;
+  d3.csv("song_data.csv", function(error, data){
+    if (error) throw error;
 
-        data.forEach(function(d){
+    data.forEach(function(d){
 		  d.album_release_year = +d.album_release_year;
 		  d.danceability = +d.danceability;
-		  d.tempo = +d.tempo;
-          d.slug = jz.str.toSlugCase(d.track_name);
+      d.tempo = +d.tempo;
+      d.energy = +d.energy;
+      d.loudness = +d.loudness
+      d.mode = +d.mode;
+      d.speechiness = +d.speechiness;
+      d.acousticness = +d.acousticness;
+      d.instrumentalness = +d.instrumentalness;
+      d.liveness = +d.liveness;
+      d.valence = +d.valence;
+      d.duration_ms = +d.duration_ms;
+      d.duration_sec = +d.duration_ms/1000;
+      d.duration_min = +d.duration_sec/60;
+      d.key = +d.key;
 		  return d;
 		});
  
@@ -120,9 +131,19 @@
 			m[d.album_name] = {...d, count: 1};
 			return m;
 			}
-			m[d.album_name].danceability += d.danceability;
-			m[d.album_name].tempo += d.tempo;
-			m[d.album_name].count += 1;
+        m[d.album_name].danceability += d.danceability;
+        m[d.album_name].tempo += d.tempo;
+        m[d.album_name].energy += d.energy;
+        m[d.album_name].loudness += d.loudness
+        m[d.album_name].mode += d.mode;
+        m[d.album_name].speechiness += d.speechiness;
+        m[d.album_name].acousticness += d.acousticness;
+        m[d.album_name].instrumentalness += d.instrumentalness;
+        m[d.album_name].liveness += d.liveness;
+        m[d.album_name].valence += d.valence;
+        m[d.album_name].key += d.key;
+        m[d.album_name].duration_min += d.duration_min;
+        m[d.album_name].count += 1;
 			return m;
 		},{});
 		
@@ -132,12 +153,22 @@
 			return {
 				album_name: item.album_name,
 				tempo: item.tempo/item.count,
-				danceability: item.danceability/item.count,
+        danceability: item.danceability/item.count,
+        energy: item.energy/item.count,
+        loudness: item.loudness/item.count,
+        mode: item.mode/item.count,
+        speechiness: item.speechiness/item.count,
+        acousticness: item.acousticness/item.count,
+        instrumentalness: item.instrumentalness/item.count,
+        liveness: item.liveness/item.count,
+        valence: item.valence/item.count,
+        key: item.key/item.count,
+        duration_min: item.duration_min/item.count
 			}
 		})
  
-		x.domain([0,1]);
-		var album_names = jz.arr.sortBy(averages_data, "danceability", "desc");
+    x.domain([d3.min(data, function(d) { return d.duration_min * .9; }), d3.max(data, function(d) { return d.duration_min * 1.1; })])
+		var album_names = jz.arr.sortBy(averages_data, "duration_min", "desc");
 		console.log(album_names)
 		y.domain(album_names.map(function(d){ return d.album_name; }));
 
@@ -152,12 +183,13 @@
             .attr("class", "axis y left")
             .call(y_axis_left)
           .selectAll(".tick text")
-            .attr("dx", -radius);
+            .attr("dx", -radius)
+            // .attr("dy", y.bandwidth() - 50);
 
         svg.append("g")
             .attr("class", "axis y right")
             .attr("transform", "translate(" + width + ", 0)")
-            .call(y_axis_right.tickFormat(function(d){ return album_names.filter(function(c){ return c.album_name == d })[0].danceability.toFixed(2); }))
+            .call(y_axis_right.tickFormat(function(d){ return album_names.filter(function(c){ return c.album_name == d })[0].duration_min.toFixed(2); }))
           .selectAll(".tick text")
             .attr("dx", radius)
             .attr('fill', "black")
@@ -168,24 +200,7 @@
             .call(x_axis)
           	.selectAll(".tick line")
             .style("display", "none")
-
-        // images
-        // var img = defs.selectAll("pattern")
-        //     .data(data, function(d){ return d.slug; })
-        //   .enter().append("pattern")
-        //     .attr("id", function(d){ return "img-" + d.slug; })
-        //     .attr("x", "0%")
-        //     .attr("y", "0%")
-        //     .attr("height", "100%")
-        //     .attr("width", "100%")
-        //     .attr("viewBox", "0 0 " + radius + " " + radius)
-        //   .append("image")
-        //     .attr("x", "0%")
-        //     .attr("y", "0%")
-        //     .attr("width", radius)
-        //     .attr("height", radius)
-        //     .attr("xlink:href", function(d){ return "https://graphics.axios.com/2017-12-12-sexual-misconduct-cases/img/" + d.image_url; })
-
+            
         forceSim();
 
         draw();
@@ -207,7 +222,7 @@
           draw(); 
         });
 
-        function draw(){
+  function draw(){
 
 		color = d3.scaleLinear()
 			.domain(d3.extent(data, function(d) { return d.x }))
@@ -215,21 +230,21 @@
 			.interpolate(d3.interpolateHsl)
 
           // hover
-          var hover_circle = svg.selectAll(".circle")
-              .data(data);
+    var hover_circle = svg.selectAll(".circle")
+        .data(data);
 
-          hover_circle.enter().append("circle")
-          	// .attr("class", function(d) { return "circle-hover circle-hover-" + d.slug; })
-            .attr("r", radius)
-			.merge(hover_circle)
-	   	.attr("fill", function(d) { return color(d.x) })
-			.attr("opacity", .6)
-			.attr("stroke", "black")
-			.attr("cx", function(d) {return x(d.danceability)})
-			.attr("cy", function(d) {return y(d.album_name)})
-			.on("mouseover", function(d){
+      hover_circle.enter().append("circle")
+        // .attr("class", function(d) { return "circle-hover circle-hover-" + d.slug; })
+        .attr("r", radius)
+        .merge(hover_circle)
+        .attr("fill", function(d) { return color(d.x) })
+        .attr("opacity", .6)
+        .attr("stroke", "black")
+        .attr("cx", function(d) {return x(d.duration_min)})
+        .attr("cy", function(d) {return y(d.album_name) + y.bandwidth() / 2} )
+        .on("mouseover", function(d){
             
-			tip.html("<span style = 'font-weight:bold'>" + d.track_name + '</span><hr> Danceability: ' + d.danceability);
+			tip.html("<span style = 'font-weight:bold'>" + d.track_name + '</span><hr>' + d.duration_min.toFixed(2));
 			
 			console.log(d.track_name);
             
@@ -247,29 +262,34 @@
             var tip_top = circle_top - radius - tip_height;
 
             tip
-                .style("left", tip_left + "px")
-				.style("top", tip_top + "px")
-				.style('opacity', 1);
+              .style("left", tip_left + "px")
+              .style("top", tip_top + "px")
+              .style('opacity', 1);
 
           }).on("mouseout", function(d){
             // d3.select(".circle-" + d.data.slug).attr("r", radius);
             // d3.select(".circle-bg-" + d.data.slug).style("fill-opacity", .3).attr("r", radius).style("stroke-width", 1);
 
             tip
-			  .style('opacity', 0);
+			        .style('opacity', 0);
 
           });
+
+          // svg.selectAll('circle').transition().duration(1000).style('opacity', 0)
+          // svg.selectAll('circle').transition().duration(10000).attr("cx", function(d) {return x(d.tempo)})
+          // svg.selectAll('circle').transition().duration(1000).attr('opacity', function(d) {return d.album_name == "JESUS IS KING" ? .55 : 0})
 
         }
 
         function forceSim(){
           var simulation = d3.forceSimulation(data)
               .force("y", d3.forceY(function(d){ return y(d.album_name) + y.bandwidth() / 2 ; }).strength(1))
-              .force("x", d3.forceX(function(d){ return x(d.danceability); }).strength(1))
+              .force("x", d3.forceX(function(d){ return x(d.duration_min); }).strength(1))
               .force("collide", d3.forceCollide(radius + 1))
               .stop();
 
           for (var i = 0; i < 182; ++i) simulation.tick();
+
 		}
 
 //https://bl.ocks.org/tomshanley/raw/e1f2a325793bc9e76fbfaa58ea6a6d15/2c781f3e92ea3f697ab3df8e990291ea6abbf2d1/roi-pre.js
@@ -282,22 +302,25 @@
       // .attr("transform", function(d) { return "translate("+ xScale(d.value) + "," + yScale(d.key) + ")"; });
 
   color_lines = d3.scaleLinear()
-			.domain(d3.extent(data, function(d) { return d.danceability }))
+			.domain(d3.extent(data, function(d) { return d.duration_min }))
 			.range(["steelblue", "brown"])
 			.interpolate(d3.interpolateHsl)
 
     avgLines.append("line")
-      .attr("x1", function(d) {return x(d.danceability)} )
-      .attr("x2", function(d) {return x(d.danceability)} )
-      .attr("y1", function(d){ return y(d.album_name) + y.bandwidth() - 16; } )
-      .attr("y2", function(d){ return y(d.album_name) + y.bandwidth() / 2.5})
-      .attr('stroke', function(d) { return color_lines(d.danceability)})
+      .attr("x1", function(d) {return x(d.duration_min)} )
+      .attr("x2", function(d) {return x(d.duration_min)} )
+      .attr("y1", function(d){ return y(d.album_name) + y.bandwidth() - 30; } )
+      .attr("y2", function(d){ return y(d.album_name) + y.bandwidth() - 10; } )
+
+      .attr('stroke', 'black')
+      .attr('stroke-linecap', 'round')
+      // .attr('stroke', function(d) { return color_lines(d.duration_min)})
       .attr('stroke-width', '5px')
-      .attr('opacity', .55);
+      .attr('opacity', .9);
 
     // avgLines.append("text")
-      // .text(function(d) { return d.danceability.toFixed(2); } )
-      // .attr("x", function(d) {return x(d.danceability)} )
+      // .text(function(d) { return d.duration_min.toFixed(2); } )
+      // .attr("x", function(d) {return x(d.duration_min)} )
       // .attr("y", function(d){ return y(d.album_name) + y.bandwidth()} );
 
       });
