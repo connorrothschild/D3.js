@@ -7,7 +7,7 @@ $(window).scroll(function() {
 	bottomoffset = $('#graphic').position().top + $('#sections').outerHeight(true);
 
 	if (window.pageYOffset >= topoffset && window.pageYOffset <= bottomoffset - window.innerHeight) {
-		console.log('GETTING fixed');
+		// console.log('GETTING fixed');
 		d3.select('#vis').classed('is_fixed', true);
 		d3.select('#vis').classed('is_unfixed', false);
 		d3.select('#vis').classed('is_bottom', false);
@@ -15,7 +15,7 @@ $(window).scroll(function() {
 		d3.select('#vis').classed('is_fixed', false);
 		d3.select('#vis').classed('is_bottom', true);
 	} else {
-		console.log('GETTING unfixed');
+		// console.log('GETTING unfixed');
 		d3.select('#vis').classed('is_fixed', false);
 		d3.select('#vis').classed('is_unfixed', true);
 	}

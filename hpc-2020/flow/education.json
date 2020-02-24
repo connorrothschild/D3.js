@@ -1,6 +1,8 @@
-[{
-    "sex": "Women",
-    "ses": "Women",
-    "Prison": 50,
-    "Rehab": 50
-}]
+[
+	{
+		"sex": "Women",
+		"ses": "Women",
+		"Prison": 50,
+		"New Path": 50
+	}
+]

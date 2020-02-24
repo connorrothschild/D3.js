@@ -203,13 +203,6 @@ body {
 	stroke-linecap: round;
 	pointer-events: all;
 }
-.beeswarm {
-	position: relative;
-}
-.beeswarm .tooltip {
-	position: absolute;
-}
-
 .cellcircle {
 	stroke: black;
 	stroke-width: 0.5px;
@@ -571,7 +564,7 @@ h2 {
 }
 
 #wrapper {
-	max-width: 900px;
+	max-width: 600px;
 	margin: 0 auto;
 }
 .circle {
@@ -602,6 +595,7 @@ h2 {
 .axis.x .tick line {
 	stroke: #ccc;
 }
+
 .tip {
 	position: absolute;
 	text-align: left;
@@ -609,7 +603,84 @@ h2 {
 	color: white;
 	padding: 10px;
 	opacity: 0;
+	border: 0px;
+	border-radius: 4px;
+	pointer-events: none;
 	/* text-shadow: -1px -1px 1px #ffffff, -1px 0px 1px #ffffff, -1px 1px 1px #ffffff, 0px -1px 1px #ffffff, 0px 1px 1px #ffffff, 1px -1px 1px #ffffff, 1px 0px 1px #ffffff, 1px 1px 1px #ffffff; */
+}
+
+/* Blockquote main style */
+.blockquote {
+	position: relative;
+	margin: 20px auto;
+	align-self: center;
+}
+
+/* Blockquote header */
+.blockquote h1 {
+	position: relative; /* for pseudos */
+	color: rgb(196, 0, 0);
+	font-size: 1.4rem;
+	font-weight: normal;
+	line-height: 1;
+	margin-top: 10px;
+	border: 2px solid #fff;
+	border: solid 2px;
+	border-radius: 20px;
+	padding-left: 25px;
+	padding-right: 25px;
+}
+
+/* Blockquote right double quotes */
+.blockquote h1:after {
+	content: "";
+	position: absolute;
+	border: 2px solid rgb(196, 0, 0);
+	border-radius: 0 50px 0 0;
+	width: 60px;
+	height: 60px;
+	bottom: -62px;
+	left: 50px;
+	border-bottom: none;
+	border-left: none;
+	z-index: 3;
+}
+
+.blockquote h1:before {
+	content: "";
+	position: absolute;
+	width: 80px;
+	border: 6px solid white;
+	bottom: -3px;
+	left: 50px;
+	z-index: 2;
+}
+
+/* increase header size after 600px */
+@media all and (min-width: 600px) {
+	.blockquote h1 {
+		font-size: 1em;
+		line-height: 1em;
+		white-space: pre-line;
+	}
+}
+
+/* Blockquote subheader */
+.blockquote h4 {
+	position: relative;
+	color: black;
+	font-size: 1rem;
+	font-weight: 400;
+	line-height: 1.2;
+	margin: 0;
+	padding-top: 15px;
+	z-index: 1;
+	margin-left: 150px;
+	padding-left: 12px;
+}
+
+.blockquote h4:first-letter {
+	margin-left: -12px;
 }
 
 #myinput {

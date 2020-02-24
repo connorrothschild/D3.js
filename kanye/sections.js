@@ -9,17 +9,18 @@ var scrollVis = function() {
 	// and margins of the vis area.
 	var radius = 12;
 
-	var margin = { top: radius * 5 + 10, left: 190, bottom: 30, right: 40 },
+	var margin = { top: radius * 5 + 30, left: 170, bottom: 50, right: 40 },
 		width = 900 - margin.left - margin.right,
-		// width = +jz.str.keepNumber(d3.select('#wrapper').style('width')) - margin.left - margin.right,
-		height = 600 - margin.top - margin.bottom,
-		svg = d3
-			.select('svg')
-			.append('svg')
-			.attr('width', width + margin.left + margin.right)
-			.attr('height', height + margin.top + margin.bottom)
-			.append('g')
-			.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
+		// width = +jz.str.keepNumber(d3.select('#vis').style('width')) - margin.left - margin.right,
+		height = 600 - margin.top - margin.bottom;
+	// ,
+	// svg = d3
+	// 	.select('svg')
+	// 	.append('svg')
+	// 	.attr('width', width + margin.left + margin.right)
+	// 	.attr('height', height + margin.top + margin.bottom)
+	// 	.append('g')
+	// 	.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
 
 	// Keep track of which visualization
 	// we are on and which was the last
@@ -98,20 +99,7 @@ var scrollVis = function() {
 		console.log(averages_data);
 		// axis
 
-		tip = d3.select('svg').append('div').attr('class', 'tip');
-
-		min_danceability = d3.min(data, function(d) {
-			return d.danceability * 0.9;
-		});
-		max_danceability = d3.max(data, function(d) {
-			return d.danceability * 1.1;
-		});
-		min_acousticness = d3.min(data, function(d) {
-			return d.acousticness * 0.9;
-		});
-		max_acousticness = d3.max(data, function(d) {
-			return d.acousticness * 1.1;
-		});
+		tip = d3.select('#vis').append('g').attr('class', 'tip').attr('opacity', 0);
 
 		var album_names = jz.arr.sortBy(averages_data, 'danceability', 'desc');
 
@@ -120,20 +108,31 @@ var scrollVis = function() {
 				return d.album_name;
 			})
 		);
-		x.domain([ min_danceability, max_danceability ]);
+		x.domain([ 0, 1 ]);
 		x_axis.tickSizeInner(-height + y.bandwidth() / 2 - 3);
 
-		svg
+		// g.append('text').attr('class', 'title').attr('x', width / 2).attr('y', height / 3).text('TESTING');
+
+		g
+			.append('svg:image')
+			.attr('class', 'kanye-image')
+			.attr('x', width / 3)
+			.attr('y', height / 4)
+			.attr('width', 200)
+			.attr('height', 200)
+			.attr('xlink:href', 'images/kanye.png');
+		g
 			.append('g')
 			.attr('class', 'axis y left')
 			.call(y_axis_left)
 			.selectAll('.tick text')
-			.attr('dx', +radius)
+			// .attr('dx', +radius)
 			// correct:
-			// .attr('dx', -radius)
-			.attr('dy', y.bandwidth() - 50);
+			.attr('dx', -radius)
+			.attr('dy', y.bandwidth() / 5)
+			.attr('opacity', 0);
 
-		svg
+		g
 			.append('g')
 			.attr('class', 'axis y right')
 			.attr('transform', 'translate(' + width + ', 0)')
@@ -148,11 +147,15 @@ var scrollVis = function() {
 			)
 			.selectAll('.tick text')
 			.attr('dx', radius)
-			.attr('fill', 'black');
+			.attr('fill', 'black')
+			.attr('opacity', 0);
 
-		svg.append('g').attr('class', 'axis x').attr('transform', 'translate(0, ' + height + ')').call(x_axis);
-		// .selectAll('.tick line')
-		// .style('display', 'none');
+		g
+			.append('g')
+			.attr('class', 'axis x')
+			.attr('transform', 'translate(0, ' + height + ')')
+			.call(x_axis)
+			.attr('opacity', 0);
 
 		forceSim();
 
@@ -177,27 +180,29 @@ var scrollVis = function() {
 		});
 
 		function draw() {
-			color = d3
-				.scaleLinear()
-				.domain(
-					d3.extent(data, function(d) {
-						return d.x;
-					})
-				)
-				.range([ 'steelblue', 'brown' ])
-				.interpolate(d3.interpolateHsl);
+			// color = d3
+			// 	.scaleLinear()
+			// 	.domain(
+			// 		d3.extent(data, function(d) {
+			// 			return d.x;
+			// 		})
+			// 	)
+			// 	.range([ 'steelblue', 'brown' ])
+			// 	.interpolate(d3.interpolateHsl);
+
+			color = d3.scaleLinear().domain([ 0, 1 ]).range([ 'steelblue', 'brown' ]).interpolate(d3.interpolateHsl);
 
 			// hover
-			hover_circle = svg
+			hover_circle = g
 				.selectAll('circle')
 				.data(data)
 				.enter()
 				.append('circle')
 				.attr('r', radius)
 				.attr('fill', function(d) {
-					return color(d.x);
+					return color(d.danceability);
 				})
-				.attr('opacity', 0.6)
+				.attr('opacity', 0)
 				.attr('stroke', 'black')
 				.attr('cx', function(d) {
 					return x(d.danceability);
@@ -207,40 +212,25 @@ var scrollVis = function() {
 				})
 				.on('mouseover', function(d) {
 					tip.html(
-						"<span style = 'font-weight:bold'>" + d.track_name + '</span><hr>' + d.danceability.toFixed(2)
+						"<span style = 'font-weight:bold'>" +
+							d.track_name +
+							' | ' +
+							d.album_name +
+							'</span><hr>Danceability: ' +
+							d.danceability.toFixed(2)
 					);
-
-					console.log(d.track_name);
-
-					// d3.select(".circle-" + d.data.slug).attr("r", radius * 2.5).moveToFront();
-					// d3.select(".circle-bg-" + d.data.slug).style("fill-opacity", 0).attr("r", radius * 2.5).style("stroke-width", 3).moveToFront();
-
-					tip_width = +jz.str.keepNumber(tip.style('width'));
-					tip_height = +jz.str.keepNumber(tip.style('height'));
-
-					circle_node = d3.select(this).node().getBoundingClientRect();
-					circle_left = circle_node.left;
-					circle_top = circle_node.top;
-
-					tip_left = circle_left - tip_width / 2 + radius;
-					tip_top = circle_top - radius - tip_height;
-
-					tip.style('left', 0 + 'px').style('top', 100 + 'px').style('opacity', 1);
+					tip
+						.style('left', d3.select(this).attr('cx') + 'px')
+						.style('top', d3.select(this).attr('cy') + 'px')
+						.style('opacity', 1);
 				})
 				.on('mouseout', function(d) {
-					// d3.select(".circle-" + d.data.slug).attr("r", radius);
-					// d3.select(".circle-bg-" + d.data.slug).style("fill-opacity", .3).attr("r", radius).style("stroke-width", 1);
-
 					tip.style('opacity', 0);
 				});
-
-			// svg.selectAll('circle').transition().duration(1000).style('opacity', 0)
-			// svg.selectAll('circle').transition().duration(10000).attr("cx", function(d) {return x(d.tempo)})
-			// svg.selectAll('circle').transition().duration(1000).attr('opacity', function(d) {return d.album_name == "JESUS IS KING" ? .55 : 0})
 		}
 
 		function forceSim() {
-			var simulation = d3
+			simulation = d3
 				.forceSimulation(data)
 				.force(
 					'y',
@@ -261,12 +251,12 @@ var scrollVis = function() {
 				.force('collide', d3.forceCollide(radius + 1))
 				.stop();
 
-			for (var i = 0; i < 182; ++i) simulation.tick();
+			for (var i = 0; i < 167; ++i) simulation.tick();
 		}
 
 		//https://bl.ocks.org/tomshanley/raw/e1f2a325793bc9e76fbfaa58ea6a6d15/2c781f3e92ea3f697ab3df8e990291ea6abbf2d1/roi-pre.js
 		//https://bl.ocks.org/tomshanley/raw/e1f2a325793bc9e76fbfaa58ea6a6d15/2c781f3e92ea3f697ab3df8e990291ea6abbf2d1/
-		avgLines = svg.selectAll('.avg-lines').data(averages_data).enter().append('g').attr('class', 'avg-line');
+		avgLines = g.selectAll('.avg-lines').data(averages_data).enter().append('g').attr('class', 'avg-line');
 		// .attr("transform", function(d) { return "translate("+ xScale(d.value) + "," + yScale(d.key) + ")"; });
 
 		color_lines = d3
@@ -297,7 +287,16 @@ var scrollVis = function() {
 			.attr('stroke-linecap', 'round')
 			// .attr('stroke', function(d) { return color_lines(d.duration_min)})
 			.attr('stroke-width', '5px')
-			.attr('opacity', 0.9);
+			.attr('opacity', 0);
+
+		svg
+			.append('text')
+			.attr('text-anchor', 'end')
+			.attr('class', 'x axis title')
+			// .attr('transform', 'translate(' + width + ', 0)')
+			.attr('x', width * 1.25)
+			.attr('y', height + margin.top + 35)
+			.text('');
 
 		// avgLines.append("text")
 		// .text(function(d) { return d.duration_min.toFixed(2); } )
@@ -315,20 +314,20 @@ var scrollVis = function() {
 	var setupSections = function() {
 		// activateFunctions are called each
 		// time the active section changes
-		activateFunctions[0] = showAcousticness;
-		activateFunctions[1] = showDanceability;
-		activateFunctions[2] = showAcousticness;
-		activateFunctions[3] = showDanceability;
-		activateFunctions[4] = showAcousticness;
-		activateFunctions[5] = showDanceability;
-		activateFunctions[6] = showAcousticness;
-		activateFunctions[7] = showDanceability;
-		activateFunctions[8] = showAcousticness;
-		activateFunctions[9] = showDanceability;
-		activateFunctions[10] = showAcousticness;
-		activateFunctions[11] = showDanceability;
-		activateFunctions[12] = showAcousticness;
-		activateFunctions[13] = showDanceability;
+		activateFunctions[0] = showTitle;
+		activateFunctions[1] = showTitle;
+		activateFunctions[2] = showTitle;
+		activateFunctions[3] = showAcousticness;
+		activateFunctions[4] = showDanceability;
+		activateFunctions[5] = showValence;
+		activateFunctions[6] = focusKillingYou;
+		activateFunctions[7] = focusKillingYou;
+		activateFunctions[8] = focusILoveKanye;
+		activateFunctions[9] = focusILoveKanye;
+		activateFunctions[10] = showValence;
+		activateFunctions[11] = showValence;
+		activateFunctions[12] = showValence;
+		activateFunctions[13] = showValence;
 
 		// updateFunctions are called while
 		// in a particular section to update
@@ -351,7 +350,59 @@ var scrollVis = function() {
 	/**
    **/
 
+	function showTitle() {
+		hover_circle.on('mouseover', tip.style('opacity', 0));
+
+		g.selectAll('.kanye-image').transition().duration(1000).attr('opacity', 1);
+
+		g.selectAll('g.axis.x').transition().duration(1000).attr('opacity', 0);
+		g.selectAll('g.axis.y.right').transition().duration(1000).attr('opacity', 0);
+		g.selectAll('g.axis.y.left').transition().duration(1000).attr('opacity', 0);
+		g.selectAll('.tick text').transition().duration(1000).attr('opacity', 0);
+		avgLines.transition().duration(1000).attr('opacity', 0);
+		hover_circle.transition().duration(1000).attr('opacity', 0);
+		d3.selectAll('.x.axis.title').text('');
+	}
 	function showAcousticness() {
+		// REMOVE OLD
+		g.selectAll('.kanye-image').transition().duration(1000).attr('opacity', 0);
+
+		// UPDATE AXES
+		g.selectAll('g.axis.x').transition().duration(1000).attr('opacity', 1);
+		g.selectAll('g.axis.y.right').transition().duration(1000).attr('opacity', 1);
+		g.selectAll('g.axis.y.left').transition().duration(1000).attr('opacity', 1);
+		g.selectAll('.tick text').transition().duration(1000).attr('opacity', 1);
+
+		//
+		album_names = jz.arr.sortBy(averages_data, 'acousticness', 'desc');
+		console.log(album_names);
+		y.domain(
+			album_names.map(function(d) {
+				return d.album_name;
+			})
+		);
+
+		x.domain([
+			d3.min(data_full, function(d) {
+				return d.acousticness * 0.9;
+			}),
+			d3.max(data_full, function(d) {
+				return d.acousticness * 1.1;
+			})
+		]);
+
+		g.selectAll('g.axis.y.right').call(
+			y_axis_right.tickFormat(function(d) {
+				return album_names
+					.filter(function(c) {
+						return c.album_name == d;
+					})[0]
+					.acousticness.toFixed(2);
+			})
+		);
+		g.selectAll('g.axis.y.left').call(y_axis_left);
+		g.selectAll('g.axis.x').call(x_axis);
+
 		// //update all circles to new positions
 		hover_circle
 			.transition()
@@ -363,12 +414,24 @@ var scrollVis = function() {
 				return y(d.album_name) + y.bandwidth() / 2;
 			})
 			.attr('fill', function(d) {
-				return color(d.x);
-			});
+				return color(d.acousticness);
+			})
+			.attr('opacity', 0.55)
+			.attr('r', radius);
 
 		hover_circle.on('mouseover', function(d) {
-			tip.html("<span style = 'font-weight:bold'>" + d.track_name + '</span><hr>' + d.acousticness.toFixed(2));
-			tip.style('left', 0 + 'px').style('top', 100 + 'px').style('opacity', 1);
+			tip.html(
+				"<span style = 'font-weight:bold'>" +
+					d.track_name +
+					' | ' +
+					d.album_name +
+					'</span><hr>Acousticness: ' +
+					d.acousticness.toFixed(2)
+			);
+			tip
+				.style('left', d3.select(this).attr('cx') + 'px')
+				.style('top', d3.select(this).attr('cy') + 'px')
+				.style('opacity', 1);
 		});
 
 		avgLines
@@ -385,9 +448,16 @@ var scrollVis = function() {
 			})
 			.attr('y2', function(d) {
 				return y(d.album_name) + y.bandwidth() - 10;
-			});
+			})
+			.attr('opacity', 1);
 
-		album_names = jz.arr.sortBy(averages_data, 'acousticness', 'desc');
+		d3.selectAll('.x.axis.title').transition().duration(1000).text('Acousticness');
+	}
+
+	function showDanceability() {
+		g.selectAll('.kanye-image').transition().duration(1000).attr('opacity', 0);
+
+		album_names = jz.arr.sortBy(averages_data, 'danceability', 'desc');
 		console.log(album_names);
 		y.domain(
 			album_names.map(function(d) {
@@ -395,14 +465,27 @@ var scrollVis = function() {
 			})
 		);
 
-		x.domain([ min_acousticness, max_acousticness ]);
+		x.domain([
+			d3.min(data_full, function(d) {
+				return d.danceability * 0.9;
+			}),
+			d3.max(data_full, function(d) {
+				return d.danceability * 1.1;
+			})
+		]);
 
-		svg.selectAll('g.axis.y.right').call(y_axis_right);
-		svg.selectAll('g.axis.y.left').call(y_axis_left);
-		svg.selectAll('g.axis.x').call(x_axis);
-	}
+		g.selectAll('g.axis.y.right').call(
+			y_axis_right.tickFormat(function(d) {
+				return album_names
+					.filter(function(c) {
+						return c.album_name == d;
+					})[0]
+					.danceability.toFixed(2);
+			})
+		);
+		g.selectAll('g.axis.y.left').call(y_axis_left);
+		g.selectAll('g.axis.x').call(x_axis);
 
-	function showDanceability() {
 		hover_circle
 			.transition()
 			.duration(1000)
@@ -414,12 +497,23 @@ var scrollVis = function() {
 				return y(d.album_name) + y.bandwidth() / 2;
 			})
 			.attr('fill', function(d) {
-				return color(d.x);
-			});
+				return color(d.danceability);
+			})
+			.attr('r', radius);
 
 		hover_circle.on('mouseover', function(d) {
-			tip.html("<span style = 'font-weight:bold'>" + d.track_name + '</span><hr>' + d.danceability.toFixed(2));
-			tip.style('left', 0 + 'px').style('top', 100 + 'px').style('opacity', 1);
+			tip.html(
+				"<span style = 'font-weight:bold'>" +
+					d.track_name +
+					' | ' +
+					d.album_name +
+					'</span><hr>Danceability: ' +
+					d.danceability.toFixed(2)
+			);
+			tip
+				.style('left', d3.select(this).attr('cx') + 'px')
+				.style('top', d3.select(this).attr('cy') + 'px')
+				.style('opacity', 1);
 		});
 
 		avgLines
@@ -436,9 +530,16 @@ var scrollVis = function() {
 			})
 			.attr('y2', function(d) {
 				return y(d.album_name) + y.bandwidth() - 10;
-			});
+			})
+			.attr('opacity', 1);
 
-		album_names = jz.arr.sortBy(averages_data, 'danceability', 'desc');
+		d3.selectAll('.x.axis.title').transition().duration(1000).text('Danceability');
+	}
+
+	function showValence() {
+		g.selectAll('.kanye-image').transition().duration(1000).attr('opacity', 0);
+
+		album_names = jz.arr.sortBy(averages_data, 'valence', 'desc');
 		console.log(album_names);
 		y.domain(
 			album_names.map(function(d) {
@@ -446,17 +547,111 @@ var scrollVis = function() {
 			})
 		);
 
-		x.domain([ min_danceability, max_danceability ]);
+		x.domain([
+			d3.min(data_full, function(d) {
+				return d.valence * 0.9;
+			}),
+			d3.max(data_full, function(d) {
+				return d.valence * 1.1;
+			})
+		]);
 
-		svg.selectAll('g.axis.y.right').call(y_axis_right);
-		svg.selectAll('g.axis.y.left').call(y_axis_left);
-		svg.selectAll('g.axis.x').call(x_axis);
+		g.selectAll('g.axis.y.right').call(
+			y_axis_right.tickFormat(function(d) {
+				return album_names
+					.filter(function(c) {
+						return c.album_name == d;
+					})[0]
+					.valence.toFixed(2);
+			})
+		);
+		g.selectAll('g.axis.y.left').call(y_axis_left);
+		g.selectAll('g.axis.x').call(x_axis);
+
+		hover_circle
+			.transition()
+			.duration(1000)
+			.attr('opacity', 0.55)
+			.attr('cx', function(d) {
+				return x(d.valence);
+			})
+			.attr('cy', function(d) {
+				return y(d.album_name) + y.bandwidth() / 2;
+			})
+			.attr('fill', function(d) {
+				return color(d.valence);
+			})
+			.attr('r', radius);
+
+		hover_circle.on('mouseover', function(d) {
+			tip.html(
+				"<span style = 'font-weight:bold'>" +
+					d.track_name +
+					' | ' +
+					d.album_name +
+					'</span><hr>Valence: ' +
+					d.valence.toFixed(2)
+			);
+			tip
+				.style('left', d3.select(this).attr('cx') + 'px')
+				.style('top', d3.select(this).attr('cy') + 'px')
+				.style('opacity', 1);
+		});
+
+		avgLines
+			.transition()
+			.duration(1000)
+			.attr('x1', function(d) {
+				return x(d.valence);
+			})
+			.attr('x2', function(d) {
+				return x(d.valence);
+			})
+			.attr('y1', function(d) {
+				return y(d.album_name) + y.bandwidth() - 30;
+			})
+			.attr('y2', function(d) {
+				return y(d.album_name) + y.bandwidth() - 10;
+			})
+			.attr('opacity', 1);
+
+		d3.selectAll('.x.axis.title').transition().duration(1000).text('Valence');
 	}
 
 	function focusKanye() {
-		svg.selectAll('circle').transition().duration(1000).attr('opacity', function(d) {
+		g.selectAll('circle').transition().duration(1000).attr('opacity', function(d) {
 			return d.album_name == 'JESUS IS KING' ? 0.55 : 0.05;
 		});
+	}
+
+	function focusKillingYou() {
+		g
+			.selectAll('circle')
+			.transition()
+			.duration(1000)
+			.attr('opacity', function(d) {
+				return d.track_name == 'I Thought About Killing You' ? 0.55 : 0.05;
+			})
+			.attr('r', function(d) {
+				return d.track_name == 'I Thought About Killing You' ? 30 : radius;
+			});
+
+		avgLines.transition().duration(1000).attr('opacity', 0);
+	}
+
+	function focusILoveKanye() {
+		g
+			.selectAll('circle')
+			.transition()
+			.duration(1000)
+			.attr('opacity', function(d) {
+				return d.track_name == 'I Love Kanye' ? 0.55 : 0.05;
+			})
+			.attr('r', function(d) {
+				return d.track_name == 'I Love Kanye' ? 30 : radius;
+			});
+
+		avgLines.transition().duration(1000).attr('opacity', 0);
 	}
 
 	/**
@@ -486,6 +681,8 @@ var scrollVis = function() {
 			d.key = +d.key;
 			return d;
 		});
+
+		data_full = data;
 		// the following groups by album name and spits out average danceability, tempo, etc.
 		// it allows for better ordering on the y axis
 		// https://stackoverflow.com/questions/51040651/group-by-and-calculate-mean-average-of-properties-in-a-javascript-array
