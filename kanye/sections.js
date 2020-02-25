@@ -120,7 +120,19 @@ var scrollVis = function() {
 			.attr('y', height / 4)
 			.attr('width', 200)
 			.attr('height', 200)
-			.attr('xlink:href', 'images/kanye.png');
+			.attr('xlink:href', 'images/kanye.png')
+			.attr('opacity', 0);
+
+		g
+			.append('svg:image')
+			.attr('class', 'album-image')
+			.attr('x', width / 5)
+			.attr('y', height / 4)
+			.attr('width', 400)
+			.attr('height', 400)
+			.attr('xlink:href', 'images/albums.png')
+			.attr('opacity', 0);
+
 		g
 			.append('g')
 			.attr('class', 'axis y left')
@@ -315,19 +327,19 @@ var scrollVis = function() {
 		// activateFunctions are called each
 		// time the active section changes
 		activateFunctions[0] = showTitle;
-		activateFunctions[1] = showTitle;
-		activateFunctions[2] = showTitle;
-		activateFunctions[3] = showAcousticness;
-		activateFunctions[4] = showDanceability;
-		activateFunctions[5] = showValence;
+		activateFunctions[1] = showAlbums;
+		activateFunctions[2] = showAcousticness;
+		activateFunctions[3] = showDanceability;
+		activateFunctions[4] = showValence;
+		activateFunctions[5] = focusKillingYou;
 		activateFunctions[6] = focusKillingYou;
-		activateFunctions[7] = focusKillingYou;
-		activateFunctions[8] = focusILoveKanye;
-		activateFunctions[9] = focusILoveKanye;
-		activateFunctions[10] = showValence;
-		activateFunctions[11] = showValence;
-		activateFunctions[12] = showValence;
-		activateFunctions[13] = showValence;
+		activateFunctions[7] = focusBreatheIn;
+		activateFunctions[8] = focusBreatheIn;
+		activateFunctions[9] = focusJesusIsKing;
+		activateFunctions[10] = splitSongs;
+		activateFunctions[11] = focusJesusIsKing;
+		// activateFunctions[12] = focusJesusIsKing;
+		// activateFunctions[13] = focusJesusIsKing;
 
 		// updateFunctions are called while
 		// in a particular section to update
@@ -354,6 +366,7 @@ var scrollVis = function() {
 		hover_circle.on('mouseover', tip.style('opacity', 0));
 
 		g.selectAll('.kanye-image').transition().duration(1000).attr('opacity', 1);
+		g.selectAll('.album-image').transition().duration(1000).attr('opacity', 0);
 
 		g.selectAll('g.axis.x').transition().duration(1000).attr('opacity', 0);
 		g.selectAll('g.axis.y.right').transition().duration(1000).attr('opacity', 0);
@@ -361,11 +374,28 @@ var scrollVis = function() {
 		g.selectAll('.tick text').transition().duration(1000).attr('opacity', 0);
 		avgLines.transition().duration(1000).attr('opacity', 0);
 		hover_circle.transition().duration(1000).attr('opacity', 0);
-		d3.selectAll('.x.axis.title').text('');
+		d3.selectAll('.x.axis.title').transition().duration(1000).text('');
 	}
+
+	function showAlbums() {
+		hover_circle.on('mouseover', tip.style('opacity', 0));
+
+		g.selectAll('.kanye-image').transition().duration(1000).attr('opacity', 0);
+		g.selectAll('.album-image').transition().duration(1000).attr('opacity', 1);
+
+		g.selectAll('g.axis.x').transition().duration(1000).attr('opacity', 0);
+		g.selectAll('g.axis.y.right').transition().duration(1000).attr('opacity', 0);
+		g.selectAll('g.axis.y.left').transition().duration(1000).attr('opacity', 0);
+		g.selectAll('.tick text').transition().duration(1000).attr('opacity', 0);
+		avgLines.transition().duration(1000).attr('opacity', 0);
+		hover_circle.transition().duration(1000).attr('opacity', 0);
+		d3.selectAll('.x.axis.title').transition().duration(1000).text('');
+	}
+
 	function showAcousticness() {
 		// REMOVE OLD
 		g.selectAll('.kanye-image').transition().duration(1000).attr('opacity', 0);
+		g.selectAll('.album-image').transition().duration(1000).attr('opacity', 0);
 
 		// UPDATE AXES
 		g.selectAll('g.axis.x').transition().duration(1000).attr('opacity', 1);
@@ -618,40 +648,129 @@ var scrollVis = function() {
 		d3.selectAll('.x.axis.title').transition().duration(1000).text('Valence');
 	}
 
-	function focusKanye() {
-		g.selectAll('circle').transition().duration(1000).attr('opacity', function(d) {
+	function focusJesusIsKing() {
+		g.selectAll('circle').transition().duration(1000).attr('r', radius).attr('opacity', function(d) {
 			return d.album_name == 'JESUS IS KING' ? 0.55 : 0.05;
 		});
+
+		hover_circle.on('mouseover', function(d) {
+			tip.html(
+				"<span style = 'font-weight:bold'>" +
+					d.track_name +
+					' | ' +
+					d.album_name +
+					'</span><hr>Valence: ' +
+					d.valence.toFixed(2)
+			);
+			tip
+				.style('left', d3.select(this).attr('cx') + 'px')
+				.style('top', d3.select(this).attr('cy') + 'px')
+				.style('opacity', 1);
+		});
+
+		hover_circle
+			.transition()
+			.duration(1000)
+			.attr('opacity', 0.55)
+			.attr('cx', function(d) {
+				return x(d.valence);
+			})
+			.attr('cy', function(d) {
+				return y(d.album_name) + y.bandwidth() / 2;
+			})
+			.attr('fill', function(d) {
+				return color(d.valence);
+			})
+			.attr('r', radius);
+
+		g.selectAll('g.axis.y.right').call(
+			y_axis_right.tickFormat(function(d) {
+				return album_names
+					.filter(function(c) {
+						return c.album_name == d;
+					})[0]
+					.valence.toFixed(2);
+			})
+		);
+		g.selectAll('g.axis.y.left').call(y_axis_left);
+		g.selectAll('g.axis.x').call(x_axis);
+
+		// hover_circle.on('mouseover', tip.style('opacity', 1));
+
+		g.selectAll('g.axis.x').transition().duration(1000).attr('opacity', 1);
+		g.selectAll('g.axis.y.right').transition().duration(1000).attr('opacity', 1);
+		g.selectAll('g.axis.y.left').transition().duration(1000).attr('opacity', 1);
+		g.selectAll('.tick text').transition().duration(1000).attr('opacity', 1);
+		avgLines.transition().duration(1000).attr('opacity', 1);
+		d3.selectAll('.x.axis.title').transition().duration(1000).text('Valence');
 	}
 
 	function focusKillingYou() {
-		g
-			.selectAll('circle')
+		// showValence();
+
+		hover_circle
 			.transition()
 			.duration(1000)
+			.attr('opacity', 0.55)
+			.attr('cx', function(d) {
+				return x(d.valence);
+			})
+			.attr('cy', function(d) {
+				return y(d.album_name) + y.bandwidth() / 2;
+			})
+			.attr('fill', function(d) {
+				return color(d.valence);
+			})
 			.attr('opacity', function(d) {
 				return d.track_name == 'I Thought About Killing You' ? 0.55 : 0.05;
 			})
 			.attr('r', function(d) {
 				return d.track_name == 'I Thought About Killing You' ? 30 : radius;
 			});
+		avgLines.transition().duration(1000).attr('opacity', 0);
+	}
+
+	function focusBreatheIn() {
+		hover_circle
+			.transition()
+			.duration(1000)
+			.attr('opacity', 0.55)
+			.attr('cx', function(d) {
+				return x(d.valence);
+			})
+			.attr('cy', function(d) {
+				return y(d.album_name) + y.bandwidth() / 2;
+			})
+			.attr('fill', function(d) {
+				return color(d.valence);
+			})
+			.attr('opacity', function(d) {
+				return d.track_name == 'Breathe In Breathe Out' ? 0.55 : 0.05;
+			})
+			.attr('r', function(d) {
+				return d.track_name == 'Breathe In Breathe Out' ? 30 : radius;
+			});
 
 		avgLines.transition().duration(1000).attr('opacity', 0);
 	}
 
-	function focusILoveKanye() {
-		g
-			.selectAll('circle')
-			.transition()
-			.duration(1000)
-			.attr('opacity', function(d) {
-				return d.track_name == 'I Love Kanye' ? 0.55 : 0.05;
-			})
-			.attr('r', function(d) {
-				return d.track_name == 'I Love Kanye' ? 30 : radius;
-			});
+	function splitSongs() {
+		hover_circle.on('mouseover', tip.style('opacity', 0));
 
+		g.selectAll('g.axis.x').transition().duration(1000).attr('opacity', 0);
+		g.selectAll('g.axis.y.right').transition().duration(1000).attr('opacity', 0);
+		g.selectAll('g.axis.y.left').transition().duration(1000).attr('opacity', 0);
+		g.selectAll('.tick text').transition().duration(1000).attr('opacity', 0);
 		avgLines.transition().duration(1000).attr('opacity', 0);
+
+		g.selectAll('circle').transition().duration(1000).attr('opacity', 0);
+
+		d3.selectAll('.x.axis.title').transition().duration(1000).text('');
+
+		data_JIK = data_full.filter(function(d) {
+			return d.album_name == 'JESUS IS KING';
+		});
+		console.log(data_JIK);
 	}
 
 	/**

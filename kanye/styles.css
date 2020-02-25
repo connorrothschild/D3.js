@@ -289,7 +289,7 @@ body {
 }
 
 .credits {
-	font-family: "Open Sans";
+	font-family: "Inter";
 	text-align: left;
 	margin-top: 50px;
 }
@@ -297,7 +297,7 @@ body {
 .credits h2 {
 	max-width: 600px;
 	margin: 0 auto;
-	font-family: "Open Sans";
+	font-family: "Inter";
 	font-size: 24px;
 	font-weight: 900;
 	text-align: left;
@@ -322,7 +322,7 @@ body {
 	padding-bottom: 1rem;
 }
 .byline {
-	font-family: "Open Sans";
+	font-family: "Inter";
 	font-size: 15px;
 }
 
@@ -341,7 +341,7 @@ body {
 	margin-top: 100px;
 	display: block;
 	margin: 0 auto;
-	font-family: "Open Sans";
+	font-family: "Inter";
 	font-size: 16px;
 	line-height: 1.7;
 	max-width: 560px;
@@ -362,7 +362,7 @@ body {
 	display: block;
 	margin: auto;
 	text-align: left;
-	font-family: "Merriweather";
+	font-family: "Inter";
 	font-size: 16;
 	line-height: 1.8;
 	max-width: 600px;
@@ -376,7 +376,7 @@ body {
 	display: block;
 	margin: auto;
 	text-align: left;
-	font-family: "Merriweather";
+	font-family: "Inter";
 	font-size: 16;
 	line-height: 1.8;
 	max-width: 400px;
@@ -387,7 +387,7 @@ body {
 	display: block;
 	margin: auto;
 	text-align: left;
-	font-family: "Merriweather";
+	font-family: "Inter";
 	font-size: 16;
 	line-height: 1.8;
 	max-width: 600px;
@@ -526,11 +526,11 @@ body {
 	height: 4rem;
 	padding: 0.5rem;
 	text-transform: uppercase;
-	font-family: "Merriweather";
+	font-family: "Inter";
 }
 
 h2 {
-	font-family: "Merriweather";
+	font-family: "Inter";
 	font-size: 24px;
 	text-align: center;
 	font-weight: 900;
