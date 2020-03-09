@@ -52,7 +52,7 @@ function responsivefy(svg) {
 
 // var w = window.innerWidth * 0.9, h = window.innerHeight * .4;
 var w = window.innerWidth * 0.9,
-	h = window.innerHeight * 0.4;
+	h = window.innerHeight * 0.6;
 
 // map colors to race
 var color = d3
@@ -465,8 +465,9 @@ d3.csv('cleaned_data.csv', function(data) {
 			.attr('x', function(d) {
 				return scale(d);
 			})
-			.attr('y', 375)
-			// put text above above circles: .attr('y', 50)
+			.attr('y', 500)
+			// put text above
+			// .attr('y', 50)
 			.attr('text-anchor', 'middle')
 			.text(function(d) {
 				return d;
@@ -840,7 +841,7 @@ d3.csv('cleaned_data.csv', function(data) {
 				.attr('x', function(d) {
 					return scale(d);
 				})
-				.attr('y', 375)
+				.attr('y', 500)
 				// above circles: .attr('y', 50)
 				.attr('text-anchor', 'middle')
 				.text(function(d) {
