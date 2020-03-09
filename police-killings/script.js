@@ -204,6 +204,8 @@ d3.csv('cleaned_data.csv', function(data) {
 
 	var defs = svg.append('defs');
 
+	var labelPos = h - 20;
+
 	// add the tooltip area to the webpage
 	var tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0);
 
@@ -465,7 +467,7 @@ d3.csv('cleaned_data.csv', function(data) {
 			.attr('x', function(d) {
 				return scale(d);
 			})
-			.attr('y', 500)
+			.attr('y', labelPos)
 			// put text above
 			// .attr('y', 50)
 			.attr('text-anchor', 'middle')
