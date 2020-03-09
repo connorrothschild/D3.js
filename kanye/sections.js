@@ -47,6 +47,25 @@ var scrollVis = function() {
 
 	var y_axis_right = d3.axisRight(y).tickSizeOuter(0).tickSizeInner(-width);
 
+	// We will set the domain when the
+	// data is processed.
+	// @v4 using new scale names
+	var xBarScale = d3.scaleLinear().range([ 0, width ]);
+
+	// You could probably get fancy and
+	// use just one axis, modifying the
+	// scale, but I will use two separate
+	// ones to keep things easy.
+	// @v4 using new axis name
+	var xAxisBar = d3.axisBottom().scale(xBarScale);
+
+	// The bar chart display is horizontal
+	// so we can use an ordinal scale
+	// to get width and y locations.
+	// @v4 using new scale type
+	var yBarScale = d3.scaleBand().paddingInner(0.08).range([ 0, height ]);
+
+	var barColors = d3.scaleOrdinal(d3.schemeCategory10);
 	// When scrolling to a new section
 	// the activation function for that
 	// section is called.
@@ -314,6 +333,28 @@ var scrollVis = function() {
 		// .text(function(d) { return d.duration_min.toFixed(2); } )
 		// .attr("x", function(d) {return x(d.duration_min)} )
 		// .attr("y", function(d){ return y(d.album_name) + y.bandwidth()} );
+
+		// barchart
+		// @v4 Using .merge here to ensure
+		// new and old data have same attrs applied
+		var bars = g.selectAll('.bar').data(
+			data.filter(function(d) {
+				return d.album_name == 'JESUS IS KING';
+			})
+		);
+
+		var barsE = bars.enter().append('rect').attr('class', 'bar');
+		bars = bars
+			.merge(barsE)
+			.attr('x', 0)
+			.attr('y', function(d) {
+				return yBarScale(d.track_name);
+			})
+			.attr('fill', function(d) {
+				return barColors(d.track_name);
+			})
+			.attr('width', 0)
+			.attr('height', yBarScale.bandwidth());
 	};
 
 	/**
@@ -334,7 +375,7 @@ var scrollVis = function() {
 		activateFunctions[5] = focusKillingYou;
 		activateFunctions[6] = focusKillingYou;
 		activateFunctions[7] = focusBreatheIn;
-		activateFunctions[8] = focusBreatheIn;
+		activateFunctions[8] = showBar;
 		activateFunctions[9] = focusJesusIsKing;
 		activateFunctions[10] = splitSongs;
 		activateFunctions[11] = focusJesusIsKing;
@@ -771,6 +812,62 @@ var scrollVis = function() {
 			return d.album_name == 'JESUS IS KING';
 		});
 		console.log(data_JIK);
+	}
+
+	/**
+   * showBar - barchart
+   *
+   * hides: square grid
+   * hides: histogram
+   * shows: barchart
+   *
+   */
+	function showBar() {
+		// ensure bar axis is set
+		showAxis(xAxisBar);
+		g.selectAll('g.axis.x').transition().duration(1000).attr('opacity', 0);
+		g.selectAll('g.axis.y.right').transition().duration(1000).attr('opacity', 0);
+		g.selectAll('g.axis.y.left').transition().duration(1000).attr('opacity', 0);
+		g.selectAll('.tick text').transition().duration(1000).attr('opacity', 0);
+		avgLines.transition().duration(1000).attr('opacity', 0);
+
+		g.selectAll('circle').transition().duration(1000).attr('opacity', 0);
+
+		d3.selectAll('.x.axis.title').transition().duration(1000).text('');
+
+		xBarScale.domain([ 0, 1 ]);
+
+		var album_names = jz.arr.sortBy(
+			data_full.filter(function(d) {
+				return d.album_name == 'JESUS IS KING';
+			}),
+			'valence',
+			'desc'
+		);
+		console.log(album_names);
+
+		yBarScale.domain(
+			album_names.map(function(d) {
+				return d.track_name;
+			})
+		);
+
+		g.selectAll('.bar').transition().duration(1000).attr('width', function(d) {
+			return xBarScale(d.valence);
+		});
+
+		// g.selectAll('.bar-text').transition().duration(600).delay(1200).attr('opacity', 1);
+	}
+
+	/**
+   * showAxis - helper function to
+   * display particular xAxis
+   *
+   * @param axis - the axis to show
+   *  (xAxisHist or xAxisBar)
+   */
+	function showAxis(axis) {
+		g.select('g.axis.x').call(axis).transition().duration(500).style('opacity', 1);
 	}
 
 	/**

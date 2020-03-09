@@ -35,3 +35,5 @@ grouped <- grouped %>%
   mutate(album_name = ifelse(album_name == "Kanye West Presents Good Music Cruel Summer", "Good Music Cruel Summer", album_name))
 
 write.csv(grouped, "../data/kanye_data.csv")
+
+lyrics <- get_album_data("Kanye West", "JESUS IS KING")
