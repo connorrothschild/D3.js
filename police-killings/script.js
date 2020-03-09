@@ -9,7 +9,7 @@ d3
 	.row(function(d) {
 		return d.CityState;
 	})
-	.get(function(error, rows) {
+	.get(function(rows) {
 		d3
 			.select('datalist')
 			.selectAll('option')
@@ -204,7 +204,7 @@ d3.csv('cleaned_data.csv', function(data) {
 
 	var defs = svg.append('defs');
 
-	var labelPos = h - 20;
+	var labelPos = h * 0.9;
 
 	// add the tooltip area to the webpage
 	var tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0);
@@ -262,8 +262,7 @@ d3.csv('cleaned_data.csv', function(data) {
 		})
 		// alt: return color(d.ID);})
 		.style('stroke-width', 2)
-		.style('pointer-events', 'all')
-		.call(d3.drag().on('start', dragstarted).on('drag', dragged).on('end', dragended));
+		.style('pointer-events', 'all');
 
 	// define a function that moves circles to the front on hover
 	// h/t https://gist.github.com/trtg/3922684
@@ -389,34 +388,6 @@ d3.csv('cleaned_data.csv', function(data) {
 			});
 	}
 
-	function dragstarted(d, i) {
-		if (!d3.event.active) simulation.alpha(1);
-		//.restart();
-		d.fx = d.x;
-		d.fy = d.y;
-	}
-
-	function dragged(d, i) {
-		d.fx = d3.event.x;
-		d.fy = d3.event.y;
-	}
-
-	function dragended(d, i) {
-		if (!d3.event.active) simulation.alphaTarget(0);
-		d.fx = null;
-		d.fy = null;
-		var me = d3.select(this);
-		console.log(me.classed('selected'));
-		me.classed('selected', !me.classed('selected'));
-
-		// modify all other circles upon click
-		// https://www.d3-graph-gallery.com/graph/arc_highlight.html
-		circles.style('stroke-width', '2');
-
-		// modify just selected circles upon click
-		d3.select(this).style('stroke-width', '4');
-	}
-
 	function groupBubbles() {
 		hideTitles();
 
@@ -435,7 +406,8 @@ d3.csv('cleaned_data.csv', function(data) {
 		);
 
 		if (byVar == 'all') {
-			hideTitles();
+			groupBubbles();
+			// hideTitles();
 		} else {
 			showTitles(byVar, centerScale);
 		}
@@ -641,8 +613,7 @@ d3.csv('cleaned_data.csv', function(data) {
 			})
 			// alt: return color(d.ID);})
 			.style('stroke-width', 2)
-			.style('pointer-events', 'all')
-			.call(d3.drag().on('start', dragstarted).on('drag', dragged).on('end', dragended));
+			.style('pointer-events', 'all');
 
 		// make the image grow a little on mouse over and add the text details on click
 		setEvents = circles
@@ -763,36 +734,6 @@ d3.csv('cleaned_data.csv', function(data) {
 				});
 		}
 
-		function dragstarted(d, i) {
-			//console.log("dragstarted " + i)
-			if (!d3.event.active) simulation.alpha(1);
-			//.restart();
-			d.fx = d.x;
-			d.fy = d.y;
-		}
-
-		function dragged(d, i) {
-			//console.log("dragged " + i)
-			d.fx = d3.event.x;
-			d.fy = d3.event.y;
-		}
-
-		function dragended(d, i) {
-			if (!d3.event.active) simulation.alphaTarget(0);
-			d.fx = null;
-			d.fy = null;
-			var me = d3.select(this);
-			console.log(me.classed('selected'));
-			me.classed('selected', !me.classed('selected'));
-
-			// modify all other circles upon click
-			// https://www.d3-graph-gallery.com/graph/arc_highlight.html
-			circles.style('stroke-width', '2');
-
-			// modify just selected circles upon click
-			d3.select(this).style('stroke-width', '4');
-		}
-
 		function groupBubbles() {
 			hideTitles();
 
@@ -811,7 +752,7 @@ d3.csv('cleaned_data.csv', function(data) {
 			);
 
 			if (byVar == 'all') {
-				hideTitles();
+				groupBubbles();
 			} else {
 				showTitles(byVar, centerScale);
 			}
