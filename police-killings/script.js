@@ -100,12 +100,22 @@ d3.csv('cleaned_data.csv', function(data) {
 
 	// i should use a switch statement but its 1am
 	radiusFunction = function(length) {
-		if (length > 60) {
-			return 12;
-		} else if (length > 30) {
-			return 16;
-		} else {
-			return 30;
+		if (length > 100) {
+			return h / 50;
+		} else if (length > 80) {
+			return h / 45;
+		} else if (length > 60) {
+			return h / 40;
+		} else if (length > 40) {
+			return h / 35;
+		} else if (length > 20) {
+			return h / 30;
+		} else if (length > 10) {
+			return h / 25;
+		} else if (length > 5) {
+			return h / 15;
+		} else if (length < 5) {
+			return h / 10;
 		}
 	};
 
@@ -200,11 +210,11 @@ d3.csv('cleaned_data.csv', function(data) {
 		.force('x', d3.forceX().x(w / 2))
 		.on('tick', ticked);
 
-	var body = d3.select('body');
+	// var body = d3.select('body');
 
 	var defs = svg.append('defs');
 
-	var labelPos = h * 0.9;
+	var labelPos = 35;
 
 	// add the tooltip area to the webpage
 	var tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0);
@@ -251,7 +261,7 @@ d3.csv('cleaned_data.csv', function(data) {
 			return 175 + 25 * i + 2 * i ** 2;
 		})
 		.attr('cy', function(d, i) {
-			return 250;
+			return h / 2;
 		})
 		// append images to circles. see https://www.youtube.com/watch?v=FUJjNG4zkWY&t=261s
 		.attr('fill', function(d) {
@@ -398,6 +408,37 @@ d3.csv('cleaned_data.csv', function(data) {
 		simulation.alpha(1).restart();
 	}
 
+	// https://stackoverflow.com/questions/24784302/wrapping-text-in-d3/24785497
+	function wrap(text, width) {
+		text.each(function() {
+			var text = d3.select(this),
+				words = text.text().split(/\s+/).reverse(),
+				word,
+				line = [],
+				lineNumber = 0,
+				lineHeight = 1.1, // ems
+				x = text.attr('x'),
+				y = text.attr('y'),
+				dy = 0, //parseFloat(text.attr("dy")),
+				tspan = text.text(null).append('tspan').attr('x', x).attr('y', y).attr('dy', dy + 'em');
+			while ((word = words.pop())) {
+				line.push(word);
+				tspan.text(line.join(' '));
+				if (tspan.node().getComputedTextLength() > width) {
+					line.pop();
+					tspan.text(line.join(' '));
+					line = [ word ];
+					tspan = text
+						.append('tspan')
+						.attr('x', x)
+						.attr('y', y)
+						.attr('dy', ++lineNumber * lineHeight + dy + 'em')
+						.text(word);
+				}
+			}
+		});
+	}
+
 	function splitBubbles(byVar) {
 		centerScale.domain(
 			data.map(function(d) {
@@ -446,6 +487,7 @@ d3.csv('cleaned_data.csv', function(data) {
 			.text(function(d) {
 				return d;
 			});
+		// .call(wrap, 30);
 		// to do: add # of obs after text (e.g. "Unarmed (6 people)")
 		//+ " (" + d.length + ")"});
 
@@ -602,7 +644,7 @@ d3.csv('cleaned_data.csv', function(data) {
 				return 175 + 25 * i + 2 * i ** 2;
 			})
 			.attr('cy', function(d, i) {
-				return 250;
+				return h / 2;
 			})
 			// append images to circles. see https://www.youtube.com/watch?v=FUJjNG4zkWY&t=261s
 			.attr('fill', function(d) {
@@ -784,12 +826,15 @@ d3.csv('cleaned_data.csv', function(data) {
 				.attr('x', function(d) {
 					return scale(d);
 				})
-				.attr('y', 500)
-				// above circles: .attr('y', 50)
+				.attr('y', labelPos)
+				// above circles:
+				//.attr('y', 50)
 				.attr('text-anchor', 'middle')
 				.text(function(d) {
 					return d;
 				});
+			// .call(wrap, 30);
+
 			//+ " (" + d.length + ")"});
 
 			titles.exit().remove();
