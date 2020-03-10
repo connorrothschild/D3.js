@@ -5,7 +5,7 @@
 // this relies on a clean list of (non-duplicated) city names.
 // from https://stackoverflow.com/questions/36804916/create-elements-for-datalist-in-d3
 d3
-	.csv('city_data.csv')
+	.csv('data/city_data.csv')
 	.row(function(d) {
 		return d.CityState;
 	})
@@ -84,7 +84,7 @@ var selected_city = selected_loc.split(',')[0];
 
 // 	data is from https://mappingpoliceviolence.org/
 // add this to footnote probably https://mappingpoliceviolence.org/aboutthedata
-d3.csv('cleaned_data.csv', function(data) {
+d3.csv('data/cleaned_data.csv', function(data) {
 	// put all data in a csv (for later filtering)
 	csv = data;
 
@@ -114,7 +114,7 @@ d3.csv('cleaned_data.csv', function(data) {
 			return h / 25;
 		} else if (length > 5) {
 			return h / 15;
-		} else if (length < 5) {
+		} else if (length <= 5) {
 			return h / 10;
 		}
 	};
@@ -237,13 +237,13 @@ d3.csv('cleaned_data.csv', function(data) {
 			if (d.Image !== '') {
 				return d.Image;
 			} else {
-				return 'default.jpg';
+				return 'images/default.jpg';
 			}
 		})
 		// if image is undefined, return default
 		// https://stackoverflow.com/questions/39988146/how-to-catch-svg-image-fail-to-load-in-d3
 		.on('error', function(d) {
-			this.setAttribute('href', 'default.jpg');
+			this.setAttribute('href', 'images/default.jpg');
 		})
 		.attr('width', 1)
 		.attr('height', 1);
@@ -467,10 +467,38 @@ d3.csv('cleaned_data.csv', function(data) {
 
 	function hideTitles() {
 		svg.selectAll('.title').remove();
+		svg.selectAll('.rect').remove();
 	}
+
+	d3.selection.prototype.moveToFront = function() {
+		return this.each(function() {
+			this.parentNode.appendChild(this);
+		});
+	};
 
 	function showTitles(byVar, scale) {
 		var titles = svg.selectAll('.title').data(scale.domain());
+
+		var rects = svg.selectAll('.rect').data(scale.domain());
+
+		rects
+			.enter()
+			.append('rect')
+			.attr('class', 'rect')
+			.merge(rects)
+			.attr('x', function(d) {
+				return scale(d);
+			})
+			.attr('y', labelPos)
+			.attr('transform', 'translate(-70,-18)')
+			.attr('width', 140)
+			.attr('height', 25)
+			.style('fill', '#E5E5E3')
+			.style('opacity', 1)
+			.style('stroke-width', 0.5)
+			.style('stroke', 'black');
+
+		rects.moveToFront();
 
 		titles
 			.enter()
@@ -481,17 +509,18 @@ d3.csv('cleaned_data.csv', function(data) {
 				return scale(d);
 			})
 			.attr('y', labelPos)
-			// put text above
-			// .attr('y', 50)
 			.attr('text-anchor', 'middle')
 			.text(function(d) {
 				return d;
 			});
+
+		titles.moveToFront();
 		// .call(wrap, 30);
 		// to do: add # of obs after text (e.g. "Unarmed (6 people)")
 		//+ " (" + d.length + ")"});
 
 		titles.exit().remove();
+		rects.exit().remove();
 	}
 
 	function setupButtons() {
@@ -620,13 +649,13 @@ d3.csv('cleaned_data.csv', function(data) {
 				if (d.Image !== '') {
 					return d.Image;
 				} else {
-					return 'default.jpg';
+					return 'images/default.jpg';
 				}
 			})
 			// if image is undefined, return default
 			// https://stackoverflow.com/questions/39988146/how-to-catch-svg-image-fail-to-load-in-d3
 			.on('error', function(d) {
-				this.setAttribute('href', 'default.jpg');
+				this.setAttribute('href', 'images/default.jpg');
 			})
 			.attr('width', 1)
 			.attr('height', 1);
@@ -813,10 +842,31 @@ d3.csv('cleaned_data.csv', function(data) {
 
 		function hideTitles() {
 			svg.selectAll('.title').remove();
+			svg.selectAll('.rect').remove();
 		}
 
 		function showTitles(byVar, scale) {
 			var titles = svg.selectAll('.title').data(scale.domain());
+			var rects = svg.selectAll('.rect').data(scale.domain());
+
+			rects
+				.enter()
+				.append('rect')
+				.attr('class', 'rect')
+				.merge(rects)
+				.attr('x', function(d) {
+					return scale(d);
+				})
+				.attr('y', labelPos)
+				.attr('transform', 'translate(-70,-18)')
+				.attr('width', 140)
+				.attr('height', 25)
+				.style('fill', '#E5E5E3')
+				.style('opacity', 1)
+				.style('stroke-width', 0.5)
+				.style('stroke', 'black');
+
+			rects.moveToFront();
 
 			titles
 				.enter()
@@ -827,17 +877,18 @@ d3.csv('cleaned_data.csv', function(data) {
 					return scale(d);
 				})
 				.attr('y', labelPos)
-				// above circles:
-				//.attr('y', 50)
 				.attr('text-anchor', 'middle')
 				.text(function(d) {
 					return d;
 				});
-			// .call(wrap, 30);
 
+			titles.moveToFront();
+			// .call(wrap, 30);
+			// to do: add # of obs after text (e.g. "Unarmed (6 people)")
 			//+ " (" + d.length + ")"});
 
 			titles.exit().remove();
+			rects.exit().remove();
 		}
 
 		function setupButtons() {
@@ -975,7 +1026,7 @@ d3.csv('cleaned_data.csv', function(data) {
 			if (d.Image !== '') {
 				return d.Image;
 			} else {
-				return 'default.jpg';
+				return 'images/default.jpg';
 			}
 		});
 
