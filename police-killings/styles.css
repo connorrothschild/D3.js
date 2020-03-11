@@ -24,7 +24,7 @@ body {
 	margin-top: 5px;
 	min-width: 130px;
 	padding: 5px 5px;
-	cursor: pointer;
+	cursor: poInter;
 	text-align: center;
 	font-size: 13px;
 	border: 1px solid #e0e0e0;
@@ -49,8 +49,9 @@ body {
 	/* font-size: 12px; */
 	font-family: 'Inter', sans-serif;
 	border-radius: 8px;
-	pointer-events: none;
+	poInter-events: none;
 	border: 1px solid #e0e0e0;
+	display: block;
 }
 
 .dropdown {
@@ -58,7 +59,7 @@ body {
 	padding-left: 10px;
 	padding-top: 2px;
 	padding-bottom: 2px;
-	font-size: 30px;
+	font-size: 22px;
 	background-color: white;
 	/*background-color: #f2f2f2;*/
 	border-top-style: none;
@@ -67,7 +68,7 @@ body {
 	border-bottom-style: medium;
 	border-bottom-width: 2px;
 	border-bottom-color: black;
-	/* max-width: 300px; */
+	/* max-width: 800px; */
 	font-weight: 100;
 }
 
@@ -76,19 +77,19 @@ a {
 }
 
 .titleText {
-	font-size: 30px;
+	font-size: 22px;
 	margin: 15px 25px;
 	font-weight: normal;
 	text-align: center;
 }
 .subtitle {
-	font-size: 22px;
+	font-size: 16px;
 	margin: 0px 25px;
 	font-weight: normal;
 	text-align: center;
 }
 .thirdtitle {
-	font-size: 16px;
+	font-size: 14px;
 	margin: 10px 25px;
 	font-weight: normal;
 	color: #1b1b1b;
@@ -96,7 +97,46 @@ a {
 }
 
 .title {
-	font-size: 16px;
+	font-size: 11px;
+}
+
+@media only screen and (max-width: 1000px) {
+	.titleText {
+		font-size: 18px;
+		margin: 15px 25px;
+		font-weight: normal;
+		text-align: center;
+	}
+	.subtitle {
+		font-size: 14px;
+		margin: 0px 25px;
+		font-weight: normal;
+		text-align: center;
+	}
+	.thirdtitle {
+		font-size: 11px;
+		margin: 10px 25px;
+		font-weight: normal;
+		color: #1b1b1b;
+		text-align: center;
+	}
+	.dropdown {
+		text-align-last: left;
+		padding-left: 10px;
+		padding-top: 2px;
+		padding-bottom: 2px;
+		font-size: 18px;
+		background-color: white;
+		/*background-color: #f2f2f2;*/
+		border-top-style: none;
+		border-left-style: none;
+		border-right-style: none;
+		border-bottom-style: medium;
+		border-bottom-width: 2px;
+		border-bottom-color: black;
+		/* max-width: 800px; */
+		font-weight: 100;
+	}
 }
 
 /* header {

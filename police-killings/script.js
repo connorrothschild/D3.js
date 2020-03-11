@@ -5,9 +5,9 @@
 // this relies on a clean list of (non-duplicated) city names.
 // from https://stackoverflow.com/questions/36804916/create-elements-for-datalist-in-d3
 d3
-	.csv('data/city_data.csv')
+	.csv('data/department_data.csv')
 	.row(function(d) {
-		return d.CityState;
+		return d['Agency responsible for death'];
 	})
 	.get(function(rows) {
 		d3
@@ -50,9 +50,13 @@ function responsivefy(svg) {
 	}
 }
 
-// var w = window.innerWidth * 0.9, h = window.innerHeight * .4;
-var w = window.innerWidth * 0.9,
-	h = window.innerHeight * 0.6;
+w = window.innerWidth * 0.9;
+// if width is > 1000 (desktop), position near center, if mobile, position near top
+// h = w > 1000 ? window.innerHeight * 0.6 : window.innerHeight * 0.3;
+// static:
+h = window.innerHeight * 0.6;
+
+console.log('Width: ' + window.innerWidth);
 
 // map colors to race
 var color = d3
@@ -70,8 +74,8 @@ var color = d3
 	.range([ '#BE3137', '#FFC600', '#59B359', '#4E070C', '#7B48AD', '#7B48AD', '#E96200', '#5F96CE' ]);
 
 // define some forceDiagram parameters
-var centerScale = d3.scalePoint().padding(1).range([ 0, w ]);
-var forceStrength = 0.15;
+var centerScale = d3.scalePoint().padding(0.8).range([ 0, w ]);
+var forceStrength = 0.2;
 
 // define svg
 var svg = d3.select('svg').attr('width', w).attr('height', h).call(responsivefy);
@@ -79,8 +83,8 @@ var svg = d3.select('svg').attr('width', w).attr('height', h).call(responsivefy)
 // create empty csv
 var csv;
 
-var selected_loc = 'Houston, TX';
-var selected_city = selected_loc.split(',')[0];
+var selected_loc = 'Houston Police Department (TX)';
+// var selected_city = selected_loc.split(',')[0];
 
 // 	data is from https://mappingpoliceviolence.org/
 // add this to footnote probably https://mappingpoliceviolence.org/aboutthedata
@@ -90,38 +94,74 @@ d3.csv('data/cleaned_data.csv', function(data) {
 
 	// define data according to selected_loc
 	data = data.filter(function(d) {
-		return d.CityState == selected_loc;
+		return d['Agency responsible for death'] == selected_loc;
 	});
 
 	// number of rows. this is for responsive header text defined later
 	length = data.length;
 
+	chargeStrength = function(length) {
+		if (length > 120) {
+			return -5;
+		} else if (length > 100) {
+			return -10;
+		} else if (length > 60) {
+			return -15;
+		} else {
+			return -20;
+		}
+	};
+
 	// functions based on length etc, which change circle parameters, text, etc. according to length (number of people)
 
 	// i should use a switch statement but its 1am
 	radiusFunction = function(length) {
-		if (length > 100) {
-			return h / 50;
-		} else if (length > 80) {
-			return h / 45;
-		} else if (length > 60) {
-			return h / 40;
-		} else if (length > 40) {
-			return h / 35;
-		} else if (length > 20) {
-			return h / 30;
-		} else if (length > 10) {
-			return h / 25;
-		} else if (length > 5) {
-			return h / 15;
-		} else if (length <= 5) {
-			return h / 10;
+		if (window.innerWidth < 1000) {
+			console.log('Small screen');
+			if (length > 120) {
+				return window.innerWidth / 100;
+			} else if (length > 100) {
+				return window.innerWidth / 80;
+			} else if (length > 80) {
+				return window.innerWidth / 75;
+			} else if (length > 60) {
+				return window.innerWidth / 70;
+			} else if (length > 40) {
+				return window.innerWidth / 65;
+			} else if (length > 20) {
+				return window.innerWidth / 50;
+			} else if (length > 10) {
+				return window.innerWidth / 45;
+			} else if (length > 5) {
+				return window.innerWidth / 35;
+			} else if (length <= 5) {
+				return window.innerWidth / 30;
+			}
+		} else {
+			console.log('Big screen');
+			if (length > 100) {
+				return h / 50;
+			} else if (length > 80) {
+				return h / 45;
+			} else if (length > 60) {
+				return h / 40;
+			} else if (length > 40) {
+				return h / 35;
+			} else if (length > 20) {
+				return h / 30;
+			} else if (length > 10) {
+				return h / 25;
+			} else if (length > 5) {
+				return h / 15;
+			} else if (length <= 5) {
+				return h / 10;
+			}
 		}
 	};
 
 	locFunction = function(selected_loc) {
-		if (selected_loc.trim() == '') {
-			return 'Houston, TX';
+		if (selected_loc.trim() == '()') {
+			return 'Houston Police Department (TX)';
 		} else {
 			return selected_loc;
 		}
@@ -205,7 +245,7 @@ d3.csv('data/cleaned_data.csv', function(data) {
 				return d.r;
 			})
 		)
-		.force('charge', d3.forceManyBody().strength(-20))
+		.force('charge', d3.forceManyBody().strength(chargeStrength(length)))
 		.force('y', d3.forceY().y(h / 2.25))
 		.force('x', d3.forceX().x(w / 2))
 		.on('tick', ticked);
@@ -291,9 +331,9 @@ d3.csv('data/cleaned_data.csv', function(data) {
 				// https://stackoverflow.com/questions/34454246/d3-js-conditional-tooltip-html
 				if (d.Name == 'Name withheld by police') {
 					return (
-						'Since 2013, ' +
-						selected_city +
-						' police have killed ' +
+						'Since 2013, the ' +
+						selected_loc +
+						' has killed ' +
 						'<u>' +
 						length +
 						personFunction(length) +
@@ -303,9 +343,9 @@ d3.csv('data/cleaned_data.csv', function(data) {
 					);
 				} else {
 					return (
-						'Since 2013, ' +
-						selected_city +
-						' police have killed ' +
+						'Since 2013, the ' +
+						selected_loc +
+						' has killed ' +
 						'<u>' +
 						length +
 						personFunction(length) +
@@ -347,7 +387,7 @@ d3.csv('data/cleaned_data.csv', function(data) {
 				.transition()
 				.delay(150)
 				.attr('r', function(d, i) {
-					return 45;
+					return radiusFunction(length) * 3;
 				}); // change the radius
 		})
 		.on('mouseleave', function() {
@@ -490,13 +530,13 @@ d3.csv('data/cleaned_data.csv', function(data) {
 				return scale(d);
 			})
 			.attr('y', labelPos)
-			.attr('transform', 'translate(-70,-18)')
-			.attr('width', 140)
-			.attr('height', 25)
+			.attr('transform', 'translate(-55,-14)')
+			.attr('width', 110)
+			.attr('height', 20)
 			.style('fill', '#E5E5E3')
-			.style('opacity', 1)
-			.style('stroke-width', 0.5)
-			.style('stroke', 'black');
+			.style('opacity', 1);
+		// .style('stroke-width', 0.5)
+		// .style('stroke', 'black');
 
 		rects.moveToFront();
 
@@ -564,13 +604,13 @@ d3.csv('data/cleaned_data.csv', function(data) {
 
 		// redefine selected location, city, etc./
 		var selected_loc = selected_loc;
-		var selected_city = selected_loc.split(',')[0];
+		// var selected_city = selected_loc.split(',')[0];
 		console.log(selected_loc);
-		console.log(selected_city);
+		// console.log(selected_city);
 
 		// filter the data
 		data = csv.filter(function(d) {
-			return d.CityState === selected_loc;
+			return d['Agency responsible for death'] === selected_loc;
 		});
 		console.table(data);
 
@@ -598,9 +638,9 @@ d3.csv('data/cleaned_data.csv', function(data) {
 		d3
 			.select('.subtitle')
 			.html(
-				'Since 2013, ' +
-					selected_city +
-					' police have killed ' +
+				'Since 2013, the ' +
+					selected_loc +
+					' has killed ' +
 					'<u>' +
 					length +
 					personFunction(length) +
@@ -622,7 +662,7 @@ d3.csv('data/cleaned_data.csv', function(data) {
 					return d.r;
 				})
 			)
-			.force('charge', d3.forceManyBody())
+			.force('charge', d3.forceManyBody().strength(chargeStrength(length)))
 			.force('y', d3.forceY().y(h / 2.25))
 			.force('x', d3.forceX().x(w / 2))
 			.on('tick', ticked);
@@ -695,9 +735,9 @@ d3.csv('data/cleaned_data.csv', function(data) {
 					// https://stackoverflow.com/questions/34454246/d3-js-conditional-tooltip-html
 					if (d.Name == 'Name withheld by police') {
 						return (
-							'Since 2013, ' +
-							selected_city +
-							' police have killed ' +
+							'Since 2013, the' +
+							selected_loc +
+							' has killed ' +
 							'<u>' +
 							length +
 							personFunction(length) +
@@ -707,9 +747,9 @@ d3.csv('data/cleaned_data.csv', function(data) {
 						);
 					} else {
 						return (
-							'Since 2013, ' +
-							selected_city +
-							' police have killed ' +
+							'Since 2013, then' +
+							selected_loc +
+							' has killed ' +
 							'<u>' +
 							length +
 							personFunction(length) +
@@ -752,7 +792,7 @@ d3.csv('data/cleaned_data.csv', function(data) {
 					.transition()
 					.delay(150)
 					.attr('r', function(d, i) {
-						return 45;
+						return radiusFunction(length) * 3;
 					}); // change the radius
 			})
 			.on('mouseleave', function() {
@@ -858,13 +898,13 @@ d3.csv('data/cleaned_data.csv', function(data) {
 					return scale(d);
 				})
 				.attr('y', labelPos)
-				.attr('transform', 'translate(-70,-18)')
-				.attr('width', 140)
-				.attr('height', 25)
+				.attr('transform', 'translate(-55,-14)')
+				.attr('width', 110)
+				.attr('height', 20)
 				.style('fill', '#E5E5E3')
-				.style('opacity', 1)
-				.style('stroke-width', 0.5)
-				.style('stroke', 'black');
+				.style('opacity', 1);
+			// .style('stroke-width', 0.5)
+			// .style('stroke', 'black');
 
 			rects.moveToFront();
 
@@ -943,9 +983,9 @@ d3.csv('data/cleaned_data.csv', function(data) {
 					// https://stackoverflow.com/questions/34454246/d3-js-conditional-tooltip-html
 					if (d.Name == 'Name withheld by police') {
 						return (
-							'Since 2013, ' +
-							selected_city +
-							' police have killed ' +
+							'Since 2013, the ' +
+							selected_loc +
+							' has killed ' +
 							'<u>' +
 							length +
 							personFunction(length) +
@@ -955,9 +995,9 @@ d3.csv('data/cleaned_data.csv', function(data) {
 						);
 					} else {
 						return (
-							'Since 2013, ' +
-							selected_city +
-							' police have killed ' +
+							'Since 2013, the' +
+							selected_loc +
+							' has killed ' +
 							'<u>' +
 							length +
 							personFunction(length) +
@@ -996,7 +1036,7 @@ d3.csv('data/cleaned_data.csv', function(data) {
 			.on('mouseenter', function() {
 				// select element in current context
 				d3.select(this).moveToFront().transition().attr('r', function(d, i) {
-					return 45;
+					return radiusFunction(length) * 3;
 				});
 			})
 			// set back
