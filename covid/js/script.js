@@ -99,7 +99,13 @@ window.onload = function() {
 		var tool_tip = d3
 			.tip()
 			.attr('class', 'd3-tip')
-			.offset([ 0, -50 ])
+			.offset(function() {
+				if (width > 1000) {
+					return [ 0, 0 ];
+				} else {
+					return [ 70, 0 ];
+				}
+			})
 			// if the mouse position is greater than 650 (~ Kentucky/Missouri),
 			// offset tooltip to the left instead of the right
 			// credit https://stackoverflow.com/questions/28536367/in-d3-js-how-to-adjust-tooltip-up-and-down-based-on-the-screen-position
