@@ -99,16 +99,17 @@ window.onload = function() {
 		var tool_tip = d3
 			.tip()
 			.attr('class', 'd3-tip')
+			.offset([ 0, -50 ])
 			// if the mouse position is greater than 650 (~ Kentucky/Missouri),
 			// offset tooltip to the left instead of the right
 			// credit https://stackoverflow.com/questions/28536367/in-d3-js-how-to-adjust-tooltip-up-and-down-based-on-the-screen-position
-			.offset(function() {
-				if (current_position[0] > 650) {
-					return [ -20, -120 ];
-				} else {
-					return [ 20, 120 ];
-				}
-			})
+			// .offset(function() {
+			// 	if (current_position[0] > 650) {
+			// 		return [ -20, -120 ];
+			// 	} else {
+			// 		return [ 20, 120 ];
+			// 	}
+			// })
 			.html("<div id='tipDiv'></div>");
 
 		svg.call(tool_tip);
@@ -148,7 +149,7 @@ window.onload = function() {
 
 				tool_tip.show();
 
-				var tip_width = 400,
+				var tip_width = width > 1000 ? 400 : width / 1.35,
 					tip_height = 200,
 					barpadding = 10,
 					barheight = tip_height / 4 - barpadding;
@@ -168,7 +169,7 @@ window.onload = function() {
 							format(d.deaths + d.recovered + d.critical) +
 							' (' +
 							percent((d.deaths + d.recovered + d.critical) / d.cases) +
-							') of them:'
+							'):'
 					)
 					.attr('class', 'countrySubtext')
 					.attr('y', 40);
