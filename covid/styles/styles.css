@@ -114,4 +114,9 @@ h1 {
 	.countrySubtext {
 		font-size: 10px;
 	}
+	h1 {
+		font-family: "Inter";
+		font-weight: 400;
+		font-size: 18px;
+	}
 }
