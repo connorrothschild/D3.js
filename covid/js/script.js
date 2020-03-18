@@ -6,10 +6,6 @@ window.onload = function() {
 		width = container.clientWidth - margin.left - margin.right,
 		height = container.clientHeight - margin.top - margin.bottom;
 
-	// var x = d3.scale.ordinal().rangeRoundBands([ 0, width ], 0.1);
-
-	// var y = d3.scale.linear().range([ height, 0 ]);
-
 	var yScale = d3.scale.ordinal().rangeRoundBands([ height, 0 ], 0.1);
 
 	var xScale = d3.scale.linear().range([ 0, width ]);
@@ -25,17 +21,8 @@ window.onload = function() {
 
 	var numCountries = 50;
 
-	// svg
-	// 	.append('g')
-	// 	.append('text') // just for the title (ticks are automatic)
-	// 	.attr('class', 'x label')
-	// 	// .attr('transform', 'rotate(-90)') // rotate the text!
-	// 	.attr('y', 0)
-	// 	.attr('x', 50)
-	// 	.style('text-anchor', 'end')
-	// 	.text('Cases');
-
-	d3.json('https://corona.lmao.ninja/countries', function(data) {
+	d3.json('testing-data/countries.json', function(data) {
+		// d3.json('https://corona.lmao.ninja/countries', function(data) {
 		csv = data;
 
 		data.sort(function(x, y) {
@@ -46,13 +33,17 @@ window.onload = function() {
 
 		console.log(data);
 
-		d3.select('#numCountries').on('input', function() {
-			numCountries = +this.value;
-			d3.select('#numCountries-value').text(numCountries);
-			console.log(numCountries);
-			data = csv.slice(0, numCountries);
-			redraw(data);
-		});
+		d3.select('#numCountries').on(
+			'input',
+			// add a slight 'debounce' so the transitions are not jittery
+			debounce(function() {
+				numCountries = +this.value;
+				d3.select('#numCountries-value').text(numCountries);
+				console.log(numCountries);
+				data = csv.slice(0, numCountries);
+				redraw(data);
+			}, 250)
+		);
 
 		draw(data, numCountries);
 
@@ -65,7 +56,7 @@ window.onload = function() {
 		var yAxis = d3.svg.axis().scale(yScale).orient('left');
 
 		var xAxis = d3.svg.axis().scale(xScale).orient('top').tickFormat(function(d) {
-			return d;
+			return format(d);
 		});
 
 		svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,0)');
@@ -105,22 +96,22 @@ window.onload = function() {
 			return d.country;
 		});
 
-		// var tool_tip = d3
-		// 	.tip()
-		// 	.attr('class', 'd3-tip')
-		// 	// if the mouse position is greater than 650 (~ Kentucky/Missouri),
-		// 	// offset tooltip to the left instead of the right
-		// 	// credit https://stackoverflow.com/questions/28536367/in-d3-js-how-to-adjust-tooltip-up-and-down-based-on-the-screen-position
-		// 	.offset(function() {
-		// 		if (current_position[0] > 650) {
-		// 			return [ -20, -120 ];
-		// 		} else {
-		// 			return [ 20, 120 ];
-		// 		}
-		// 	})
-		// 	.html("<p>Outcomes: </p><div id='tipDiv'></div>");
+		var tool_tip = d3
+			.tip()
+			.attr('class', 'd3-tip')
+			// if the mouse position is greater than 650 (~ Kentucky/Missouri),
+			// offset tooltip to the left instead of the right
+			// credit https://stackoverflow.com/questions/28536367/in-d3-js-how-to-adjust-tooltip-up-and-down-based-on-the-screen-position
+			.offset(function() {
+				if (current_position[0] > 650) {
+					return [ -20, -120 ];
+				} else {
+					return [ 20, 120 ];
+				}
+			})
+			.html("<div id='tipDiv'></div>");
 
-		// svg.call(tool_tip);
+		svg.call(tool_tip);
 
 		// data that needs DOM = enter() (a set/selection, not an event!)
 		bars
@@ -143,43 +134,120 @@ window.onload = function() {
 			})
 			.attr('height', yScale.rangeBand());
 
-		// bars
-		// 	.on('mouseover', function(d) {
-		// 		// define and store the mouse position. this is used to define
-		// 		// tooltip offset, seen above.
-		// 		current_position = d3.mouse(this);
-		// 		//console.log(current_position[0])
+		bars
+			.on('mouseover', function(d) {
+				// define and store the mouse position. this is used to define
+				// tooltip offset, seen above.
+				current_position = d3.mouse(this);
 
-		// 		current_country = d.country;
-		// 		countryData = data.filter(function(d) {
-		// 			return d.country == current_country;
-		// 		});
+				current_country = d.country;
 
-		// 		tool_tip.show();
-		// 		var tipSVG = d3.select('#tipDiv').append('svg').attr('width', 220).attr('height', 55);
+				countryData = data.filter(function(d) {
+					return d.country == current_country;
+				});
 
-		// 		var x = d3.scaleBand().rangeRound([ 0, width ]).padding(0.1);
+				tool_tip.show();
 
-		// 		var y = d3.scaleLinear().rangeRound([ height, 0 ]);
+				var tip_width = 400,
+					tip_height = 200,
+					barpadding = 10,
+					barheight = tip_height / 4 - barpadding;
+				//Make an SVG Container
+				var tipSVG = d3.select('#tipDiv').append('svg').attr('width', tip_width).attr('height', tip_height);
 
-		// 		x.domain([ d.deaths, d.recovered, d.critical ]);
-		// 		y.domain([ 0, d.cases ]);
+				tipSVG
+					.append('text')
+					.html(d.country + ' has ' + format(d.cases) + ' recorded cases.')
+					.attr('class', 'countryText')
+					.attr('y', 20);
 
-		// 		tipSVG
-		// 			.append('rect')
-		// 			.datum(countryData)
-		// 			.attr('x', function(d) {
-		// 				return x(d.Run);
-		// 			})
-		// 			.attr('y', function(d) {
-		// 				return y(Number(d.Speed));
-		// 			})
-		// 			.attr('width', x.bandwidth())
-		// 			.attr('height', function(d) {
-		// 				return height - y(Number(d.Speed));
-		// 			});
-		// 	})
-		// 	.on('mouseout', tool_tip.hide);
+				tipSVG
+					.append('text')
+					.html(
+						'We know the status of ' +
+							format(d.deaths + d.recovered + d.critical) +
+							' (' +
+							percent((d.deaths + d.recovered + d.critical) / d.cases) +
+							') of them:'
+					)
+					.attr('class', 'countrySubtext')
+					.attr('y', 40);
+
+				// tool_tip_x_scale = d3.scale.linear().range([ 0, tip_width ]).domain([
+				// 	0,
+				// 	d3.max(countryData, function(d) {
+				// 		return Math.max(d.deaths, d.recovered, d.critical);
+				// 	})
+				// ]);
+
+				tool_tip_x_scale = d3.scale.linear().range([ 0, tip_width ]).domain([
+					0,
+					d3.max(countryData, function(d) {
+						return d.cases;
+					})
+				]);
+
+				var bar = tipSVG.selectAll('g').data(countryData).enter().append('g');
+
+				bar
+					.append('rect')
+					.data(countryData)
+					.attr('x', 1)
+					.attr('y', tip_height * 0.25)
+					.attr('width', function(d) {
+						return tool_tip_x_scale(d.deaths);
+					})
+					.attr('height', barheight)
+					.attr('fill', '#FF8C02');
+
+				bar
+					.append('text')
+					.html(function(d) {
+						return 'Deaths: ' + format(d.deaths);
+					})
+					.attr('x', 3)
+					.attr('y', tip_height * 0.25 + barpadding * 2.5);
+
+				bar
+					.append('rect')
+					.data(countryData)
+					.attr('class', 'recovered_rectangle')
+					.attr('x', 1)
+					.attr('y', tip_height * 0.5)
+					.attr('width', function(d) {
+						return tool_tip_x_scale(d.recovered);
+					})
+					.attr('height', barheight)
+					.attr('fill', '#BD99F6');
+
+				bar
+					.append('text')
+					.html(function(d) {
+						return 'Recovered: ' + format(d.recovered);
+					})
+					.attr('x', 3)
+					.attr('y', tip_height * 0.5 + barpadding * 2.5);
+
+				bar
+					.append('rect')
+					.data(countryData)
+					.attr('x', 1)
+					.attr('y', tip_height * 0.75)
+					.attr('width', function(d) {
+						return tool_tip_x_scale(d.critical);
+					})
+					.attr('height', barheight)
+					.attr('fill', '#97ABC5');
+
+				bar
+					.append('text')
+					.html(function(d) {
+						return 'Critical: ' + format(d.critical);
+					})
+					.attr('x', 3)
+					.attr('y', tip_height * 0.75 + barpadding * 2.5);
+			})
+			.on('mouseout', tool_tip.hide);
 
 		// D3 Axis - renders a d3 scale in SVG
 		createAxis();

@@ -2,86 +2,83 @@
 <meta charset="utf-8">
 
 <!-- Load d3.js -->
-<script src="https://d3js.org/d3.v4.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.js"></script>
 
 <!-- Create a div where the graph will take place -->
 <div id="tool_tip"></div>
 
 <!-- Color scale -->
-<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<!-- <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script> -->
 
 </head>
 
 <body>
     <script>
 
-        // set the dimensions and margins of the graph
-        var width = 450
-            height = 450
-            margin = 40
-        
-        // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
-        var radius = Math.min(width, height) / 2 - margin
-        
-        // append the svg object to the div called 'my_dataviz'
-        var svg = d3.select("#tool_tip")
-          .append("svg")
-            .attr("width", width)
-            .attr("height", height)
-          .append("g")
-            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-        
-        // Create dummy data
-        d3.json('https://corona.lmao.ninja/countries', function(data) {
+var tip_width = 400,
+    tip_height = 200,
+    barpadding = 10,
+    barheight = (tip_height / 4) - barpadding;
+        //Make an SVG Container
+ var svgContainer = d3.select("body").append("svg")
+                                     .attr("width", tip_width)
+                                     .attr("height", tip_height);
 
-            // data = data.splice(2,2)
-        console.log(data)
-        data = data.filter(function(d){return d.country == "China"})
-        
-        data.map((col, i) => data.map(row => row[i]));
-        console.log(data)
+d3.json('https://corona.lmao.ninja/countries', function(data) {  
+  
+  data = data.filter(function(d){return d.country == "China"})  
+  
+  console.log(data)
+ //Draw the Rectangle
 
-        // set the color scale
-        var color = d3.scaleOrdinal()
-          .domain(data)
-          .range(d3.schemeSet2);
-        
-        // Compute the position of each group on the pie:
-        var pie = d3.pie()
-          .value('deaths','recovered','critical')
-        var data_ready = pie(d3.entries(data))
+tool_tip_x_scale = d3.scale.linear().range([ 0, tip_width ]).domain([0, d3.max(data, function(d) {return d.cases})]);
 
-        console.log(data_ready)
-        // Now I know that group A goes from 0 degrees to x degrees and so on.
-        
-        // shape helper to build arcs:
-        var arcGenerator = d3.arc()
-          .innerRadius(0)
-          .outerRadius(radius)
-        
-        // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
-        svg
-          .selectAll('mySlices')
-          .data(data_ready)
-          .enter()
-          .append('path')
-            .attr('d', arcGenerator)
-            .attr('fill', function(d){ return(color(d.data.key)) })
-            .attr("stroke", "black")
-            .style("stroke-width", "2px")
-            .style("opacity", 0.7)
-        
-        // Now add the annotation. Use the centroid method to get the best coordinates
-        svg
-          .selectAll('mySlices')
-          .data(data_ready)
-          .enter()
-          .append('text')
-          .text(function(d){ return "grp " + d.data.key})
-          .attr("transform", function(d) { return "translate(" + arcGenerator.centroid(d) + ")";  })
-          .style("text-anchor", "middle")
-          .style("font-size", 17)
-        });
-        
+var bar = svgContainer.selectAll("g")
+    .data(data)
+    .enter().append("g")
+    // .attr("transform", function(d, i) { return "translate(0," + i * barheight + ")"; });
+
+ var rectangle = bar.append("rect")
+                             .data(data)
+                             .attr("x", 1)
+                             .attr("y", tip_height * .25)
+                             .attr("width", function(d) {return tool_tip_x_scale(d.deaths)})
+                             .attr("height", barheight)
+                             .attr('fill', '#FF8C02');
+                             
+  var deathsText = bar.append("text")
+                              .html(function(d) { return "Deaths: " + d.deaths})
+                              .attr("x", 3)
+                              .attr("y", (tip_height * .25) + barpadding * 2.5)
+
+ var rectangle2 = bar.append("rect")
+                             .data(data)
+                             .attr("class", "recovered_rectangle")
+                             .attr("x", 1)
+                             .attr("y", tip_height * .5)
+                             .attr("width", function(d) {return tool_tip_x_scale(d.recovered)})
+                             .attr("height", barheight)
+                             .attr('fill', '#BD99F6');
+
+  var recoveredText = bar.append("text")
+                                .html(function(d) { return "Recovered: " + d.recovered})
+                                .attr("x", 3)
+                                .attr("y", (tip_height * .5) + barpadding * 2.5)
+                                // .attr('alignment-baseline', 'text-top')
+
+  var rectangle3 = bar.append("rect")
+                               .data(data)
+                             .attr("x", 1)
+                             .attr("y", tip_height * .75)
+                             .attr("width", function(d) {return tool_tip_x_scale(d.critical)})
+                             .attr("height", barheight)
+                             .attr('fill', '#97ABC5');
+
+  var criticalText = bar.append("text")
+                              .html(function(d) { return "Critical: " + d.critical})
+                              .attr("x", 3)
+                              .attr("y", (tip_height * .75) + barpadding * 2.5)
+});
+
         </script>
 </body>

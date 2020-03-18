@@ -3,10 +3,18 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <title>COVID-19 Cases | Connor Rothschild</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 
-  <title>COVID</title>
-  <meta name="description" content="COVID">
-  <meta name="author" content="COVID">
+  <meta name="twitter:card" content="summary_large_image" >
+  <meta name="twitter:site" content="@CL_Rothschild" >
+  <meta name="twitter:creator" content="@CL_Rothschild" >
+  <meta name="twitter:title" content="COVID-19 Cases" >
+  <meta name="twitter:description" content="Cumulative counts of COVID-19 cases, by country." >
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/connorrothschild/D3.js/covid/master/images/thumbnail.jpg" >
+
+  <link rel="icon" target="_blank" href="https://raw.githubusercontent.com/connorrothschild/connorrothschild.github.io/master/me/favicon.ico">
 
   <link rel="stylesheet" href="styles/styles.css">
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.js"></script>
@@ -17,9 +25,11 @@
 
 <body>
   <script src="js/script.js"></script>
+  <script src="js/helpers.js"></script>
+  
   <h1>Recorded COVID-19 cases in the top 
     <span id="numCountries-value">50</span>
-    <input class = "slider" style="width: 100px;" type="range" min="1" max="50" id="numCountries" value="50" step='1'">
+    <input class = "slider" style="width: 100px;" type="range" min="3" max="50" id="numCountries" value="50" step='1'">
   countries</h1>
   </label>
   <div id="chart"></div>
