@@ -584,9 +584,10 @@ h2 {
 }
 .axis text {
 	font-size: 1.2em;
+	font-family: "Inter";
 }
 .axis.y.right .tick text {
-	/* fill: steelblue; */
+	fill: darkslategray;
 }
 .axis.y .tick line {
 	stroke: #eee;
