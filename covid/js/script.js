@@ -155,7 +155,7 @@ window.onload = function() {
 
 				tool_tip.show();
 
-				var tip_width = width > 1000 ? 400 : width / 1.35,
+				var tip_width = width > 1000 ? 400 : width / 1.25,
 					tip_height = 200,
 					barpadding = 10,
 					barheight = tip_height / 4 - barpadding;
