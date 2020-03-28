@@ -1,0 +1,103 @@
+@import url('https://rsms.me/inter/inter.css');
+html {
+	font-family: 'Inter', sans-serif;
+}
+@supports (font-variation-settings: normal) {
+	html {
+		font-family: 'Inter var', sans-serif;
+	}
+}
+
+h1 {
+	font: 500 2.5em "Inter";
+	text-align: center;
+}
+
+p {
+	font: 200 1em "Inter";
+	text-align: center;
+	line-height: 0;
+}
+
+footer {
+	font: 200 .9em "Inter";
+	text-align: left;
+	margin-top: 2em;
+	border-style: solid;
+	border-width: 1px 0px 0px 0px;
+	padding: 8px 0px 0px 6px;
+}
+
+a {
+	color: #0000ee;
+}
+
+.states :hover {
+	stroke: white;
+	stroke-width: 8px;
+}
+
+.year.label {
+	font: 300 1em "Inter";
+	fill: black;
+}
+
+.helper.label {
+	font: 150 1em "Inter";
+	fill: black;
+}
+
+.overlay {
+	fill: none;
+	pointer-events: all;
+	cursor: ew-resize;
+}
+
+.caption {
+	font: 150 1.1em "Inter";
+}
+
+.topnav {
+	background-color: white;
+	border-style: solid;
+	border-width: 0px 0px 1px 0px;
+	padding: 6px 0px 6px 6px;
+	overflow: hidden;
+	font: 200 .9em "Inter";
+	position: -webkit-sticky;
+	position: sticky;
+	top: 0;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+	float: left;
+	color: black;
+	text-align: left;
+	padding: 6px 6px 6px 6px;
+	text-decoration: none;
+	font-size: 16px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+	background-color: #ddd;
+	color: black;
+}
+
+.d3-tip {
+	line-height: .8;
+	padding-right: 6px;
+	padding-left: 6px;
+	padding-bottom: 6px;
+	background: #fff;
+	border: 1px solid black;
+	font-size: 13px;
+	pointer-events: none !important;
+}
+
+/* .my_chart {
+	width: 90%;
+	padding-left: 15%;
+	padding-right: 10%;
+} */
