@@ -1,15 +1,3 @@
-/* This viz was made a lot easier thanks to the following code:
-
-* animation using TweenYear
-http://bl.ocks.org/jgujgu/bfbb41f5e8b90ff09d7805f71ef2538e
-* choropleth map of us states (using json fips state ids)
-https://bl.ocks.org/chucklam/f628765b873d707a3d0e44ffc78deab8
-* another choropleth; although I didn't end up following its structure it was a helpful introduction
-https://bl.ocks.org/wboykinm/dbbe50d1023f90d4e241712395c27fb3
-
-A special thanks to Robert Hosbach for his viz here (and his willingness to respond to my email!): https://rahosbach.github.io/2018-10-27-d3UnemploymentChoropleth/
-*/
-
 var svg = d3
 	.select('svg')
 	.attr('class', 'my_chart')
@@ -59,61 +47,90 @@ function responsivefy(svg) {
 	}
 }
 
+function dateFunction(date) {
+	var formatTime = d3.timeFormat('%B %d, %Y');
+	return formatTime(new Date(date));
+}
+
+function dateFunctionNoYear(date) {
+	var formatTime = d3.timeFormat('%B %d');
+	return formatTime(new Date(date));
+}
+
+var radius = d3.scaleSqrt().domain([ 0, 5000 ]).range([ 0, 25 ]);
+
 // options for color scheme: https://github.com/d3/d3-scale-chromatic
-var colorScheme = d3.schemeReds[9];
-colorScheme.unshift('#eee');
+var colorScheme = d3.schemeBlues[5];
+// colorScheme.unshift("#eee");
+
+const logScale = d3.scaleLog().domain([ 10, 10000 ]);
 
 // building the legend at the top
-var color = d3.scaleQuantize().domain([ 0, 50 ]).range(colorScheme);
-var x = d3
-	.scaleLinear()
-	.domain(d3.extent(color.domain())) // the range specifies the x position of the legend
-	.rangeRound([ 600, 860 ]);
+var color = d3.scaleSequential((d) => d3.interpolateReds(logScale(d)));
+// var x = d3.scaleLinear()
+//   .domain(d3.extent(color.domain()))
+//   // the range specifies the x position of the legend
+//   .rangeRound([600,860]);
+
 var g = svg.append('g').attr('transform', 'translate(0,40)');
 
-// legend boxes
-g
-	.selectAll('rect')
-	.data(
-		color.range().map(function(d) {
-			return color.invertExtent(d);
-		})
-	)
-	.enter()
-	.append('rect')
-	.attr('height', 8)
-	.attr('x', function(d) {
-		return x(d[0]);
-	})
-	.attr('width', function(d) {
-		return x(d[1]) - x(d[0]);
-	})
-	.attr('fill', function(d) {
-		return color(d[0]);
-	});
+// g
+//     // .attr('class', 'legend')
+//       // .attr('transform', 'translate(' + margin + ',' +  (2 * margin + i * 3 * barHeight) + ')')
+//     .selectAll('rect')
+//     .data(color.range().map(function(d){ return color.invertExtent(d); }))
+//       .enter()
+//       .append('rect')
+//       // .attr('y', 0)
+//       .attr("x", function(d){ return x(d[0]); })
+//       .attr("width", 10)
+//       .attr('height', 10)
+//       .attr('fill', color)
 
-// legend title
-g
-	.append('text')
-	.attr('class', 'caption')
-	.attr('x', x.range()[0])
-	.attr('y', -6)
-	.attr('fill', '#000')
-	.attr('text-anchor', 'start')
-	.attr('font-weight', 30)
-	.text('Overdose Death Rate (Per 100,000)');
+// g.append('text')
+//     .text('Logarithmic')
+//     .attr('x', 0)
+//     .attr('y', -10)
+//     .attr('fill', '#333')
+var log = d3.scaleLog().domain([ 10, 100, 1000, 10000 ]).range([ '#FFF5F0', '#FCB094', '#9F2E22', '#67000D' ]);
 
-// legend ticks
-g
-	.call(
-		d3.axisBottom(x).tickSize(13).tickFormat(format).tickValues(
-			color.range().slice(1).map(function(d) {
-				return color.invertExtent(d)[0];
-			})
-		)
-	)
-	.select('.domain')
-	.remove();
+var svg = d3.select('svg');
+
+svg.append('g').attr('class', 'legendLog').attr('transform', 'translate(715,60)');
+
+var logLegend = d3.legendColor().cells([ 10, 100, 1000, 10000 ]).scale(log);
+
+logLegend.labelFormat(d3.format('.0f')).title('Confimed Cases');
+
+svg.select('.legendLog').call(logLegend);
+
+// // legend boxes
+// g.selectAll("rect")
+//   .data(color.range().map(function(d){ return color.invertExtent(d); }))
+//   .enter()
+//   .append("rect")
+//     .attr("height", 8)
+//     .attr("x", function(d){ return x(d[0]); })
+//     .attr("width", function(d){ return x(d[1]) - x(d[0]); })
+//     .attr("fill", function(d){ return color(d[0]); });
+
+// // legend title
+// g.append("text")
+//   .attr("class", "caption")
+//   .attr("x", x.range()[0])
+//   .attr("y", -6)
+//   .attr("fill", "#000")
+//   .attr("text-anchor", "start")
+//   .attr("font-weight", 30)
+//   .text("Number of Confirmed Cases");
+
+// // legend ticks
+// g.call(d3.axisBottom(x)
+//   .tickSize(13)
+//   .tickFormat(format)
+//   .tickValues(color.range().slice(1).map(function(d){ return color.invertExtent(d)[0]; })))
+//   .select(".domain")
+//   .remove();
 
 // create tooltip
 var div = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0);
@@ -130,7 +147,7 @@ var label = svg
 	// position the label
 	.attr('y', labely)
 	.attr('x', labelx)
-	.text(1999);
+	.text(dateFunction('2020-01-22'));
 
 var helperlabel = svg
 	.append('text')
@@ -139,44 +156,33 @@ var helperlabel = svg
 	// position the label
 	.attr('y', labely + 20)
 	.attr('x', labelx)
-	.text('Hover to change year');
+	.text('Hover to change date');
 
 queue()
 	// read in JSON which includes all of the complicated shape data for states/counties/etc.
 	.defer(d3.json, 'https://d3js.org/us-10m.v1.json')
-	// read in opioid data
-	.defer(d3.csv, 'overdoses.csv')
-	/*
-  NOTE ON OVERDOSE DATA: 
-  
-  This CSV file was created via pulling data from CDC's WONDER database.
-  
-  I pulled all deaths from the National Vital Statistics System's multiple cause-of-death mortality files which had one of the following causes of death: opioids (T40.0, T40.1, T40.2, T40.3, T40.4, or T40.6)**; natural/semisynthetic opioids (T40.2); methadone (T40.3); heroin (T40.1); synthetic opioids other than methadone (T40.4); cocaine (T40.5). I followed the methodology of this paper: https://www.cdc.gov/mmwr/volumes/67/wr/mm675152e1.htm?s_cid=mm675152e1_w. Deaths may include multiple opioids as a cause and thus are not mutually exclusive.
-
-  You can replicate the data pull on CDC WONDER with this link: https://wonder.cdc.gov/mcd-icd10.html
-
-  Source: Multiple Cause of Death 1999–2017 on CDC Wide-ranging Online Data for Epidemiologic Research (CDC WONDER). Atlanta, GA: CDC, National Center for Health Statistics. 2018. Available at http://wonder.cdc.gov. 
-  */
+	// .defer(d3.csv, "us-counties.csv")
+	.defer(d3.csv, 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv')
 	.await(ready);
 
 function ready(error, us, overdoses) {
 	if (error) throw error;
 
-	// Initialize data to 1990
-	var currentYear = 1999;
+	var currentDate = dateFunction('2020-01-22');
 	var rateById = {};
 	var nameById = {};
-	// var yearById = {};
-
-	//console.table(overdoses)
 
 	overdoses.forEach(function(d) {
-		rateById[d.id] = +d.rate;
-		nameById[d.id] = d.state;
-		d.year = d.year;
+		d.cases = +d.cases;
+		rateById[d.fips] = +d.cases;
+		nameById[d.fips] = d.county;
+		d.date_old = d.date;
+		d.date = dateFunction(d.date);
 	});
 
-	console.table(overdoses);
+	console.log(overdoses);
+
+	//  color.domain([0, d3.max(overdoses, function(d) {return d.cases})])
 
 	// Add an overlay for the year label.
 	var box = label.node().getBBox();
@@ -190,27 +196,6 @@ function ready(error, us, overdoses) {
 		.attr('height', box.height)
 		.on('mouseover', enableInteraction);
 
-	var x_tooltip = d3
-		.scaleLinear()
-		.domain(
-			d3.extent(overdoses, function(d) {
-				return d.year;
-			})
-		)
-		.range([ 0, 130 ]);
-
-	var y_tooltip = d3.scaleLinear().domain([ 0, 60 ]).range([ 50, 0 ]);
-
-	// define line function
-	var line = d3
-		.line()
-		.x(function(d) {
-			return x_tooltip(d.year);
-		})
-		.y(function(d) {
-			return y_tooltip(+d.rate);
-		});
-
 	var tool_tip = d3
 		.tip()
 		.attr('class', 'd3-tip')
@@ -219,26 +204,29 @@ function ready(error, us, overdoses) {
 		// credit https://stackoverflow.com/questions/28536367/in-d3-js-how-to-adjust-tooltip-up-and-down-based-on-the-screen-position
 		.offset(function() {
 			if (current_position[0] > 650) {
-				return [ -20, -120 ];
+				return [ -30, -240 ];
 			} else {
-				return [ 20, 120 ];
+				return [ 5, 30 ];
 			}
 		})
-		.html("<p>Opioid-involved deaths over time in</p><div id='tipDiv'></div>");
+		.html("<div id='tipDiv'></div>");
 
 	svg.call(tool_tip);
 
 	// Start a transition that interpolates the data based on year.
-	svg.transition().duration(10000).ease(d3.easeLinear).tween('year', tweenYear);
+	svg.transition().duration(10000).ease(d3.easeLinear).tween('date', tweenDate);
 
-	states = svg
+	counties = svg
 		.append('g')
-		.attr('class', 'states')
+		.attr('class', 'counties')
 		.selectAll('path')
-		.data(topojson.feature(us, us.objects.states).features)
+		.data(topojson.feature(us, us.objects.counties).features)
 		.enter()
 		.append('path')
 		.attr('d', path)
+		.attr('stroke', 'grey')
+		.attr('stroke-width', 0.1)
+		.call(style, currentDate)
 		// appending svg inside of tooltip for year by year change.
 		// h/t https://bl.ocks.org/maelafifi/ee7fecf90bb5060d5f9a7551271f4397
 		// h/t https://stackoverflow.com/questions/43904643/add-chart-to-tooltip-in-d3
@@ -246,167 +234,110 @@ function ready(error, us, overdoses) {
 			// define and store the mouse position. this is used to define
 			// tooltip offset, seen above.
 			current_position = d3.mouse(this);
-			//console.log(current_position[0])
+			// console.log(current_position[0]);
 
-			current_state = nameById[d.id];
+			current_county = nameById[d.id];
 
 			tool_tip.show();
 			var tipSVG = d3.select('#tipDiv').append('svg').attr('width', 220).attr('height', 55);
 
 			tipSVG
-				.append('path')
-				.datum(
-					overdoses.filter(function(d) {
-						return nameById[d.id] == current_state;
-					})
-				)
-				.style('stroke', function() {
-					if (rateById[d.id] < 10) {
-						return 'grey';
-					} else {
-						return color(rateById[d.id]);
-					}
-				})
-				.style('stroke-width', 1.5)
-				.style('fill', 'none')
-				.attr('d', line);
-
-			tipSVG
 				.append('circle')
 				.attr('fill', function() {
-					if (rateById[d.id] < 10) {
-						return 'grey';
-					} else {
-						return color(rateById[d.id]);
-					}
+					return color(rateById[d.id]);
 				})
 				.attr('stroke', 'black')
-				.attr('cx', 130)
-				.attr('cy', y_tooltip(rateById[d.id]))
-				.attr('r', 3);
-
-			tipSVG
-				.append('text')
-				.text(rateById[d.id] + ' deaths')
-				// .transition()
-				// .duration(1000)
-				.attr('x', 140)
-				.attr('y', function() {
-					if (y_tooltip(rateById[d.id]) < 15) {
-						return 10;
-					} else {
-						return y_tooltip(rateById[d.id]) - 7;
-					}
+				.attr('cx', 180)
+				.attr('cy', 30)
+				.attr('r', function() {
+					return radius(rateById[d.id]);
 				});
 
 			tipSVG
 				.append('text')
-				.text('per 100,000')
-				// .transition()
-				// .duration(1000)
-				.attr('x', 140)
-				.attr('y', function() {
-					if (y_tooltip(rateById[d.id]) < 15) {
-						return 24;
+				.text(function() {
+					if (current_county == undefined) {
+						return '';
 					} else {
-						return y_tooltip(rateById[d.id]) + 7;
+						return rateById[d.id] + ' confirmed cases';
 					}
-				});
+				}) // .transition()
+				// .duration(1000)
+				.attr('x', 0)
+				.attr('y', 55);
 
 			tipSVG
 				.append('text')
-				.text(current_state)
+				.attr('class', 'county-name')
+				.text(function() {
+					if (current_county == undefined) {
+						return 'No cases';
+					} else {
+						return current_county + ' County';
+					}
+				})
 				// .transition()
 				// .duration(1000)
 				.attr('x', 0)
-				.attr('y', 15)
-				.style('font-size', 18)
-				.style('font-weight', 400);
+				.attr('y', 20);
 		})
 		.on('mouseout', tool_tip.hide)
-		.call(style, currentYear);
+		.call(style, currentDate);
 
-	// FOR BAR CHART //
-	//    .on('mouseover', function(d) {
-	//   tool_tip.show();
-	//   var tipSVG = d3.select("#tipDiv")
-	//     .append("svg")
-	//     .attr("width", 200)
-	//     .attr("height", 50);
-
-	//   tipSVG.append("rect")
-	//     .attr("fill", color(rateById[d.id]))
-	//     .attr("y", 10)
-	//     .attr("width", 0)
-	//     .attr("height", 30)
-	//     .transition()
-	//     .duration(1000)
-	//     .attr("width", rateById[d.id] * 6);
-
-	//   tipSVG.append("text")
-	//     .text(rateById[d.id] + " per 100,000")
-	//     .attr("x", 10)
-	//     .attr("y", 30)
-	//     .transition()
-	//     .duration(1000)
-	//     .attr("x", 6 + rateById[d.id] * 6)
-	// })
-	//   .on('mouseout', tool_tip.hide)
-	//    .call(style, currentYear)
-
-	function style(states, year) {
-		newoverdoses = interpolateData(year);
+	function style(counties, date) {
+		newoverdoses = interpolateData(date);
 
 		var rateById = {};
 		var nameById = {};
 
 		newoverdoses.forEach(function(d) {
-			// each state is encoded according to its ANSI/FIPS state code
-			// you can find states and their codes here https://en.wikipedia.org/wiki/List_of_U.S._state_abbreviations#ANSI_standard_INCITS_38:2009
-			rateById[d.id] = +d.rate;
-			nameById[d.id] = d.state;
-			d.year = d.year;
+			d.cases = +d.cases;
+			rateById[d.fips] = +d.cases;
+			nameById[d.fips] = d.county;
+			// d.date = d.date;
 		});
+
+		console.log(newoverdoses);
 
 		// add fill according to death rates, for each id (state)
-		states.style('fill', function(d) {
-			return color(rateById[d.id]);
+		counties.style('fill', function(d) {
+			if (rateById[d.id] != null) {
+				return color(rateById[d.id]);
+			} else {
+				return 'white';
+			}
 		});
-		// OLD TOOLTIP //
-		// .on("mouseover", function(d) {
-		//     div.transition()
-		//       .duration(200)
-		//       .style("opacity", .9);
 
-		// // add tooltip here
-		//     div.html('<strong> State: </strong>' + nameById[d.id] +
-		//       '<br>' +
-		//       '<strong> Year: </strong>' + Math.round(currentYear) +
-		//       '<br>' +
-		//       '<strong> Rate: </strong>' + rateById[d.id] + " per 100,000")
-		//       .style("left", (d3.event.pageX) + "px")
-		//       .style("top", (d3.event.pageY - 28) + "px");})
-		//  // remove tooltip on mouse out
-		//  .on("mouseout", function(d) {
-		//     div.transition()
-		//      .duration(500)
-		//      .style("opacity", 0);});
+		// create nation
+		svg
+			.append('path')
+			.datum(topojson.feature(us, us.objects.nation))
+			.attr('class', 'land')
+			.attr('d', path)
+			.attr('fill', 'none')
+			.attr('stroke', 'grey')
+			.attr('stroke-width', 0.2);
 
 		// create the actual state objects
 		svg
 			.append('path')
 			.datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
 			.attr('fill', 'none')
-			.attr('stroke', 'white')
-			// .attr("stroke-linejoin", "round")
+			.attr('stroke', 'grey')
+			.attr('stroke-width', 0.15)
+			.attr('stroke-linejoin', 'round')
 			.attr('d', path);
 	}
 
 	// after the transition finishes, mouseover to change  year.
 	function enableInteraction() {
-		var yearScale = d3
+		var dateScale = d3
 			.scaleLinear()
-			.domain([ 1999, 2017 ])
+			.domain(
+				d3.extent(overdoses, function(d) {
+					return new Date(d.date);
+				})
+			)
 			.range([ box.x + 10, box.x + box.width - 10 ])
 			.clamp(true);
 
@@ -426,30 +357,31 @@ function ready(error, us, overdoses) {
 			label.classed('active', false);
 		}
 		function mousemove() {
-			displayYear(yearScale.invert(d3.mouse(this)[0]));
+			displayDate(dateScale.invert(d3.mouse(this)[0]));
 		}
 	}
 
 	// Tweens the entire chart by first tweening the year, and then the data.
 	// For the interpolated data, the dots and label are redrawn.
-	function tweenYear() {
-		var year = d3.interpolateNumber(1999, 2017);
+	function tweenDate() {
+		var date = d3.interpolate(new Date('2020-01-22'), new Date('2020-03-26'));
 		return function(t) {
-			displayYear(year(t));
+			displayDate(date(t));
 		};
 	}
 
 	// Updates the display to show the specified year.
-	function displayYear(year) {
-		currentYear = year;
-		states.call(style, year);
-		label.text(Math.round(year));
+	function displayDate(date) {
+		currentDate = date;
+		counties.call(style, date);
+		label.text(dateFunctionNoYear(date));
 	}
 
 	// Interpolates the dataset for the given (fractional) year.
-	function interpolateData(year) {
+	function interpolateData(date) {
 		return overdoses.filter(function(row) {
-			return row['year'] == Math.round(year);
+			return row['date'] == dateFunction(date);
+			// return new Date(row.date) === new Date(date);
 		});
 	}
 }

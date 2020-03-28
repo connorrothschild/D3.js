@@ -9,18 +9,18 @@ html {
 }
 
 h1 {
-	font: 500 2.5em "Inter";
+	font: 500 200% "Inter";
 	text-align: center;
 }
 
 p {
-	font: 200 1em "Inter";
+	font: 200 100% "Inter";
 	text-align: center;
-	line-height: 0;
+	line-height: 0.5em;
 }
 
 footer {
-	font: 200 .9em "Inter";
+	font: 200 90% "Inter";
 	text-align: left;
 	margin-top: 2em;
 	border-style: solid;
@@ -96,8 +96,6 @@ a {
 	pointer-events: none !important;
 }
 
-/* .my_chart {
-	width: 90%;
-	padding-left: 15%;
-	padding-right: 10%;
-} */
+.county-name {
+	font-size: 150%;
+}

@@ -9,18 +9,18 @@ html {
 }
 
 h1 {
-	font: 500 2.5em "Inter";
+	font: 500 200% "Inter";
 	text-align: center;
 }
 
 p {
 	font: 200 1em "Inter";
 	text-align: center;
-	line-height: 0;
+	line-height: .5em;
 }
 
 footer {
-	font: 200 .9em "Inter";
+	font: 200 90% "Inter";
 	text-align: left;
 	margin-top: 2em;
 	border-style: solid;
