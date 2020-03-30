@@ -101,6 +101,7 @@ function renderChoropleth() {
 			d.cases = +d.cases;
 			rateById[d.fips] = +d.cases;
 			nameById[d.fips] = d.county;
+			stateById = d.state;
 		});
 
 		console.log(overdoses);
@@ -145,6 +146,7 @@ function renderChoropleth() {
 				// console.log(current_position[0]);
 
 				current_county = nameById[d.id];
+				current_state = stateById;
 
 				tool_tip.show();
 				var tipSVG = d3.select('#tipDiv').append('svg').attr('width', 220).attr('height', 55);
@@ -187,7 +189,22 @@ function renderChoropleth() {
 					// .transition()
 					// .duration(1000)
 					.attr('x', 0)
-					.attr('y', 20);
+					.attr('y', 18);
+
+				tipSVG
+					.append('text')
+					.attr('class', 'state-name')
+					.text(function() {
+						if (current_county == undefined) {
+							return '';
+						} else {
+							return current_state;
+						}
+					})
+					// .transition()
+					// .duration(1000)
+					.attr('x', 0)
+					.attr('y', 35);
 			})
 			.on('mouseout', tool_tip.hide);
 
@@ -357,6 +374,7 @@ function renderChoroplethOverTime() {
 			d.cases = +d.cases;
 			rateById[d.fips] = +d.cases;
 			nameById[d.fips] = d.county;
+			stateById = d.state;
 			d.date_old = d.date;
 			d.date = dateFunction(d.date);
 		});
@@ -418,6 +436,7 @@ function renderChoroplethOverTime() {
 				// console.log(current_position[0]);
 
 				current_county = nameById[d.id];
+				current_state = stateById;
 
 				tool_tip.show();
 				var tipSVG = d3.select('#tipDiv').append('svg').attr('width', 220).attr('height', 55);
@@ -460,7 +479,22 @@ function renderChoroplethOverTime() {
 					// .transition()
 					// .duration(1000)
 					.attr('x', 0)
-					.attr('y', 20);
+					.attr('y', 18);
+
+				tipSVG
+					.append('text')
+					.attr('class', 'state-name')
+					.text(function() {
+						if (current_county == undefined) {
+							return '';
+						} else {
+							return current_state;
+						}
+					})
+					// .transition()
+					// .duration(1000)
+					.attr('x', 0)
+					.attr('y', 35);
 			})
 			.on('mouseout', tool_tip.hide)
 			.call(style, currentDate);
@@ -545,7 +579,7 @@ function renderChoroplethOverTime() {
 		// Tweens the entire chart by first tweening the year, and then the data.
 		// For the interpolated data, the dots and label are redrawn.
 		function tweenDate() {
-			var date = d3.interpolate(new Date('2020-01-22'), new Date('2020-03-26'));
+			var date = d3.interpolate(new Date('2020-01-22'), new Date('2020-03-29'));
 			return function(t) {
 				displayDate(date(t));
 			};
@@ -620,6 +654,7 @@ function renderBubble() {
 			d.cases = +d.cases;
 			rateById[d.fips] = +d.cases;
 			nameById[d.fips] = d.county;
+			stateById[d.fips] = d.state;
 		});
 
 		counties = svg
@@ -637,14 +672,14 @@ function renderBubble() {
 		counties.style('fill', '#F2F2F2');
 
 		// create nation
-		states = svg
+		nation = svg
 			.append('path')
 			.datum(topojson.feature(us, us.objects.nation))
 			.attr('class', 'land')
 			.attr('d', path)
 			.attr('fill', 'none');
 
-		states.style('fill', '#F2F2F2');
+		nation.style('fill', '#F2F2F2');
 
 		// create states
 		states = svg
@@ -676,7 +711,11 @@ function renderBubble() {
 			})
 			.attr('fill', '#EB9898')
 			.attr('opacity', 0.4)
-			.attr('stroke', '#8b0000');
+			.attr('stroke', '#8b0000')
+			.on('mouseover', function(d) {
+				current_county = nameById[d.id];
+				console.log(current_county + ': ' + rateById[d.id]);
+			});
 	}
 }
 

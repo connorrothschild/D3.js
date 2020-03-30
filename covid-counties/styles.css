@@ -97,7 +97,8 @@ a {
 }
 
 .county-name {
-	font-size: 150%;
+	font-size: 120%;
+	font-weight: 500;
 }
 
 .button1 {
