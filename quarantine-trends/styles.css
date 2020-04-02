@@ -5,7 +5,7 @@
 }
 
 #group {
-	font-weight: bold;
+	font-weight: lighter;
 	/* font-size: 1.5em; */
 	color: #0000ff;
 	/* text-decoration: underline; */
@@ -38,7 +38,7 @@ x-axis text {
 }
 
 body {
-	display: flex;
+	/* display: flex; */
 	justify-content: center;
 	padding: 5em 1em;
 	font-family: sans-serif;

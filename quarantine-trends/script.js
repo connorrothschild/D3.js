@@ -11,9 +11,37 @@ let dimensions = {
 dimensions.boundedWidth = dimensions.width - dimensions.margin.left - dimensions.margin.right;
 dimensions.boundedHeight = dimensions.height - dimensions.margin.top - dimensions.margin.bottom;
 
-// 3. Draw canvas
+const svg = d3
+	.select('#my_dataviz')
+	.append('svg')
+	.attr('width', dimensions.width)
+	.attr('height', dimensions.height)
+	.call(responsivefy);
 
-const svg = d3.select('#my_dataviz').append('svg').attr('width', dimensions.width).attr('height', dimensions.height);
+function responsivefy(svg) {
+	// get container + svg aspect ratio
+	var container = d3.select(svg.node().parentNode),
+		width = parseInt(svg.style('width')),
+		height = parseInt(svg.style('height')),
+		aspect = width / height;
+
+	// add viewBox and preserveAspectRatio properties,
+	// and call resize so that svg resizes on inital page load
+	svg.attr('viewBox', '0 0 ' + width + ' ' + height).attr('perserveAspectRatio', 'xMinYMid').call(resize);
+
+	// to register multiple listeners for same event type,
+	// you need to add namespace, i.e., 'click.foo'
+	// necessary if you call invoke this function for multiple svgs
+	// api docs: https://github.com/mbostock/d3/wiki/Selections#on
+	d3.select(window).on('resize.' + container.attr('id'), resize);
+
+	// get width of container and resize svg to fit it
+	function resize() {
+		var targetWidth = parseInt(container.style('width'));
+		svg.attr('width', targetWidth);
+		svg.attr('height', Math.round(targetWidth / aspect));
+	}
+}
 
 const bounds = svg.append('g').attr('transform', `translate(${dimensions.margin.left}, ${dimensions.margin.top})`);
 
@@ -26,7 +54,6 @@ bounds
 	.attr('height', dimensions.boundedHeight);
 
 const clip = bounds.append('g').attr('clip-path', 'url(#bounds-clip-path)');
-
 //Read the data
 d3.csv('data-cleaning/data/final/data.csv', function(data) {
 	data.forEach(function(d) {
@@ -137,13 +164,6 @@ d3.csv('data-cleaning/data/final/data.csv', function(data) {
 			return 'end';
 		}
 	});
-
-	// .selectAll('text')
-	// .attr('class', 'text')
-	// .attr('dy', '.5em')
-	// .attr('dx', '.5em')
-	// .attr('transform', 'rotate(45)')
-	// .style('text-anchor', 'start');
 
 	// Add Y axis
 	const y = d3.scaleLinear().domain([ 0, 100 ]).range([ dimensions.boundedHeight, 0 ]);
