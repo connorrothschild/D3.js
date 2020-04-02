@@ -41,11 +41,17 @@ d3.csv('data-cleaning/data/final/data.csv', function(data) {
 		d.how_to_cut_your_own_hair_united_states = +d.how_to_cut_your_own_hair_united_states;
 		d.at_home_workout_united_states = +d.at_home_workout_united_states;
 		d.can_i_see_my_boyfriend_during_social_distancing_united_states = +d.can_i_see_my_boyfriend_during_social_distancing_united_states;
-		d.zoom_worldwide = +d.zoom_worldwide;
+		d.zoom_united_states = +d.zoom_united_states;
 		d.work_from_home_united_states = +d.work_from_home_united_states;
 		d.delivery_united_states = +d.delivery_united_states;
 		d.buy_gun_united_states = +d.buy_gun_united_states;
 		d.hydroxychloroquine_united_states = +d.hydroxychloroquine_united_states;
+		d.i_cant_smell_united_states = +d.hydroxychloroquine_united_states;
+		d.lysol_united_states = +d.lysol_united_states;
+		d.can_landlords_evict_tenants_united_states = +d.can_landlords_evict_tenants_united_states;
+		d.wine_delivery_service_united_states = +d.wine_delivery_service_united_states;
+		d.contagion_united_states = +d.contagion_united_states;
+		// d.dog_coronavirus_united_states = +d.dog_coronavirus_united_states;
 	});
 
 	const xAccessor = (d) => new Date(d.week);
@@ -65,11 +71,16 @@ d3.csv('data-cleaning/data/final/data.csv', function(data) {
 		'how_to_cut_your_own_hair_united_states',
 		'at_home_workout_united_states',
 		'can_i_see_my_boyfriend_during_social_distancing_united_states',
-		'zoom_worldwide',
+		'zoom_united_states',
 		'work_from_home_united_states',
 		'delivery_united_states',
 		'buy_gun_united_states',
-		'hydroxychloroquine_united_states'
+		'hydroxychloroquine_united_states',
+		'i_cant_smell_united_states',
+		'lysol_united_states',
+		'can_landlords_evict_tenants_united_states',
+		'wine_delivery_service_united_states',
+		'contagion_united_states'
 	];
 
 	// add the options to the button
@@ -80,34 +91,59 @@ d3.csv('data-cleaning/data/final/data.csv', function(data) {
 		.enter()
 		.append('option')
 		.text(function(d) {
-			return d.replace(/_/g, ' ').replace('united states', '').replace('worldwide', '');
+			return d.replace(/_/g, ' ').replace('united states', '');
 		}) // text showed in the menu
 		.attr('value', function(d) {
 			return d;
 		}); // corresponding value returned by the button
 
+	svg
+		.append('text')
+		.attr('id', 'click-me')
+		.attr('x', dimensions.width * 0.98)
+		.attr('y', dimensions.boundedHeight)
+		.text('Click the chart to update!')
+		.style('text-anchor', 'end');
+
 	// A color scale: one color for each group
 	var myColor = d3.scaleOrdinal().domain(allGroup).range(d3.schemeSet2);
 
 	var mindate = new Date('2019-04-07'),
-		maxdate = new Date('2020-03-14');
+		maxdate = new Date('2020-03-29');
+
+	var ticks = [ mindate, maxdate ];
+	var tickLabels = [ 'April 2019', 'April 2020' ];
 
 	var x = d3
 		.scaleTime()
 		.domain([ mindate, maxdate ]) // values between for month of january
 		.range([ 0, dimensions.boundedWidth ]);
 
-	bounds
+	var xAxisGenerator = d3.axisBottom(x);
+
+	xAxisGenerator.tickValues(ticks).tickFormat(function(d, i) {
+		return tickLabels[i];
+	});
+
+	var xAxis = bounds
 		.append('g')
 		.attr('transform', 'translate(0,' + dimensions.boundedHeight + ')')
-		.call(d3.axisBottom(x))
-		.attr('class', 'x axis')
-		.selectAll('text')
-		.attr('class', 'text')
-		.attr('dy', '.5em')
-		.attr('dx', '.5em')
-		.attr('transform', 'rotate(45)')
-		.style('text-anchor', 'start');
+		.call(xAxisGenerator);
+
+	xAxis.selectAll('text').attr('font-size', '2em').style('text-anchor', function(d, i) {
+		if (tickLabels[i] == 'April 2019') {
+			return 'start';
+		} else {
+			return 'end';
+		}
+	});
+
+	// .selectAll('text')
+	// .attr('class', 'text')
+	// .attr('dy', '.5em')
+	// .attr('dx', '.5em')
+	// .attr('transform', 'rotate(45)')
+	// .style('text-anchor', 'start');
 
 	// Add Y axis
 	const y = d3.scaleLinear().domain([ 0, 100 ]).range([ dimensions.boundedHeight, 0 ]);
@@ -160,17 +196,18 @@ d3.csv('data-cleaning/data/final/data.csv', function(data) {
 
 	svg.on('click', function() {
 		selectedGroup = allGroup[Math.floor(Math.random() * allGroup.length)];
-		console.log(selectedGroup);
 		update(selectedGroup);
 
-		url = selectedGroup.replace(/_/g, '+').replace('united+states', '').replace('worldwide', '');
+		tooltip.style('opacity', 0);
+		tooltipCircle.style('opacity', 0);
 
-		d3
-			.select('#group')
-			.text(selectedGroup.replace(/_/g, ' ').replace('united states', '').replace('worldwide', ''))
-			.on('click', function() {
-				window.open('https://www.google.com/search?client=firefox-b-1-d&q=' + url);
-			});
+		url = selectedGroup.replace(/_/g, '+').replace('united+states', '');
+
+		d3.select('#group').text(selectedGroup.replace(/_/g, ' ').replace('united states', '')).on('click', function() {
+			window.open('https://www.google.com/search?client=firefox-b-1-d&q=' + url);
+		});
+
+		d3.select('#click-me').transition().duration(1000).style('opacity', 0);
 	});
 
 	function onMouseMove(mousePosition, data) {
@@ -184,7 +221,7 @@ d3.csv('data-cleaning/data/final/data.csv', function(data) {
 		const closestXValue = xAccessor(closestDataPoint);
 		const closestYValue = yAccessor(closestDataPoint);
 
-		const formatDate = d3.timeFormat('%A, %B %-d, %Y');
+		const formatDate = d3.timeFormat('%B %-d, %Y');
 		tooltip.select('#date').text(formatDate(closestXValue));
 
 		tooltip.select('#interest').text(closestYValue);
@@ -192,7 +229,7 @@ d3.csv('data-cleaning/data/final/data.csv', function(data) {
 		const xTip = x(closestXValue) + dimensions.margin.left;
 		const yTip = y(closestYValue) + dimensions.margin.top;
 
-		tooltip.style('transform', `translate(` + `calc(-50% + ${xTip}px),` + `calc(-100% + ${yTip}px)` + `)`);
+		tooltip.style('transform', `translate(` + `calc(-50% + ${xTip}px),` + `calc(${yTip}px)` + `)`);
 
 		tooltip.style('opacity', 1);
 
@@ -250,7 +287,7 @@ d3.csv('data-cleaning/data/final/data.csv', function(data) {
 				const closestXValue = xAccessor(closestDataPoint);
 				const closestYValue = yAccessor2(closestDataPoint);
 
-				const formatDate = d3.timeFormat('%A, %B %-d, %Y');
+				const formatDate = d3.timeFormat('%B %-d, %Y');
 				tooltip.select('#date').text(formatDate(closestXValue));
 
 				tooltip.select('#interest').text(closestYValue);
@@ -258,7 +295,7 @@ d3.csv('data-cleaning/data/final/data.csv', function(data) {
 				const xTip = x(closestXValue) + dimensions.margin.left;
 				const yTip = y(closestYValue) + dimensions.margin.top;
 
-				tooltip.style('transform', `translate(` + `calc(-50% + ${xTip}px),` + `calc(-100% + ${yTip}px)` + `)`);
+				tooltip.style('transform', `translate(` + `calc(-50% + ${xTip}px),` + `calc(${yTip}px)` + `)`);
 
 				tooltip.style('opacity', 1);
 
@@ -266,12 +303,4 @@ d3.csv('data-cleaning/data/final/data.csv', function(data) {
 			})
 			.on('mouseleave', onMouseLeave);
 	}
-
-	// When the button is changed, run the updateChart function
-	d3.select('#selectButton').on('change', function(d) {
-		// recover the option that has been chosen
-		var selectedOption = d3.select(this).property('value');
-		// run the updateChart function with this selected option
-		update(selectedOption);
-	});
 });

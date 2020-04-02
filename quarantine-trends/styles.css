@@ -4,31 +4,33 @@
 	font-family: "Inter", sans-serif;
 }
 
-#selectButton {
-	position: relative;
-}
-
 #group {
 	font-weight: bold;
-	font-size: 1.5em;
+	/* font-size: 1.5em; */
 	color: #0000ff;
-	text-decoration: underline;
+	/* text-decoration: underline; */
+	background-color: rgb(230, 230, 230);
+	/* border: 1px solid; */
+	padding: 3px;
 	cursor: pointer;
+}
+
+p {
+	margin-left: 5%;
+	font-size: 1.25em;
 }
 
 a {
 	color: #0000ff;
-	text-decoration: underline;
+	text-decoration: none;
 }
 
 .my_dataviz {
 	position: relative;
 }
 
-.line {
-	fill: none;
-	stroke: #af9358;
-	stroke-width: 2;
+x-axis text {
+	font-size: 2em;
 }
 
 .listening-rect {
