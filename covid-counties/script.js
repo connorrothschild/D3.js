@@ -579,7 +579,7 @@ function renderChoroplethOverTime() {
 		// Tweens the entire chart by first tweening the year, and then the data.
 		// For the interpolated data, the dots and label are redrawn.
 		function tweenDate() {
-			var date = d3.interpolate(new Date('2020-01-22'), new Date('2020-03-29'));
+			var date = d3.interpolate(new Date('2020-01-22'), new Date('2020-4-21'));
 			return function(t) {
 				displayDate(date(t));
 			};
