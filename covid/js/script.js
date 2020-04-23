@@ -22,7 +22,7 @@ window.onload = function() {
 	var numCountries = 50;
 
 	// d3.json('testing-data/countries.json', function(data) {
-	d3.json('https://corona.lmao.ninja/countries', function(data) {
+	d3.json('https://corona.lmao.ninja/v2/countries', function(data) {
 		csv = data;
 
 		data.sort(function(x, y) {
