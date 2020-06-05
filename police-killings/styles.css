@@ -1,34 +1,23 @@
-@import url('https://rsms.me/inter/inter.css');
-html {
-	font-family: 'Inter', sans-serif;
-}
-@supports (font-variation-settings: normal) {
-	html {
-		font-family: 'Inter var', sans-serif;
-	}
-}
-
 body {
 	margin: 0;
-	/* position: fixed; */
 	top: 0;
 	right: 0;
 	bottom: 0;
 	left: 0;
-	font-family: 'Inter', sans-serif;
+	font-family: 'Montserrat', sans-serif;
 	background-color: white;
-	/* background-color: #f1f2f6; */
 }
 
 .button {
 	margin-top: 5px;
 	min-width: 130px;
 	padding: 5px 5px;
-	cursor: poInter;
+	cursor: pointer;
 	text-align: center;
 	font-size: 13px;
 	border: 1px solid #e0e0e0;
 	text-decoration: none;
+	font-family: 'Montserrat', sans-serif;
 }
 
 #toolbar {
@@ -47,9 +36,9 @@ body {
 	text-align: left;
 	padding: 4px;
 	/* font-size: 12px; */
-	font-family: 'Inter', sans-serif;
+	font-family: 'Montserrat', sans-serif;
 	border-radius: 8px;
-	poInter-events: none;
+	pointer-events: none;
 	border: 1px solid #e0e0e0;
 	display: block;
 }
@@ -68,8 +57,13 @@ body {
 	border-bottom-style: medium;
 	border-bottom-width: 2px;
 	border-bottom-color: black;
-	/* max-width: 800px; */
 	font-weight: 100;
+	width: 350px;
+}
+
+.mini {
+	font-size: 1em;
+	width: 150px;
 }
 
 a {
@@ -82,12 +76,14 @@ a {
 	font-weight: normal;
 	text-align: center;
 }
+
 .subtitle {
 	font-size: 16px;
 	margin: 0px 25px;
 	font-weight: normal;
 	text-align: center;
 }
+
 .thirdtitle {
 	font-size: 14px;
 	margin: 10px 25px;
@@ -100,6 +96,15 @@ a {
 	font-size: 11px;
 }
 
+#stateText {
+	color: grey;
+	opacity: .8;
+}
+
+select:invalid {
+	color: gray;
+}
+
 @media only screen and (max-width: 1000px) {
 	.titleText {
 		font-size: 18px;
@@ -107,12 +112,14 @@ a {
 		font-weight: normal;
 		text-align: center;
 	}
+
 	.subtitle {
 		font-size: 14px;
 		margin: 0px 25px;
 		font-weight: normal;
 		text-align: center;
 	}
+
 	.thirdtitle {
 		font-size: 11px;
 		margin: 10px 25px;
@@ -120,6 +127,7 @@ a {
 		color: #1b1b1b;
 		text-align: center;
 	}
+
 	.dropdown {
 		text-align-last: left;
 		padding-left: 10px;
@@ -134,8 +142,25 @@ a {
 		border-bottom-style: medium;
 		border-bottom-width: 2px;
 		border-bottom-color: black;
-		/* max-width: 800px; */
+		/* min-width: fit-content; */
+		/* display: inline-block; */
 		font-weight: 100;
+	}
+
+	.button {
+		margin-top: 5px;
+		min-width: 50px;
+		padding: 2px 2px;
+		cursor: pointer;
+		text-align: center;
+		font-size: 8px;
+		border: .5px solid #e0e0e0;
+		text-decoration: none;
+		font-family: 'Montserrat', sans-serif;
+	}
+
+	.title {
+		font-size: 8px;
 	}
 }
 
@@ -147,7 +172,7 @@ a {
 } */
 
 footer {
-	font: 200 12px "Inter";
+	font: 200 12px "Montserrat";
 	text-align: left;
 	margin-top: 0em;
 	border-style: solid;
@@ -161,7 +186,7 @@ footer {
 	border-width: 0px 0px 1px 0px;
 	padding: 6px 0px 6px 6px;
 	overflow: hidden;
-	font: 200 .9em "Inter";
+	font: 200 .9em "Montserrat";
 	position: -webkit-sticky;
 	position: sticky;
 	top: 0;

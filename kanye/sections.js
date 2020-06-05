@@ -116,21 +116,8 @@ var scrollVis = function() {
 		console.log(data);
 		console.log(reduced);
 		console.log(averages_data);
-		// axis
 
-		tip = d3.select('#vis').append('g').attr('class', 'tip').attr('opacity', 0);
-
-		var album_names = jz.arr.sortBy(averages_data, 'danceability', 'desc');
-
-		y.domain(
-			album_names.map(function(d) {
-				return d.album_name;
-			})
-		);
-		x.domain([ 0, 1 ]);
-		x_axis.tickSizeInner(-height + y.bandwidth() / 2 - 3);
-
-		// g.append('text').attr('class', 'title').attr('x', width / 2).attr('y', height / 3).text('TESTING');
+		// images //
 
 		g
 			.append('svg:image')
@@ -151,6 +138,22 @@ var scrollVis = function() {
 			.attr('height', 400)
 			.attr('xlink:href', 'images/albums.png')
 			.attr('opacity', 0);
+
+		// beeswarm //
+
+		tip = d3.select('#vis').append('g').attr('class', 'tip').attr('opacity', 0);
+
+		var album_names = jz.arr.sortBy(averages_data, 'danceability', 'desc');
+
+		y.domain(
+			album_names.map(function(d) {
+				return d.album_name;
+			})
+		);
+		x.domain([ 0, 1 ]);
+		x_axis.tickSizeInner(-height + y.bandwidth() / 2 - 3);
+
+		// g.append('text').attr('class', 'title').attr('x', width / 2).attr('y', height / 3).text('TESTING');
 
 		g
 			.append('g')
@@ -192,23 +195,23 @@ var scrollVis = function() {
 
 		draw();
 
-		window.addEventListener('resize', function() {
-			// all of these things need to be updated on resize
-			width = +jz.str.keepNumber(d3.select('svg').style('width')) - margin.left - margin.right;
+		// window.addEventListener('resize', function() {
+		// 	// all of these things need to be updated on resize
+		// 	width = +jz.str.keepNumber(d3.select('svg').style('width')) - margin.left - margin.right;
 
-			d3
-				.select('.axis.y.right')
-				.attr('transform', 'translate(' + width + ', 0)')
-				.call(y_axis_right.tickSizeInner(-width));
+		// 	d3
+		// 		.select('.axis.y.right')
+		// 		.attr('transform', 'translate(' + width + ', 0)')
+		// 		.call(y_axis_right.tickSizeInner(-width));
 
-			x.rangeRound([ 0, width ]);
+		// 	x.rangeRound([ 0, width ]);
 
-			forceSim();
+		// 	forceSim();
 
-			d3.select('.x.axis').call(x_axis);
+		// 	d3.select('.x.axis').call(x_axis);
 
-			draw();
-		});
+		// 	draw();
+		// });
 
 		function draw() {
 			// color = d3
@@ -375,10 +378,10 @@ var scrollVis = function() {
 		activateFunctions[5] = focusKillingYou;
 		activateFunctions[6] = focusKillingYou;
 		activateFunctions[7] = focusBreatheIn;
-		activateFunctions[8] = showBar;
-		activateFunctions[9] = focusJesusIsKing;
+		activateFunctions[8] = focusBreatheIn;
+		activateFunctions[9] = showBar;
 		activateFunctions[10] = splitSongs;
-		activateFunctions[11] = focusJesusIsKing;
+		activateFunctions[11] = showBar;
 		// activateFunctions[12] = focusJesusIsKing;
 		// activateFunctions[13] = focusJesusIsKing;
 
@@ -817,8 +820,7 @@ var scrollVis = function() {
 	/**
    * showBar - barchart
    *
-   * hides: square grid
-   * hides: histogram
+   * hides: beeswarm
    * shows: barchart
    *
    */
@@ -847,44 +849,40 @@ var scrollVis = function() {
 			// 	left   : 150
 			// };
 
-			// var w = window.innerWidth * 0.9;
-			// var h = window.innerHeight * 0.9;
+			// var margin = { top: radius * 5 + 30, left: 170, bottom: 50, right: 40 },
+			// 	width = 900 - margin.left - margin.right,
+			// 	// width = +jz.str.keepNumber(d3.select('#vis').style('width')) - margin.left - margin.right,
+			// 	height = 600 - margin.top - margin.bottom;
 
-			// var width = w - margin.left - margin.right,
-			// 	height = h - margin.top - margin.bottom;
-
-			// var svg = d3
-			// 	.select('#graphic')
+			// svg = d3
+			// 	.select('#vis')
 			// 	.append('svg')
 			// 	.attr('width', width + margin.left + margin.right)
 			// 	.attr('height', height + margin.top + margin.bottom)
 			// 	.append('g')
 			// 	.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-			var xBarScale = d3.scale.linear().range([ 0, width ]).domain([
+			var xBarScale = d3.scaleLinear().range([ 0, width ]).domain([
 				0,
 				d3.max(data, function(d) {
 					return d.valence;
 				})
 			]);
 
-			var yBarScale = d3.scale.ordinal().rangeRoundBands([ height, 0 ], 0.05).domain(
+			var yBarScale = d3.scaleBand().rangeRound([ height, 0 ], 0.05).domain(
 				data.map(function(d) {
 					return d.track_name;
 				})
 			);
 
 			//make y axis to show bar names
-			var yAxisBar = d3.svg
-				.axis()
-				.scale(yBarScale)
-				//no tick marks
-				.tickSize(0)
-				.orient('left');
+			var yAxisBar = d3.axisLeft().scale(yBarScale).tickSize(0);
 
-			var gy = svg.append('g').attr('class', 'y axis').call(yAxis);
+			var gy = svg.append('g').attr('class', 'y axis').call(yAxisBar);
 
 			var bars = svg.selectAll('.bar').data(data).enter().append('g');
+
+			console.log(bars);
 
 			//append rects
 			bars
@@ -893,7 +891,7 @@ var scrollVis = function() {
 				.attr('y', function(d) {
 					return yBarScale(d.track_name);
 				})
-				.attr('height', y.rangeBand())
+				.attr('height', y.bandwidth())
 				.attr('x', 0)
 				.attr('width', 0)
 				.transition()
@@ -908,18 +906,20 @@ var scrollVis = function() {
 				.attr('class', 'label')
 				//y position of the label is halfway down the bar
 				.attr('y', function(d) {
-					return yBarScale(d.track_name) + y.rangeBand() / 2 + 4;
+					return yBarScale(d.track_name) + y.bandwidth() / 2 + 4;
 				})
 				.attr('x', 0)
 				.transition()
 				.duration(1000)
 				//x position is 3 pixels to the right of the bar
 				.attr('x', function(d) {
-					return x(d.valence) + 5;
+					return xBarScale(d.valence) + 5;
 				})
 				.text(function(d) {
 					return d.valence;
 				});
+
+			console.log(bars);
 		});
 
 		// // OLD
