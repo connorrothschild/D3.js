@@ -61,18 +61,23 @@
 
 		</div>
 
-		<div id='graphic'>
-			<div id='sections'>
-				<section class="step">
+			<section id='scroll'>
+				<!-- graphics -->
+				<div class='scroll__graphic sticky'>
+					<div class="plotArea is-active" id="chart"></div>
+					<div class="plotArea" id="mapPlot"></div>
+				</div>
+				<div class="scroll__text">
+					<div class='step is-active' data-step='0'>
 					<h2> Kanye West</h2>
 					<p class="prose">
 						Kanye West is a perplexing figure. His persona and personality have been the subject of
 						interviews, books, podcasts, and documentaries.
 					</p>
+				</div>
 
-				</section>
-				<section class="step">
-					<!-- <h2> Who is Kanye?</h2> -->
+				<div class='step' data-step='0'>
+					<h2> Who is Kanye?</h2>
 					<p class="prose">
 						We know Kanye has changed. But what about his music?
 						<br><br>Using audio features from the Spotify API, we can take a look at each song in Kanye's
@@ -87,9 +92,9 @@
 							<li>Valence</li>
 						</ul>
 					</p>
-				</section>
+				</div>
 
-				<section class="step">
+				<div class='step' data-step='1'>
 					<h2> Acousticness</h2>
 					<p class="prose">
 						Lorem ipsum dolor sit amet, sale ullum vivendo eos ei, nemore delectus an ius. Ei dolore admodum
@@ -99,8 +104,8 @@
 						persecuti ut vis. Mei ne nonumes facilis, ut dolor graecis corpora pri. Facilisi interpretaris
 						vituperatoribus ei vis. Id vis omnes utinam, vero numquam ea usu. Ei diceret explicari
 						vituperata has, ponderum eloquentiam eu est. Vel te bonorum mediocritatem.
-				</section>
-				<section class="step">
+					</div>
+					<div class='step' data-step='2'>
 					<h2> Danceability</h2>
 					<p class="prose">
 						Lorem ipsum dolor sit amet, sale ullum vivendo eos ei, nemore delectus an ius. Ei dolore admodum
@@ -110,8 +115,8 @@
 						persecuti ut vis. Mei ne nonumes facilis, ut dolor graecis corpora pri. Facilisi interpretaris
 						vituperatoribus ei vis. Id vis omnes utinam, vero numquam ea usu. Ei diceret explicari
 						vituperata has, ponderum eloquentiam eu est. Vel te bonorum mediocritatem.
-				</section>
-				<section class="step">
+					</div>
+					<div class='step' data-step='3'>
 					<h2> Valence</h2>
 					<p class="prose">
 						Lorem ipsum dolor sit amet, sale ullum vivendo eos ei, nemore delectus an ius. Ei dolore admodum
@@ -121,8 +126,8 @@
 						persecuti ut vis. Mei ne nonumes facilis, ut dolor graecis corpora pri. Facilisi interpretaris
 						vituperatoribus ei vis. Id vis omnes utinam, vero numquam ea usu. Ei diceret explicari
 						vituperata has, ponderum eloquentiam eu est. Vel te bonorum mediocritatem.
-				</section>
-				<section class="step">
+					</div>
+					<div class='step' data-step='4'>
 					<!-- <h2> I Thought About Killing You</h2> -->
 					<p class="prose">
 						Certain songs are darker than others. The first track on Kanye's 2018 album 'Ye' has a valence
@@ -132,8 +137,8 @@
 						<br><br>When the <em>most positive</em> song on your album is called 'I Thought About Killing
 						You,' that's probably a good indication of your album's valence.
 					</p>
-				</section>
-				<section class="step">
+					</div>
+					<div class='step' data-step='5'>
 					<div class="blockquote">
 						<h1>
 							I love myself way more than I love you<br>
@@ -143,12 +148,10 @@
 						</h1>
 						<h4>&mdash; Kanye West,<br><em>I Thought About Killing You</em></h4>
 					</div>
-				</section>
+				</div>
 				<!-- <blockquote class='rg_standalone_container' data-src='//genius.com/annotations/14696275/standalone_embed'><a href='https://genius.com/14696275/Kanye-west-violent-crimes/Fallin-dreamin-talkin-in-your-sleep-i-know-you-want-to-cry-all-night-all-night-plottin-schemin-findin-reason-to-defend-all-of-your-violent-nights-promise-me-you-will-see'>Fallin&#39;, dreamin&#39;, talkin&#39; in your sleep&lt;br&gt; I know you want to cry all night, all night&lt;br&gt; Plottin&#39;, schemin&#39;, findin&#39;&lt;br&gt; Reason to defend all of your violent nights&lt;br&gt; Promise me you will see</a><br><a href='https://genius.com/Kanye-west-violent-crimes-lyrics'>&#8213; Kanye West – Violent Crimes</a></blockquote><script async crossorigin src='//genius.com/annotations/load_standalone_embeds.js'></script> -->
-				</p>
 				<!-- <blockquote class='rg_standalone_container' data-src='//genius.com/annotations/14692046/standalone_embed'><a href='https://genius.com/14692046/Kanye-west-i-thought-about-killing-you/I-thought-about-killing-you'>I Thought About Killing You</a><br><a href='https://genius.com/Kanye-west-i-thought-about-killing-you-lyrics'>&#8213; Kanye West – I Thought About Killing You</a></blockquote><script async crossorigin src='//genius.com/annotations/load_standalone_embeds.js'></script> -->
-				</section>
-				<section class="step">
+				<div class='step' data-step='6'>
 					<!-- <h2> Other songs are... happier</h2> -->
 					<p class="prose">
 						Other songs are happier. <br><br>
@@ -158,33 +161,11 @@
 							Dropout</em>. As with most songs on the album, it's a more jovial track. In it, Kanye
 						discusses what he perceives to be the lifestyle of a rapper: cars, money, and fame.
 					</p>
-				</section>
-				<section class="step">
-					<h2> Lyrics</h2>
-					<p class="prose"> Content </p>
+				</div>
+				</div>
 				</section>
 
-				<section class="step">
-					<h2> Title</h2>
-					<p class="prose"> Content </p>
-				</section>
-
-				<section class="step">
-					<h2> Title</h2>
-					<p class="prose"> Content </p>
-				</section>
-
-			</div>
-			<div id='vis'>
-			</div>
-			
-			</div>
-			<div id='vis2'>
-			</div>
-
-		</div>
-		</div>
-		<div id="ending">
+		<section id="ending">
 			<div id="conclusion">
 				<p class="prose">
 					Concluding text. Concluding text. Concluding text. Concluding text. Concluding text. Concluding
@@ -200,21 +181,27 @@
 				<p class="prose"> Data comes from <a>here</a>.</p>
 			</div>
 
-		</div>
+		</section>
+
 	</main>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<script src="https://d3js.org/d3.v5.min.js"></script>
 	<script sync src="https://platform.twitter.com/widgets.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.5/d3-legend.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
 	<script src="https://unpkg.com/d3-moveto@0.0.3/build/d3-moveto.min.js"></script>
 	<script src="https://unpkg.com/jeezy@1.12.13/lib/jeezy.min.js"></script>
 	<script src="https://d3js.org/d3-voronoi.v1.min.js"></script>
+	<script src="js/libraries/stickyfill.min.js"></script>
+	<script src='https://unpkg.com/intersection-observer@0.5.0/intersection-observer.js'></script>
+	<script src='https://unpkg.com/scrollama'></script>
 
-	<script src="sections.js"></script>
-	<script src="scroller.js"></script>
-	<script src="index.js"></script>
-	<script src="bars/bars.js"></script>
+	<!-- Internals -->
+
+	<script type="text/javascript" src="js/00-init.js"></script>
+	<script type="text/javascript" src="js/01-barChartValence.js"></script>
+	<script type="text/javascript" src="js/02-barChartAcousticness.js"></script>
+	<script type="text/javascript" src="js/index.js"></script>
 
 </body>
 
