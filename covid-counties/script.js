@@ -61,7 +61,7 @@ function renderChoropleth() {
 		return formatTime(new Date(date));
 	}
 
-	var radius = d3.scaleSqrt().domain([ 0, 5000 ]).range([ 0, 25 ]);
+	var radius = d3.scaleSqrt().range([ 0, 25 ]);
 
 	const logScale = d3.scaleLog().domain([ 10, 10000 ]);
 
@@ -105,6 +105,7 @@ function renderChoropleth() {
 		});
 
 		console.log(overdoses);
+		radius.domain([ 0, d3.max(overdoses, (d) => d.cases) ]);
 
 		var tool_tip = d3
 			.tip()
@@ -301,7 +302,7 @@ function renderChoroplethOverTime() {
 		return formatTime(new Date(date));
 	}
 
-	var radius = d3.scaleSqrt().domain([ 0, 5000 ]).range([ 0, 25 ]);
+	var radius = d3.scaleSqrt().range([ 0, 25 ]);
 
 	// options for color scheme: https://github.com/d3/d3-scale-chromatic
 	var colorScheme = d3.schemeBlues[5];
@@ -613,7 +614,7 @@ function renderBubble() {
 	var svg = d3.select('svg').attr('class', 'my_chart').attr('height', 600).attr('width', 960).call(responsivefy);
 
 	var path = d3.geoPath();
-	var radius = d3.scaleSqrt().domain([ 0, 5000 ]).range([ 0, 50 ]);
+	var radius = d3.scaleSqrt().range([ 0, 50 ]);
 	var format = d3.format('');
 	var height = 600;
 	var width = 960;
@@ -656,6 +657,8 @@ function renderBubble() {
 			nameById[d.fips] = d.county;
 			stateById[d.fips] = d.state;
 		});
+
+		radius.domain([ 0, d3.max(covid_data, (d) => d.cases) ]);
 
 		counties = svg
 			.append('g')

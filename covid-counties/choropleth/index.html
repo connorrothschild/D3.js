@@ -8,7 +8,7 @@
   <meta name="twitter:card" content="summary_large_image" >
   <meta name="twitter:site" content="@CL_Rothschild" >
   <meta name="twitter:creator" content="@CL_Rothschild" >
-  <meta name="twitter:title" content="Reported COVID-19 Cases, Over Time" >
+  <meta name="twitter:title" content="Reported COVID-19 Cases in the United States >
   <meta name="twitter:description" content="Cumulative counts of COVID-19 cases, by county." >
   <meta name="twitter:image" content="https://raw.githubusercontent.com/connorrothschild/D3.js/master/covid-counties/choropleth/img/thumbnail.jpg" >
 
@@ -25,12 +25,17 @@
       <article>
 
         <h1>Coronavirus Cases in the U.S.</h1>
-        <p>By <a href = "https://connorrothschild.github.io">Connor Rothschild</a></p><p>Last updated March 28, 2020</p>
+        <p>By <a href = "https://connorrothschild.github.io">Connor Rothschild</a></p><p>Last updated September 2, 2020</p>
+        <p>
+          <button class = "button1" onclick="renderChoropleth()">Choropleth</button>
+          <button class = "button1" onclick="renderChoroplethOverTime()">Animated Choropleth</button>
+          <button class = "button1" onclick="renderBubble()">Bubble</button>
+        </p>
         <svg width="960" height="600"></svg>
 
         <footer>
 	     <b>Source:</b> The New York Times. Available on Github at <a href="https://github.com/nytimes/covid-19-data" target="_blank">https://github.com/nytimes/covid-19-data.</a><br><br>
-	     Source code available <a href="https://github.com/connorrothschild/D3.js/tree/master/covid-counties/choropleth" target="_blank">here.</a></footer>
+	     Source code available <a href="https://github.com/connorrothschild/D3.js/tree/master/covid-counties/" target="_blank">here.</a></footer>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
 

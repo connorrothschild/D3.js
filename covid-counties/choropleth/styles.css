@@ -1,7 +1,9 @@
 @import url('https://rsms.me/inter/inter.css');
+
 html {
 	font-family: 'Inter', sans-serif;
 }
+
 @supports (font-variation-settings: normal) {
 	html {
 		font-family: 'Inter var', sans-serif;
@@ -97,5 +99,33 @@ a {
 }
 
 .county-name {
-	font-size: 150%;
+	font-size: 120%;
+	font-weight: 500;
+}
+
+.button1 {
+	display: inline-block;
+	padding: 0.35em 1.2em;
+	border: 0.1em solid #ffffff;
+	margin: 0 2px 2px 0;
+	border-radius: 0.12em;
+	box-sizing: border-box;
+	text-decoration: none;
+	font-family: 'Inter', sans-serif;
+	font-weight: 300;
+	color: #000000;
+	text-align: center;
+	transition: all .5s;
+}
+
+.button1:hover {
+	color: #ffffff;
+	background-color: darkred;
+}
+
+@media all and (max-width: 30em) {
+	.button1 {
+		display: block;
+		margin: 0.4em auto;
+	}
 }

@@ -9,7 +9,7 @@ data <- readxl::read_excel(here::here("data/uncleaned_data.xlsx"))
 data <- data %>% 
   rename("Date" = `Date of Incident (month/day/year)`,
          "Link" = `Link to news article or photo of official document`,
-         "Armed Status" = `Unarmed`, 
+         "Armed Status" = `Unarmed/Did Not Have an Actual Weapon`, 
          "Age" = `Victim's age` , 
          "Race" = `Victim's race`, 
          "Sex" = `Victim's gender`, 
