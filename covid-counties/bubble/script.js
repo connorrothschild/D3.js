@@ -101,7 +101,7 @@ function renderChoropleth() {
 			d.cases = +d.cases;
 			rateById[d.fips] = +d.cases;
 			nameById[d.fips] = d.county;
-			stateById = d.state;
+			// stateById[d.fips] = d.state;
 		});
 
 		console.log(overdoses);
@@ -144,10 +144,12 @@ function renderChoropleth() {
 				// define and store the mouse position. this is used to define
 				// tooltip offset, seen above.
 				current_position = d3.mouse(this);
+				// current_data = this;
+				// console.log(current_data);
 				// console.log(current_position[0]);
 
 				current_county = nameById[d.id];
-				current_state = stateById;
+				// current_state = stateById;
 
 				tool_tip.show();
 				var tipSVG = d3.select('#tipDiv').append('svg').attr('width', 220).attr('height', 55);
@@ -192,20 +194,20 @@ function renderChoropleth() {
 					.attr('x', 0)
 					.attr('y', 18);
 
-				tipSVG
-					.append('text')
-					.attr('class', 'state-name')
-					.text(function() {
-						if (current_county == undefined) {
-							return '';
-						} else {
-							return current_state;
-						}
-					})
-					// .transition()
-					// .duration(1000)
-					.attr('x', 0)
-					.attr('y', 35);
+				// tipSVG
+				// 	.append('text')
+				// 	.attr('class', 'state-name')
+				// 	.text(function() {
+				// 		if (current_county == undefined) {
+				// 			return '';
+				// 		// } else {
+				// 		// 	return current_state;
+				// 		}
+				// 	})
+				// .transition()
+				// .duration(1000)
+				// .attr('x', 0)
+				// .attr('y', 35);
 			})
 			.on('mouseout', tool_tip.hide);
 
@@ -375,7 +377,7 @@ function renderChoroplethOverTime() {
 			d.cases = +d.cases;
 			rateById[d.fips] = +d.cases;
 			nameById[d.fips] = d.county;
-			stateById = d.state;
+			// d.stateById = d.state;
 			d.date_old = d.date;
 			d.date = dateFunction(d.date);
 		});
@@ -415,6 +417,7 @@ function renderChoroplethOverTime() {
 
 		// Start a transition that interpolates the data based on year.
 		svg.transition().duration(10000).ease(d3.easeLinear).tween('date', tweenDate);
+		radius.domain([ 0, d3.max(overdoses, (d) => d.cases) ]);
 
 		counties = svg
 			.append('g')
@@ -437,7 +440,7 @@ function renderChoroplethOverTime() {
 				// console.log(current_position[0]);
 
 				current_county = nameById[d.id];
-				current_state = stateById;
+				// current_state = d.stateById;
 
 				tool_tip.show();
 				var tipSVG = d3.select('#tipDiv').append('svg').attr('width', 220).attr('height', 55);
@@ -482,20 +485,20 @@ function renderChoroplethOverTime() {
 					.attr('x', 0)
 					.attr('y', 18);
 
-				tipSVG
-					.append('text')
-					.attr('class', 'state-name')
-					.text(function() {
-						if (current_county == undefined) {
-							return '';
-						} else {
-							return current_state;
-						}
-					})
-					// .transition()
-					// .duration(1000)
-					.attr('x', 0)
-					.attr('y', 35);
+				// tipSVG
+				// 	.append('text')
+				// 	.attr('class', 'state-name')
+				// 	.text(function() {
+				// 		if (current_county == undefined) {
+				// 			return '';
+				// 		// } else {
+				// 		// 	return current_state;
+				// 		}
+				// 	})
+				// .transition()
+				// .duration(1000)
+				// .attr('x', 0)
+				// .attr('y', 35);
 			})
 			.on('mouseout', tool_tip.hide)
 			.call(style, currentDate);
@@ -655,7 +658,7 @@ function renderBubble() {
 			d.cases = +d.cases;
 			rateById[d.fips] = +d.cases;
 			nameById[d.fips] = d.county;
-			stateById[d.fips] = d.state;
+			// d.stateById = d.state;
 		});
 
 		radius.domain([ 0, d3.max(covid_data, (d) => d.cases) ]);
