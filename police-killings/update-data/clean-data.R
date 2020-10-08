@@ -22,6 +22,9 @@ data <- data %>%
 
 clean_data <- data %>% 
   mutate(Year = lubridate::year(Date),
+         `Armed Status` = ifelse(`Armed Status` == 'Unarmed/Did Not Have an Actual Weapon', 'Unarmed', `Armed Status`),
+         # manually adding image of Shelly Porter III, per family request
+         `Image` = ifelse(Name == "Shelly Porter III", "https://i.imgur.com/64RKdEw.jpg", Image),
          `Agency responsible for death` = ifelse(is.na(`Agency responsible for death`), 'Unknown', `Agency responsible for death`),
          `Agencies responsible for death` = `Agency responsible for death`,
          `Agency responsible for death` = str_replace_all(`Agency responsible for death`, 
@@ -34,6 +37,7 @@ clean_data <- data %>%
          `Symptoms of mental illness?` = str_to_title(`Symptoms of mental illness?`),
          ID = row_number())
 
-write.csv(clean_data, here::here("data/cleaned_data.csv"), row.names = FALSE)
+
+readr::write_csv(clean_data, here::here("data/cleaned_data.csv"))
 
 source(here::here('update-data/pull-departments.R'))

@@ -78,8 +78,7 @@ var forceStrength = 0.2;
 // define svg
 var svg = d3.select('svg').attr('width', w).attr('height', h).call(responsivefy);
 
-/////// functions based on length etc, which change circle parameters, text, etc. according to length (number of people)
-
+// functions based on length etc, which change circle parameters, text, etc. according to length (number of people)
 chargeStrength = function(length) {
 	if (length > 120) {
 		return -5;
@@ -111,9 +110,9 @@ radiusFunction = function(length) {
 		} else if (length > 10) {
 			return window.innerWidth / 45;
 		} else if (length > 5) {
-			return window.innerWidth / 35;
+			return window.innerWidth / 2.255;
 		} else if (length <= 5) {
-			return window.innerWidth / 30;
+			return window.innerWidth / 2.25;
 		}
 	} else {
 		// console.log('Big screen');
@@ -130,9 +129,9 @@ radiusFunction = function(length) {
 		} else if (length > 60) {
 			return h / 40;
 		} else if (length > 40) {
-			return h / 35;
+			return h / 25;
 		} else if (length > 20) {
-			return h / 30;
+			return h / 22.5;
 		} else if (length > 10) {
 			return h / 25;
 		} else if (length > 5) {
@@ -204,11 +203,14 @@ var months = [
 ];
 
 dateFunction = function(date_str) {
+	// remove timezone
+	date_str = date_str.replace('T', '-');
 	temp_date = date_str.split('-');
 	return months[Number(temp_date[1] - 1)] + ' ' + temp_date[2] + ', ' + temp_date[0];
 };
 
 var radius = radiusFunction(length);
+console.log(radius);
 
 var body = d3.select('body');
 
@@ -230,7 +232,7 @@ d3.selection.prototype.moveToFront = function() {
 // create empty csv
 var csv;
 
-var selected_loc = 'Houston Police Department';
+var selected_loc = 'Houston Police Department (TX)';
 
 // d3.csv('https://raw.githubusercontent.com/connorrothschild/police-killings/master/data/cleaned_data.csv', function(
 d3.csv('data/cleaned_data.csv', function(data) {
@@ -307,7 +309,7 @@ d3.csv('data/cleaned_data.csv', function(data) {
 			d.Age = +d.Age;
 			d.r = radius;
 			d.x = w / 2;
-			d.y = h / 2;
+			d.y = h / 2.25;
 		});
 
 		function namePlural(length) {
@@ -322,7 +324,7 @@ d3.csv('data/cleaned_data.csv', function(data) {
 		d3
 			.select('.subtitle')
 			.html(
-				'From 2013-2019, the ' +
+				'From 2013-2020, the ' +
 					selected_loc +
 					' killed ' +
 					'<u>' +
@@ -344,6 +346,7 @@ d3.csv('data/cleaned_data.csv', function(data) {
 				})
 			)
 			.force('charge', d3.forceManyBody().strength(chargeStrength(length)))
+			// center the circles
 			.force('y', d3.forceY().y(h / 2.25))
 			.force('x', d3.forceX().x(w / 2))
 			.on('tick', ticked);
@@ -367,11 +370,12 @@ d3.csv('data/cleaned_data.csv', function(data) {
 		var images = patterns
 			.append('svg:image')
 			.attr('xlink:href', function(d) {
-				if (d.Image !== '') {
-					return d.Image;
-				} else {
-					return 'images/default.jpg';
-				}
+				//// UNCOMMENT TO RESTORE IMAGES
+				// if (d.Image !== '') {
+				// 	return d.Image;
+				// } else {
+				return 'images/default.jpg';
+				// }
 			})
 			// if image is undefined, return default
 			// https://stackoverflow.com/questions/39988146/how-to-catch-svg-image-fail-to-load-in-d3
@@ -391,15 +395,16 @@ d3.csv('data/cleaned_data.csv', function(data) {
 				return d.r;
 			})
 			.attr('cx', function(d, i) {
-				return 175 + 25 * i + 2 * i ** 2;
+				return d.x;
 			})
 			.attr('cy', function(d, i) {
-				return h / 2;
+				return d.y;
 			})
-			// append images to circles. see https://www.youtube.com/watch?v=FUJjNG4zkWY&t=261s
-			.attr('fill', function(d) {
-				return 'url(#' + d.ID + ')';
-			})
+			//// UNCOMMENT TO RESTORE IMAGES
+			//// append images to circles. see https://www.youtube.com/watch?v=FUJjNG4zkWY&t=261s
+			// .attr('fill', function(d) {
+			// 	return 'url(#' + d.ID + ')';
+			// })
 			.style('stroke', function(d, i) {
 				return color(d.Race);
 			})
@@ -416,7 +421,7 @@ d3.csv('data/cleaned_data.csv', function(data) {
 					// https://stackoverflow.com/questions/34454246/d3-js-conditional-tooltip-html
 					if (d.Name == 'Name withheld by police') {
 						return (
-							'From 2013-2019, the' +
+							'From 2013-2020, the' +
 							selected_loc +
 							' killed ' +
 							'<u>' +
@@ -428,7 +433,7 @@ d3.csv('data/cleaned_data.csv', function(data) {
 						);
 					} else {
 						return (
-							'From 2013-2019, then' +
+							'From 2013-2020, then' +
 							selected_loc +
 							' killed ' +
 							'<u>' +
@@ -530,7 +535,19 @@ d3.csv('data/cleaned_data.csv', function(data) {
 			hideTitles();
 
 			// @v4 Reset the 'x' force to draw the bubbles to the center.
-			simulation.force('x', d3.forceX().strength(forceStrength).x(w / 2));
+			simulation
+				// .forceSimulation(data)
+				// .force(
+				// 	'collide',
+				// 	d3.forceCollide(function(d) {
+				// 		return d.r;
+				// 	})
+				// )
+				// .force('charge', d3.forceManyBody().strength(chargeStrength(length)))
+				// center the circles
+				// .force('y', d3.forceY().y(h / 2.25))
+				.force('x', d3.forceX().x(w / 2));
+			// .on('tick', ticked);
 
 			// @v4 We can reset the alpha value and restart the simulation
 			simulation.alpha(1).restart();
@@ -547,18 +564,18 @@ d3.csv('data/cleaned_data.csv', function(data) {
 				groupBubbles();
 			} else {
 				showTitles(byVar, centerScale);
+
+				// @v4 Reset the 'x' force to draw the bubbles to their centers
+				simulation.force(
+					'x',
+					d3.forceX().strength(forceStrength).x(function(d) {
+						return centerScale(d[byVar]);
+					})
+				);
+
+				// @v4 We can reset the alpha value and restart the simulation
+				simulation.alpha(1).restart();
 			}
-
-			// @v4 Reset the 'x' force to draw the bubbles to their centers
-			simulation.force(
-				'x',
-				d3.forceX().strength(forceStrength).x(function(d) {
-					return centerScale(d[byVar]);
-				})
-			);
-
-			// @v4 We can reset the alpha value and restart the simulation
-			simulation.alpha(2).restart();
 		}
 
 		function hideTitles() {
@@ -663,7 +680,7 @@ d3.csv('data/cleaned_data.csv', function(data) {
 					// https://stackoverflow.com/questions/34454246/d3-js-conditional-tooltip-html
 					if (d.Name == 'Name withheld by police') {
 						return (
-							'From 2013-2019, the ' +
+							'From 2013-2020, the ' +
 							selected_loc +
 							' killed ' +
 							'<u>' +
@@ -675,7 +692,7 @@ d3.csv('data/cleaned_data.csv', function(data) {
 						);
 					} else {
 						return (
-							'From 2013-2019, the' +
+							'From 2013-2020, the' +
 							selected_loc +
 							' killed ' +
 							'<u>' +
@@ -743,11 +760,12 @@ d3.csv('data/cleaned_data.csv', function(data) {
 		images.data(data).exit().remove();
 
 		images.transition(t).attr('xlink:href', function(d) {
-			if (d.Image !== '') {
-				return d.Image;
-			} else {
-				return 'images/default.jpg';
-			}
+			//// UNCOMMENT TO RESOTRE IMAGES
+			// if (d.Image !== '') {
+			// 	return d.Image;
+			// } else {
+			return 'images/default.jpg';
+			// }
 		});
 
 		images = images.enter().append('svg:image').merge(images);
@@ -786,14 +804,16 @@ d3.csv('data/cleaned_data.csv', function(data) {
 
 		// redefine length, radius
 		var length = data.length;
+		console.log(length);
 		var radius = radiusFunction(length);
+		console.log(radius);
 
 		// redefine data
 		data.forEach(function(d) {
 			d.Age = +d.Age;
 			d.r = radius;
 			d.x = w / 2;
-			d.y = h / 2;
+			d.y = h / 2.25;
 		});
 
 		function namePlural(length) {
@@ -808,7 +828,7 @@ d3.csv('data/cleaned_data.csv', function(data) {
 		d3
 			.select('.subtitle')
 			.html(
-				'From 2013-2019, ' +
+				'From 2013-2020, ' +
 					'police in ' +
 					longStateName +
 					' killed ' +
@@ -854,11 +874,12 @@ d3.csv('data/cleaned_data.csv', function(data) {
 		var images = patterns
 			.append('svg:image')
 			.attr('xlink:href', function(d) {
-				if (d.Image !== '') {
-					return d.Image;
-				} else {
-					return 'images/default.jpg';
-				}
+				//// UNCOMMENT TO RESTORE IMAGES
+				// if (d.Image !== '') {
+				// 	return d.Image;
+				// } else {
+				return 'images/default.jpg';
+				// }
 			})
 			// if image is undefined, return default
 			// https://stackoverflow.com/questions/39988146/how-to-catch-svg-image-fail-to-load-in-d3
@@ -878,15 +899,16 @@ d3.csv('data/cleaned_data.csv', function(data) {
 				return d.r;
 			})
 			.attr('cx', function(d, i) {
-				return 175 + 25 * i + 2 * i ** 2;
+				return d.x;
 			})
 			.attr('cy', function(d, i) {
-				return h / 2;
+				return d.y;
 			})
-			// append images to circles. see https://www.youtube.com/watch?v=FUJjNG4zkWY&t=261s
-			.attr('fill', function(d) {
-				return 'url(#' + d.ID + ')';
-			})
+			//// UNCOMMENT TO RESTORE IMAGES
+			//// append images to circles. see https://www.youtube.com/watch?v=FUJjNG4zkWY&t=261s
+			// .attr('fill', function(d) {
+			// 	return 'url(#' + d.ID + ')';
+			// })
 			.style('stroke', function(d, i) {
 				return color(d.Race);
 			})
@@ -903,9 +925,9 @@ d3.csv('data/cleaned_data.csv', function(data) {
 					// https://stackoverflow.com/questions/34454246/d3-js-conditional-tooltip-html
 					if (d.Name == 'Name withheld by police') {
 						return (
-							'From 2013-2019, the' +
-							selected_loc +
-							' killed ' +
+							'From 2013-2020, the ' +
+							longStateName +
+							' police killed ' +
 							'<u>' +
 							length +
 							personFunction(length) +
@@ -915,9 +937,9 @@ d3.csv('data/cleaned_data.csv', function(data) {
 						);
 					} else {
 						return (
-							'From 2013-2019, then' +
-							selected_loc +
-							' killed ' +
+							'From 2013-2020, the ' +
+							longStateName +
+							' police killed ' +
 							'<u>' +
 							length +
 							personFunction(length) +
@@ -1017,7 +1039,19 @@ d3.csv('data/cleaned_data.csv', function(data) {
 			hideTitles();
 
 			// @v4 Reset the 'x' force to draw the bubbles to the center.
-			simulation.force('x', d3.forceX().strength(forceStrength).x(w / 2));
+			simulation
+				// .forceSimulation(data)
+				// .force(
+				// 	'collide',
+				// 	d3.forceCollide(function(d) {
+				// 		return d.r;
+				// 	})
+				// )
+				// .force('charge', d3.forceManyBody().strength(chargeStrength(length)))
+				// center the circles
+				// .force('y', d3.forceY().y(h / 2.25))
+				.force('x', d3.forceX().x(w / 2));
+			// .on('tick', ticked);
 
 			// @v4 We can reset the alpha value and restart the simulation
 			simulation.alpha(1).restart();
@@ -1031,23 +1065,21 @@ d3.csv('data/cleaned_data.csv', function(data) {
 			);
 
 			if (byVar == 'all') {
-				// console.log('Grouping together...');
 				groupBubbles();
 			} else {
-				// console.log('Splitting up...');
 				showTitles(byVar, centerScale);
+
+				// @v4 Reset the 'x' force to draw the bubbles to their centers
+				simulation.force(
+					'x',
+					d3.forceX().strength(forceStrength).x(function(d) {
+						return centerScale(d[byVar]);
+					})
+				);
+
+				// @v4 We can reset the alpha value and restart the simulation
+				simulation.alpha(1).restart();
 			}
-
-			// @v4 Reset the 'x' force to draw the bubbles to their centers
-			simulation.force(
-				'x',
-				d3.forceX().strength(forceStrength).x(function(d) {
-					return centerScale(d[byVar]);
-				})
-			);
-
-			// @v4 We can reset the alpha value and restart the simulation
-			simulation.alpha(2).restart();
 		}
 
 		function hideTitles() {
@@ -1152,8 +1184,8 @@ d3.csv('data/cleaned_data.csv', function(data) {
 					// https://stackoverflow.com/questions/34454246/d3-js-conditional-tooltip-html
 					if (d.Name == 'Name withheld by police') {
 						return (
-							'From 2013-2019, the ' +
-							selected_loc +
+							'From 2013-2020, police in ' +
+							longStateName +
 							' killed ' +
 							'<u>' +
 							length +
@@ -1164,8 +1196,8 @@ d3.csv('data/cleaned_data.csv', function(data) {
 						);
 					} else {
 						return (
-							'From 2013-2019, the' +
-							selected_loc +
+							'From 2013-2020, police in ' +
+							longStateName +
 							' killed ' +
 							'<u>' +
 							length +
@@ -1232,11 +1264,12 @@ d3.csv('data/cleaned_data.csv', function(data) {
 		images.data(data).exit().remove();
 
 		images.transition(t).attr('xlink:href', function(d) {
-			if (d.Image !== '') {
-				return d.Image;
-			} else {
-				return 'images/default.jpg';
-			}
+			//// UNCOMMENT TO RESTORE IMAGES
+			// if (d.Image !== '') {
+			// 	return d.Image;
+			// } else {
+			return 'images/default.jpg';
+			// }
 		});
 
 		images = images.enter().append('svg:image').merge(images);
@@ -1248,5 +1281,6 @@ d3.csv('data/cleaned_data.csv', function(data) {
 		simulation.nodes(data).on('tick', ticked).alpha(1).restart();
 	}
 
-	applyFilter('Houston Police Department');
+	// default on load
+	applyFilter('Houston Police Department (TX)');
 });
